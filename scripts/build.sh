@@ -6,13 +6,13 @@ BUILD_DIR="$PROJECT_ROOT/build"
 
 cd "$PROJECT_ROOT" || exit
 
-# echo "Wiping and rebuilding..."
+echo "Wiping and rebuilding..."
 
-# rm -rf "$BUILD_DIR"
-# mkdir -p "$BUILD_DIR"
+rm -rf "$BUILD_DIR"
+mkdir -p "$BUILD_DIR"
 
-# cmake -S "$PROJECT_ROOT" -B "$BUILD_DIR"
-# cmake --build "$BUILD_DIR" -- -j$(nproc 2>/dev/null || echo 1)
+cmake -S "$PROJECT_ROOT" -B "$BUILD_DIR"
+cmake --build "$BUILD_DIR" -- -j$(nproc 2>/dev/null || echo 1)
 
 cp -r "$BUILD_DIR/_deps/jsbsim_fetch-src/aircraft" "$PROJECT_ROOT/data"
 cp -r "$BUILD_DIR/_deps/jsbsim_fetch-src/engine" "$PROJECT_ROOT/data"
