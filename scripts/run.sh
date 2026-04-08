@@ -9,7 +9,7 @@ if [ -d "$BUILD_DIR" ]; then
   echo "Rebuilding..."
   cmake --build "$BUILD_DIR"
 
-  "$BUILD_DIR/Debug/bin/$BINARY_NAME"
+  "$BUILD_DIR/bin/$BINARY_NAME"
 else
   echo "Run build.sh first"
   exit 1
