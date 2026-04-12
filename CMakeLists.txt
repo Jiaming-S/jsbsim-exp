@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
 project(jsbsimexp VERSION 1.0 LANGUAGES C CXX)
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+# Look for SDL2
+find_package(SDL2 REQUIRED)
 
 # Setup FetchContent
 include(FetchContent)
@@ -51,6 +55,8 @@ FetchContent_MakeAvailable(magnum_fetch)
 # Build and link jsbsimexp executable
 add_executable(jsbsimexp 
   src/main.cpp
+  src/sim.cpp
+  src/utils.cpp
 )
 
 target_include_directories(jsbsimexp PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/types)
@@ -62,6 +68,7 @@ target_link_libraries(jsbsimexp PRIVATE
   Magnum::Sdl2Application 
   Magnum::GL
   Magnum::Shaders
+  SDL2::SDL2
 )
 
 target_compile_options(jsbsimexp PRIVATE -Os)

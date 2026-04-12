@@ -1,26 +1,72 @@
+// Magnum
+#include <Magnum/GL/DefaultFramebuffer.h>
+#include <Magnum/GL/Mesh.h>
+#include <Magnum/Platform/Sdl2Application.h>
+#include <Magnum/Shaders/VertexColorGL.h>
+
+// JSBSim
 #include <FGFDMExec.h>
 #include <initialization/FGInitialCondition.h>
+#include <models/FGInput.h>
 
+// Standard library
 #include <iostream>
+#include <memory>
+#include <string>
+
+// Project
+#include "sim.h"
+#include "utils.h"
+#include "../types/types.h"
 
 
-int main() {
-  std::shared_ptr<JSBSim::FGFDMExec> fdmexec = std::make_shared<JSBSim::FGFDMExec>();
-  fdmexec->SetAircraftPath(SGPath("data/aircraft"));
-  fdmexec->SetEnginePath(SGPath("data/engine"));
-  fdmexec->SetSystemsPath(SGPath("data/systems"));
-  fdmexec->SetOutputPath(SGPath("output"));
-  fdmexec->LoadModel("f16");
+class JSBSimVis: public Magnum::Platform::Application {
+  public:
+    explicit JSBSimVis(const Arguments& arguments);
 
-  std::shared_ptr<JSBSim::FGInitialCondition> ic = fdmexec->GetIC();
-  ic->InitializeIC();
-  ic->Load(SGPath("reset00.xml"));
+  private:
+    // Overloads
+    void tickEvent() override;
+    void drawEvent() override;
 
-  fdmexec->RunIC();
+    // Magnum
+    Magnum::GL::Mesh _mesh;
+    Magnum::Shaders::VertexColorGL2D _shader;
 
-  for (long it = 0; fdmexec->Run(); it++) {
-    if (it == 10) break;
-  }
+    // JSBSim
+    std::vector<std::unique_ptr<JSBSim::FGFDMExec>> _aircraft;
+};
 
-  return 0;
+JSBSimVis::JSBSimVis(const Arguments& arguments):
+  Magnum::Platform::Application{arguments, Configuration{}.setTitle("Visualizer")},
+  _mesh{},
+  _shader{},
+  _aircraft{}
+{
+  std::unique_ptr<JSBSim::FGFDMExec> red1 = std::make_unique<JSBSim::FGFDMExec>();
+  load_aircraft(*red1, "f16", "reset00.xml", true);
+  
+  std::unique_ptr<JSBSim::FGFDMExec> blue1 = std::make_unique<JSBSim::FGFDMExec>();
+  load_aircraft(*blue1, "f16", "reset00.xml", true);
+
+  this->_aircraft.push_back(std::move(red1));
+  this->_aircraft.push_back(std::move(blue1));
+}
+
+void JSBSimVis::tickEvent() {
+  
+}
+
+void JSBSimVis::drawEvent() {
+  Magnum::GL::defaultFramebuffer.clear(Magnum::GL::FramebufferClear::Color);
+
+
+  
+  swapBuffers();
+}
+
+int main(int argc, char** argv) {
+  Magnum::Platform::Application::Arguments args{argc, argv};
+  JSBSimVis app{args};
+  return app.exec();
 }

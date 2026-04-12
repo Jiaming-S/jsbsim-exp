@@ -7,7 +7,7 @@ BINARY_NAME="jsbsimexp"
 
 if [ -d "$BUILD_DIR" ]; then
   echo "Rebuilding..."
-  cmake --build "$BUILD_DIR" -- -j$(nproc 2>/dev/null || echo 16)
+  cmake --build "$BUILD_DIR" -- -j$(nproc 2>/dev/null || echo 16) || exit 1
 
   "$BUILD_DIR/bin/$BINARY_NAME"
 else
