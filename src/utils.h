@@ -12,9 +12,9 @@
 /// @param aircraft_ic_file 
 /// @param quiet 
 extern void load_aircraft(
-  JSBSim::FGFDMExec &aircraft_fdmexec,
-  std::string aircraft_type_dir,
-  std::string aircraft_ic_file,
-  bool quiet
+  std::unique_ptr<JSBSim::FGFDMExec> &aircraft_fdmexec,
+  std::string aircraft_type_dir = "f16",
+  std::string aircraft_ic_file = "reset00.xml",
+  bool quiet = true
 );
 

@@ -68,6 +68,8 @@ target_link_libraries(jsbsimexp PRIVATE
   Magnum::Sdl2Application 
   Magnum::GL
   Magnum::Shaders
+  Magnum::Primitives
+  Magnum::SceneGraph
   SDL2::SDL2
 )
 
