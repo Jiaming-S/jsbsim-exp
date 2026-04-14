@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Magnum/SceneGraph/Object.h>
 #include <Magnum/SceneGraph/MatrixTransformation3D.h>
 
@@ -14,6 +16,8 @@ namespace types {
     types::Object3D *model;
   };
 
-  
-
+  struct ModelPart {
+    Magnum::GL::Mesh mesh;
+    Magnum::Matrix4 transformation;
+  };
 }

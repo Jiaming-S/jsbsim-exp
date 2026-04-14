@@ -1,7 +1,7 @@
 #include "utils.h"
 
 void load_aircraft(
-  std::unique_ptr<JSBSim::FGFDMExec> &aircraft_fdmexec,
+  std::unique_ptr<JSBSim::FGFDMExec>& aircraft_fdmexec,
   std::string aircraft_type_dir,
   std::string aircraft_ic_file,
   bool quiet
@@ -27,4 +27,63 @@ void load_aircraft(
 
   // Restore original debug level
   JSBSim::FGJSBBase::debug_lvl = orig_debug_level;
+}
+
+// Recursively flatten GLTF
+void flatten_gltf_nodes(
+  Magnum::Trade::AbstractImporter& importer, 
+  Magnum::UnsignedInt node_id, 
+  const Magnum::Matrix4& parent_transform, 
+  std::vector<types::ModelPart>& parts
+) {
+                        
+  Corrade::Containers::Pointer<Magnum::Trade::ObjectData3D> object = importer.object3D(node_id);
+  if (!object) return;
+
+  Magnum::Matrix4 absolute_transform = parent_transform * object->transformation();
+  if (object->instanceType() == Magnum::Trade::ObjectInstanceType3D::Mesh) {
+    Corrade::Containers::Optional<Magnum::Trade::MeshData> meshData = importer.mesh(object->instance());
+    if (meshData) parts.push_back({Magnum::MeshTools::compile(*meshData), absolute_transform});
+  }
+
+  for (Magnum::UnsignedInt child_id : object->children()) {
+    flatten_gltf_nodes(importer, child_id, absolute_transform, parts);
+  }
+}
+
+void load_meshes(
+  std::unordered_map<std::string, std::vector<types::ModelPart>>& _meshes,
+  const std::vector<std::pair<std::string, std::string>>& to_import
+) {
+  Corrade::PluginManager::Manager<Magnum::Trade::AbstractImporter> manager;
+  Corrade::Containers::Pointer<Magnum::Trade::AbstractImporter> importer = manager.loadAndInstantiate("AnySceneImporter");
+  assert(importer);
+
+  for (const auto& item : to_import) {
+    const std::string& model_name = item.first;
+    const std::string& model_filepath = item.second;
+
+    if (!importer->openFile(model_filepath)) continue;
+
+    std::vector<types::ModelPart> model_parts;
+
+    // Start flattening from default scene root
+    if (importer->defaultScene() != -1) {
+      Corrade::Containers::Optional<Magnum::Trade::SceneData> scene = importer->scene(importer->defaultScene());
+      if (scene) {
+        for(Magnum::UnsignedInt root_id : scene->children3D()) {
+          flatten_gltf_nodes(*importer, root_id, Magnum::Matrix4{}, model_parts);
+        }
+      }
+    }
+    else {
+      // If there is no scene hierarchy
+      for(Magnum::UnsignedInt i = 0; i < importer->meshCount(); ++i) {
+        Corrade::Containers::Optional<Magnum::Trade::MeshData> meshData = importer->mesh(i);
+        if (meshData) model_parts.push_back({Magnum::MeshTools::compile(*meshData), Magnum::Matrix4{}});
+      }
+    }
+
+    _meshes[model_name] = std::move(model_parts);
+  }
 }

@@ -49,8 +49,23 @@ set(MAGNUM_WITH_GL ON CACHE BOOL "Enable OpenGL Wrapper" FORCE)
 set(MAGNUM_WITH_SHADERS ON CACHE BOOL "Enable Built-in Shaders" FORCE)
 set(MAGNUM_WITH_PRIMITIVES ON CACHE BOOL "Enable 3D Primitives" FORCE)
 set(MAGNUM_BUILD_TESTS OFF CACHE BOOL "Disable Magnum Tests" FORCE)
+set(MAGNUM_WITH_TRADE ON CACHE BOOL "Enable Trade library" FORCE)
+set(MAGNUM_BUILD_PLUGINS_STATIC ON CACHE BOOL "Bake plugins into the executable" FORCE)
+set(MAGNUM_WITH_ANYSCENEIMPORTER ON CACHE BOOL "Enable AnySceneImporter plugin" FORCE)
+set(MAGNUM_WITH_ANYIMAGEIMPORTER ON CACHE BOOL "Enable AnyImageImporter plugin" FORCE)
 
 FetchContent_MakeAvailable(magnum_fetch)
+
+# Fetch Magnum Plugins
+FetchContent_Declare(
+  magnum_plugins_fetch
+  GIT_REPOSITORY https://github.com/mosra/magnum-plugins.git
+  GIT_TAG        master
+)
+
+set(MAGNUM_WITH_TINYGLTFIMPORTER ON CACHE BOOL "Enable TinyGltfImporter plugin" FORCE)
+
+FetchContent_MakeAvailable(magnum_plugins_fetch)
 
 # Build and link jsbsimexp executable
 add_executable(jsbsimexp 
@@ -70,6 +85,9 @@ target_link_libraries(jsbsimexp PRIVATE
   Magnum::Shaders
   Magnum::Primitives
   Magnum::SceneGraph
+  Magnum::Trade
+  AnySceneImporter
+  TinyGltfImporter
   SDL2::SDL2
 )
 

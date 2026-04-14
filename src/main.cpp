@@ -4,6 +4,7 @@
 #include <Magnum/GL/Renderer.h>
 #include <Magnum/Math/Color.h>
 #include <Magnum/MeshTools/Compile.h>
+#include <Magnum/MeshTools/Copy.h>
 #include <Magnum/Platform/Sdl2Application.h>
 #include <Magnum/Primitives/Cube.h>
 #include <Magnum/SceneGraph/Camera.h>
@@ -14,6 +15,9 @@
 #include <Magnum/Shaders/PhongGL.h>
 #include <Magnum/Trade/MeshData.h>
 #include <Magnum/Timeline.h>
+#include <Magnum/Trade/AbstractImporter.h>
+#include <Magnum/Trade/SceneData.h>
+#include <Magnum/GL/Texture.h>
 
 // JSBSim
 #include <FGFDMExec.h>
@@ -24,6 +28,8 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <unordered_map>
+#include <vector>
 
 // Project
 #include "sim.h"
@@ -73,16 +79,15 @@ class JSBSimVisualizer: public Magnum::Platform::Application {
     void _moveCameraMount();
 
     // Magnum
-    Magnum::GL::Mesh _mesh;
     Magnum::Shaders::PhongGL _shader;
     Magnum::SceneGraph::DrawableGroup3D _drawables;
+    std::unordered_map<std::string, std::vector<types::ModelPart>> _meshes;
 
     Magnum::Timeline _timeline;
-
     types::Scene3D _scene;
 
     // Input
-    std::map<KeyEvent::Key, bool> _keys_down;
+    std::unordered_map<Sdl2Application::Key, bool> _keys_down;
 
     // Camera
     types::Object3D *_mount, *_revolut;
@@ -99,7 +104,11 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::DepthTest);
 
   // Load meshes and shaders
-  this->_mesh = Magnum::MeshTools::compile(Magnum::Primitives::cubeSolid());
+  std::vector<std::pair<std::string, std::string>> to_import = {
+    {"f16", "models/f16_low_poly/scene.gltf"},
+  };
+  
+  load_meshes(_meshes, to_import);
 
   // Load and setup camera
   _mount = new types::Object3D{&_scene};
@@ -119,19 +128,27 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   std::unique_ptr<JSBSim::FGFDMExec> red1 = std::make_unique<JSBSim::FGFDMExec>();
   types::Object3D *red1_aircraft_object = new types::Object3D{&_scene};
   load_aircraft(red1, "f16", "reset00.xml", true);
-  new ColoredDrawable{*red1_aircraft_object, _shader, _mesh, _drawables};
-  this->_aircraft.push_back(types::AircraftHandle{std::move(red1),  red1_aircraft_object});
+  _aircraft.push_back(types::AircraftHandle{std::move(red1),  red1_aircraft_object});
+  for(auto& part : _meshes["f16"]) {
+    types::Object3D *part_node = new types::Object3D{red1_aircraft_object};
+    part_node->setTransformation(part.transformation);
+    new ColoredDrawable{*part_node, _shader, part.mesh, _drawables};
+  }
   
   std::unique_ptr<JSBSim::FGFDMExec> blue1 = std::make_unique<JSBSim::FGFDMExec>();
   types::Object3D *blue1_aircraft_object = new types::Object3D{&_scene};
   load_aircraft(blue1, "f16", "reset00.xml", true);
-  new ColoredDrawable{*blue1_aircraft_object, _shader, _mesh, _drawables};
-  this->_aircraft.push_back(types::AircraftHandle{std::move(blue1), blue1_aircraft_object});
+  _aircraft.push_back(types::AircraftHandle{std::move(blue1), blue1_aircraft_object});
+  for(auto& part : _meshes["f16"]) {
+    types::Object3D *part_node = new types::Object3D{red1_aircraft_object};
+    part_node->setTransformation(part.transformation);
+    new ColoredDrawable{*part_node, _shader, part.mesh, _drawables};
+  }
 
   // Start Magnum timeline
   _timeline.start();
   // Enable VSync
-  this->setSwapInterval(1);
+  setSwapInterval(1);
 }
 
 void JSBSimVisualizer::tickEvent() {
@@ -142,15 +159,15 @@ void JSBSimVisualizer::_moveCameraMount() {
   const float speed = 0.1f;
   const auto speed_rotation = 1.0_degf;
 
-  if(_keys_down[KeyEvent::Key::Up])    _revolut->rotateLocal( speed_rotation, Magnum::Vector3::xAxis());
-  if(_keys_down[KeyEvent::Key::Down])  _revolut->rotateLocal(-speed_rotation, Magnum::Vector3::xAxis());
+  if(_keys_down[Sdl2Application::Key::Up])    _revolut->rotateLocal( speed_rotation, Magnum::Vector3::xAxis());
+  if(_keys_down[Sdl2Application::Key::Down])  _revolut->rotateLocal(-speed_rotation, Magnum::Vector3::xAxis());
   
-  if(_keys_down[KeyEvent::Key::Left]) {
+  if(_keys_down[Sdl2Application::Key::Left]) {
     Magnum::Matrix4 rot = Magnum::Matrix4::rotation(speed_rotation, Magnum::Vector3::yAxis());
     _revolut->setTransformation(rot * _revolut->transformation());
   }
 
-  if(_keys_down[KeyEvent::Key::Right]) {
+  if(_keys_down[Sdl2Application::Key::Right]) {
     Magnum::Matrix4 rot = Magnum::Matrix4::rotation(-speed_rotation, Magnum::Vector3::yAxis());
     _revolut->setTransformation(rot * _revolut->transformation());
   }
@@ -158,20 +175,20 @@ void JSBSimVisualizer::_moveCameraMount() {
   Magnum::Vector3 forward = _revolut->transformation().backward();
   Magnum::Vector3 right   = _revolut->transformation().right();
 
-  if(_keys_down[KeyEvent::Key::W]) _mount->translate(forward * -speed);
-  if(_keys_down[KeyEvent::Key::S]) _mount->translate(forward *  speed);
-  if(_keys_down[KeyEvent::Key::A]) _mount->translate(right * -speed);
-  if(_keys_down[KeyEvent::Key::D]) _mount->translate(right *  speed);
+  if(_keys_down[Sdl2Application::Key::W]) _mount->translate(forward * -speed);
+  if(_keys_down[Sdl2Application::Key::S]) _mount->translate(forward *  speed);
+  if(_keys_down[Sdl2Application::Key::A]) _mount->translate(right * -speed);
+  if(_keys_down[Sdl2Application::Key::D]) _mount->translate(right *  speed);
   
-  if(_keys_down[KeyEvent::Key::Space])     _mount->translate(Magnum::Vector3::yAxis( speed));
-  if(_keys_down[KeyEvent::Key::LeftShift]) _mount->translate(Magnum::Vector3::yAxis(-speed));
+  if(_keys_down[Sdl2Application::Key::Space])     _mount->translate(Magnum::Vector3::yAxis( speed));
+  if(_keys_down[Sdl2Application::Key::LeftShift]) _mount->translate(Magnum::Vector3::yAxis(-speed));
 }
 
 void JSBSimVisualizer::drawEvent() {
   _timeline.nextFrame();
   Magnum::GL::defaultFramebuffer.clear(Magnum::GL::FramebufferClear::Color | Magnum::GL::FramebufferClear::Depth);
 
-  this->_moveCameraMount();
+  _moveCameraMount();
   _camera->draw(_drawables);
   
   swapBuffers();

@@ -1,10 +1,23 @@
 #pragma once
 
+#include <Magnum/GL/Mesh.h>
+#include <Magnum/Trade/AbstractImporter.h>
+#include <Magnum/Trade/MeshData.h>
+#include <Magnum/MeshTools/Compile.h>
+#include <Magnum/Trade/SceneData.h>
+#include <Magnum/Trade/ObjectData3D.h>
+#include <Corrade/PluginManager/Manager.h>
+#include <Corrade/Containers/Optional.h>
+#include <Corrade/Utility/Debug.h>
 #include <FGFDMExec.h>
 #include <initialization/FGInitialCondition.h>
 
 #include <memory>
+#include <unordered_map>
+#include <vector>
 #include <string>
+
+#include "../types/types.h"
 
 /// @brief Loads and initializes an aircraft FGFDMExec
 /// @param aircraft_fdmexec 
@@ -12,9 +25,16 @@
 /// @param aircraft_ic_file 
 /// @param quiet 
 extern void load_aircraft(
-  std::unique_ptr<JSBSim::FGFDMExec> &aircraft_fdmexec,
+  std::unique_ptr<JSBSim::FGFDMExec>& aircraft_fdmexec,
   std::string aircraft_type_dir = "f16",
   std::string aircraft_ic_file = "reset00.xml",
   bool quiet = true
 );
 
+/// @brief Loads all meshes of a gltf as ModelParts into a vector, then publishes to shared _meshes hashmap
+/// @param _meshes 
+/// @param to_import 
+extern void load_meshes(
+  std::unordered_map<std::string, std::vector<types::ModelPart>>& _meshes,
+  const std::vector<std::pair<std::string, std::string>>& to_import
+);
