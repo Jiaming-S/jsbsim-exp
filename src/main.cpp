@@ -13,6 +13,7 @@
 #include <Magnum/SceneGraph/Scene.h>
 #include <Magnum/Shaders/PhongGL.h>
 #include <Magnum/Trade/MeshData.h>
+#include <Magnum/Timeline.h>
 
 // JSBSim
 #include <FGFDMExec.h>
@@ -66,17 +67,26 @@ class JSBSimVisualizer: public Magnum::Platform::Application {
     void tickEvent() override;
     void drawEvent() override;
     void keyPressEvent(KeyEvent& event) override;
+    void keyReleaseEvent(KeyEvent& event) override;
+
+    // Private Methods
+    void _moveCameraMount();
 
     // Magnum
     Magnum::GL::Mesh _mesh;
     Magnum::Shaders::PhongGL _shader;
     Magnum::SceneGraph::DrawableGroup3D _drawables;
 
+    Magnum::Timeline _timeline;
+
     types::Scene3D _scene;
 
+    // Input
+    std::map<KeyEvent::Key, bool> _keys_down;
+
     // Camera
-    Magnum::SceneGraph::Camera3D* _camera;
-    types::Object3D * _mount;
+    types::Object3D *_mount, *_revolut;
+    Magnum::SceneGraph::Camera3D *_camera;
 
     // JSBSim
     std::vector<types::AircraftHandle> _aircraft;
@@ -93,9 +103,9 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
 
   // Load and setup camera
   _mount = new types::Object3D{&_scene};
-  _mount->translate(Magnum::Vector3::zAxis(10.0f));
+  _revolut = new types::Object3D{_mount};
 
-  _camera = new Magnum::SceneGraph::Camera3D{*_mount};
+  _camera = new Magnum::SceneGraph::Camera3D{*_revolut};
   _camera->setProjectionMatrix(
     Magnum::Matrix4::perspectiveProjection(
       35.0_degf,
@@ -117,15 +127,51 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   load_aircraft(blue1, "f16", "reset00.xml", true);
   new ColoredDrawable{*blue1_aircraft_object, _shader, _mesh, _drawables};
   this->_aircraft.push_back(types::AircraftHandle{std::move(blue1), blue1_aircraft_object});
+
+  // Start Magnum timeline
+  _timeline.start();
+  // Enable VSync
+  this->setSwapInterval(1);
 }
 
 void JSBSimVisualizer::tickEvent() {
   
 }
 
+void JSBSimVisualizer::_moveCameraMount() {
+  const float speed = 0.1f;
+  const auto speed_rotation = 1.0_degf;
+
+  if(_keys_down[KeyEvent::Key::Up])    _revolut->rotateLocal( speed_rotation, Magnum::Vector3::xAxis());
+  if(_keys_down[KeyEvent::Key::Down])  _revolut->rotateLocal(-speed_rotation, Magnum::Vector3::xAxis());
+  
+  if(_keys_down[KeyEvent::Key::Left]) {
+    Magnum::Matrix4 rot = Magnum::Matrix4::rotation(speed_rotation, Magnum::Vector3::yAxis());
+    _revolut->setTransformation(rot * _revolut->transformation());
+  }
+
+  if(_keys_down[KeyEvent::Key::Right]) {
+    Magnum::Matrix4 rot = Magnum::Matrix4::rotation(-speed_rotation, Magnum::Vector3::yAxis());
+    _revolut->setTransformation(rot * _revolut->transformation());
+  }
+
+  Magnum::Vector3 forward = _revolut->transformation().backward();
+  Magnum::Vector3 right   = _revolut->transformation().right();
+
+  if(_keys_down[KeyEvent::Key::W]) _mount->translate(forward * -speed);
+  if(_keys_down[KeyEvent::Key::S]) _mount->translate(forward *  speed);
+  if(_keys_down[KeyEvent::Key::A]) _mount->translate(right * -speed);
+  if(_keys_down[KeyEvent::Key::D]) _mount->translate(right *  speed);
+  
+  if(_keys_down[KeyEvent::Key::Space])     _mount->translate(Magnum::Vector3::yAxis( speed));
+  if(_keys_down[KeyEvent::Key::LeftShift]) _mount->translate(Magnum::Vector3::yAxis(-speed));
+}
+
 void JSBSimVisualizer::drawEvent() {
+  _timeline.nextFrame();
   Magnum::GL::defaultFramebuffer.clear(Magnum::GL::FramebufferClear::Color | Magnum::GL::FramebufferClear::Depth);
 
+  this->_moveCameraMount();
   _camera->draw(_drawables);
   
   swapBuffers();
@@ -133,31 +179,12 @@ void JSBSimVisualizer::drawEvent() {
 }
 
 void JSBSimVisualizer::keyPressEvent(KeyEvent& event) {
-  const float moveSpeed = 0.5f;
-  const auto rotSpeed = 5.0_degf;
+  _keys_down[event.key()] = true;
+  event.setAccepted();
+}
 
-  switch(event.key()) {
-    // Translation (Move Camera)
-    case KeyEvent::Key::W: _mount->translateLocal(Magnum::Vector3::zAxis(-moveSpeed)); break;
-    case KeyEvent::Key::S: _mount->translateLocal(Magnum::Vector3::zAxis( moveSpeed)); break;
-    case KeyEvent::Key::A: _mount->translateLocal(Magnum::Vector3::xAxis(-moveSpeed)); break;
-    case KeyEvent::Key::D: _mount->translateLocal(Magnum::Vector3::xAxis( moveSpeed)); break;
-    case KeyEvent::Key::Space:     _mount->translateLocal(Magnum::Vector3::yAxis( moveSpeed)); break;
-    case KeyEvent::Key::LeftShift: _mount->translateLocal(Magnum::Vector3::yAxis(-moveSpeed)); break;
-    
-    // Rotation (Pitch and Yaw Camera)
-    case KeyEvent::Key::Up:   _mount->rotate( rotSpeed, Magnum::Vector3::xAxis()); break;
-    case KeyEvent::Key::Down: _mount->rotate(-rotSpeed, Magnum::Vector3::xAxis()); break;
-    case KeyEvent::Key::Q: _mount->rotate( rotSpeed, Magnum::Vector3::yAxis()); break;
-    case KeyEvent::Key::E: _mount->rotate(-rotSpeed, Magnum::Vector3::yAxis()); break;
-    
-    // Roll Camera
-    case KeyEvent::Key::Left: _mount->rotate( rotSpeed, Magnum::Vector3::zAxis()); break;
-    case KeyEvent::Key::Right:_mount->rotate(-rotSpeed, Magnum::Vector3::zAxis()); break;
-    
-    default: return;
-  }
-  
+void JSBSimVisualizer::keyReleaseEvent(KeyEvent& event) {
+  _keys_down[event.key()] = false;
   event.setAccepted();
 }
 
