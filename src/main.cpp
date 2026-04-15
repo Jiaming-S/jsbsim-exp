@@ -102,7 +102,13 @@ class JSBSimVisualizer: public Magnum::Platform::Application {
 };
 
 JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
-  : Magnum::Platform::Application{arguments, Configuration{}.setTitle("Visualizer")}
+  : Magnum::Platform::Application{
+      arguments,
+      Configuration{}
+        .setTitle("Visualizer")
+        .addWindowFlags(Magnum::Platform::Sdl2Application::Configuration::WindowFlag::Resizable)
+        .addWindowFlags(Magnum::Platform::Sdl2Application::Configuration::WindowFlag::Maximized)
+    }
 {
   // Enable depth test
   Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::DepthTest);
@@ -129,13 +135,13 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   );
 
   // Load and setup aircraft
-  utils::_construct_tmp_jsbsim_dir(_rs, "f16");
+  utils::_construct_tmp_jsbsim_dir(_rs, types::AircraftType::F16);
 
   std::unique_ptr<JSBSim::FGFDMExec> red1 = std::make_unique<JSBSim::FGFDMExec>();
   types::Object3D *red1_aircraft_object = new types::Object3D{&_scene};
   utils::load_aircraft(red1, types::AircraftType::F16, true);
   _aircraft.push_back(types::AircraftHandle{std::move(red1),  red1_aircraft_object});
-  for(auto& part : _meshes["f16"]) {
+  for (auto& part : _meshes["f16"]) {
     types::Object3D *part_node = new types::Object3D{red1_aircraft_object};
     part_node->setTransformation(part.transformation);
     new ColoredDrawable{*part_node, _shader, part.mesh, _drawables};
@@ -145,11 +151,14 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   types::Object3D *blue1_aircraft_object = new types::Object3D{&_scene};
   utils::load_aircraft(blue1, types::AircraftType::F16, true);
   _aircraft.push_back(types::AircraftHandle{std::move(blue1), blue1_aircraft_object});
-  for(auto& part : _meshes["f16"]) {
-    types::Object3D *part_node = new types::Object3D{red1_aircraft_object};
+  for (auto& part : _meshes["f16"]) {
+    types::Object3D *part_node = new types::Object3D{blue1_aircraft_object};
     part_node->setTransformation(part.transformation);
     new ColoredDrawable{*part_node, _shader, part.mesh, _drawables};
   }
+
+  blue1_aircraft_object->translate(Magnum::Vector3::zAxis(-30.0f));
+  blue1_aircraft_object->rotateLocal(180.0_degf, Magnum::Vector3::yAxis());
 
   // Start Magnum timeline
   _timeline.start();

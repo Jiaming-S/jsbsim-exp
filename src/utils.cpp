@@ -4,7 +4,7 @@ namespace utils {
 
 void _construct_tmp_jsbsim_dir(
   Corrade::Utility::Resource& _rs,
-  std::string aircraft_type
+  types::AircraftType aircraft_type
 ) {
   std::string tmp_dir = (*Corrade::Utility::Path::temporaryDirectory()) + "/jsbsim-flightmodels/";
   Magnum::Utility::Path::make(tmp_dir);
@@ -12,16 +12,19 @@ void _construct_tmp_jsbsim_dir(
   Magnum::Utility::Path::make(tmp_dir + "systems/");
   Magnum::Utility::Path::make(tmp_dir + "engine/");
 
-  Magnum::Utility::Path::make(tmp_dir + "aircraft/" + aircraft_type);
-  if (aircraft_type == "f16") {
-    Magnum::Utility::Path::write(tmp_dir + "aircraft/f16/f16.xml",     _rs.getString("assets/f16/flightmodel/f16.xml"));
-    Magnum::Utility::Path::write(tmp_dir + "aircraft/f16/reset00.xml", _rs.getString("assets/f16/flightmodel/reset00.xml"));
-
-    Magnum::Utility::Path::write(tmp_dir + "systems/hook.xml", _rs.getString("assets/f16/flightmodel/hook.xml"));
-    Magnum::Utility::Path::write(tmp_dir + "systems/pushback.xml", _rs.getString("assets/f16/flightmodel/pushback.xml"));
-
-    Magnum::Utility::Path::write(tmp_dir + "engine/F100-PW-229.xml", _rs.getString("assets/f16/flightmodel/F100-PW-229.xml"));
-    Magnum::Utility::Path::write(tmp_dir + "engine/direct.xml", _rs.getString("assets/f16/flightmodel/direct.xml"));
+  switch (aircraft_type) {
+    case types::AircraftType::F16:
+      // Fightmodel
+      Magnum::Utility::Path::write(tmp_dir + "aircraft/f16/f16.xml",     _rs.getString("assets/f16/flightmodel/f16.xml"));
+      Magnum::Utility::Path::write(tmp_dir + "aircraft/f16/reset00.xml", _rs.getString("assets/f16/flightmodel/reset00.xml"));
+      // Systems
+      Magnum::Utility::Path::write(tmp_dir + "systems/hook.xml", _rs.getString("assets/f16/flightmodel/hook.xml"));
+      Magnum::Utility::Path::write(tmp_dir + "systems/pushback.xml", _rs.getString("assets/f16/flightmodel/pushback.xml"));
+      // Engine
+      Magnum::Utility::Path::write(tmp_dir + "engine/F100-PW-229.xml", _rs.getString("assets/f16/flightmodel/F100-PW-229.xml"));
+      Magnum::Utility::Path::write(tmp_dir + "engine/direct.xml", _rs.getString("assets/f16/flightmodel/direct.xml"));
+      break;
+    default: break;
   }
 }
 

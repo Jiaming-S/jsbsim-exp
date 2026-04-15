@@ -25,7 +25,7 @@ namespace utils {
 
 extern void _construct_tmp_jsbsim_dir(
   Corrade::Utility::Resource& _rs,
-  std::string aircraft_type = "f16"
+  types::AircraftType aircraft_type = types::AircraftType::F16
 );
 
 /// @brief Loads and initializes an aircraft FGFDMExec
