@@ -97,5 +97,5 @@ target_link_libraries(jsbsimexp PRIVATE
   SDL2::SDL2
 )
 
-target_compile_options(jsbsimexp PRIVATE -Os)
+target_compile_options(jsbsimexp PRIVATE -Os -g) # TODO: remove debug
 target_compile_features(jsbsimexp PRIVATE cxx_std_17)

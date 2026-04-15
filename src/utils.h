@@ -48,4 +48,10 @@ extern void load_meshes(
   const std::vector<std::pair<std::string, std::string>>& to_import
 );
 
+/// Right Up Back
+extern Magnum::Vector3 as_magnum_RUB(float x, float y, float z);
+
+/// North East Down
+extern Magnum::Vector3 as_jsbsim_NED(float x, float y, float z);
+
 }

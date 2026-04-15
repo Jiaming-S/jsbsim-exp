@@ -14,6 +14,8 @@ void _construct_tmp_jsbsim_dir(
 
   switch (aircraft_type) {
     case types::AircraftType::F16:
+      Magnum::Utility::Path::make(tmp_dir + "aircraft/f16/");
+
       // Fightmodel
       Magnum::Utility::Path::write(tmp_dir + "aircraft/f16/f16.xml",     _rs.getString("assets/f16/flightmodel/f16.xml"));
       Magnum::Utility::Path::write(tmp_dir + "aircraft/f16/reset00.xml", _rs.getString("assets/f16/flightmodel/reset00.xml"));
@@ -57,6 +59,11 @@ void load_aircraft(
   switch (aircraft_type) {
     case types::F16:
       aircraft_ic->Load(SGPath("reset00.xml"));
+      aircraft_ic->SetAltitudeAGLFtIC(1234.5);
+      aircraft_ic->SetPhiDegIC(12.3);
+      aircraft_ic->SetPsiDegIC(45.6);
+      aircraft_ic->SetThetaDegIC(45.0);
+      aircraft_ic->SetVgroundFpsIC(432.1);
       break;
     default: break;
   }
@@ -126,6 +133,14 @@ void load_meshes(
 
     _meshes[model_name] = std::move(model_parts);
   }
+}
+
+Magnum::Vector3 as_magnum_RUB(float x, float y, float z) {
+  return Magnum::Vector3{y, -z, -x};
+}
+
+Magnum::Vector3 as_jsbsim_NED(float x, float y, float z) {
+  return Magnum::Vector3{-z, x, -y};
 }
 
 }

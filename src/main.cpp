@@ -23,7 +23,9 @@
 // JSBSim
 #include <FGFDMExec.h>
 #include <initialization/FGInitialCondition.h>
+#include <models/FGAircraft.h>
 #include <models/FGInput.h>
+#include <models/FGPropagate.h>
 
 // Standard library
 #include <iostream>
@@ -167,7 +169,9 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
 }
 
 void JSBSimVisualizer::tickEvent() {
-  
+  for (auto& cur : _aircraft) {
+    cur.fdmexec->Run();
+  }
 }
 
 void JSBSimVisualizer::_moveCameraMount() {
@@ -202,6 +206,24 @@ void JSBSimVisualizer::_moveCameraMount() {
 void JSBSimVisualizer::drawEvent() {
   _timeline.nextFrame();
   Magnum::GL::defaultFramebuffer.clear(Magnum::GL::FramebufferClear::Color | Magnum::GL::FramebufferClear::Depth);
+
+  for (auto& cur : _aircraft) {
+    std::shared_ptr<JSBSim::FGAircraft>  cur_aircraft =  cur.fdmexec->GetAircraft();
+    std::shared_ptr<JSBSim::FGPropagate> cur_propagate = cur.fdmexec->GetPropagate();
+
+    JSBSim::FGColumnVector3 euler = cur_propagate->GetEuler();
+    auto pitch = Magnum::Rad(euler.Entry(1));
+    auto roll  = Magnum::Rad(euler.Entry(2));
+    auto yaw   = Magnum::Rad(euler.Entry(3));
+    double x = 0.0;
+    double y = 0.0;
+    double z = 0.0;
+
+    cur.model->setTransformation(Magnum::Matrix4::translation(utils::as_magnum_RUB(x, y, z)))
+      .rotateY(-yaw)
+      .rotateX(pitch)
+      .rotateZ(roll);
+  }
 
   _moveCameraMount();
   _camera->draw(_drawables);
