@@ -1,5 +1,7 @@
 #include "utils.h"
 
+namespace utils {
+
 void _construct_tmp_jsbsim_dir(
   Corrade::Utility::Resource& _rs,
   std::string aircraft_type
@@ -25,8 +27,7 @@ void _construct_tmp_jsbsim_dir(
 
 void load_aircraft(
   std::unique_ptr<JSBSim::FGFDMExec>& aircraft_fdmexec,
-  std::string aircraft_type_dir,
-  std::string aircraft_ic_file,
+  types::AircraftType aircraft_type,
   bool quiet
 ) {
   // Store original debug level
@@ -37,15 +38,25 @@ void load_aircraft(
   std::string tmp_dir = (*Corrade::Utility::Path::temporaryDirectory()) + "/jsbsim-flightmodels/";
   
   // Import aircraft (default "f16")
-  aircraft_fdmexec->SetAircraftPath(SGPath(tmp_dir + "/aircraft"));
-  aircraft_fdmexec->SetEnginePath(SGPath(tmp_dir + "/engine"));
-  aircraft_fdmexec->SetSystemsPath(SGPath(tmp_dir + "/systems"));
-  aircraft_fdmexec->LoadModel(aircraft_type_dir);
+  aircraft_fdmexec->SetAircraftPath(SGPath(tmp_dir + "aircraft/"));
+  aircraft_fdmexec->SetEnginePath(SGPath(tmp_dir + "engine/"));
+  aircraft_fdmexec->SetSystemsPath(SGPath(tmp_dir + "systems/"));
+  switch (aircraft_type) {
+    case types::F16:
+      aircraft_fdmexec->LoadModel("f16");
+      break;
+    default: break;
+  }
 
   // Import aircraft initial conditions (default "reset00.xml")
   std::shared_ptr<JSBSim::FGInitialCondition> aircraft_ic = aircraft_fdmexec->GetIC();
   aircraft_ic->InitializeIC();
-  aircraft_ic->Load(SGPath(aircraft_ic_file));
+  switch (aircraft_type) {
+    case types::F16:
+      aircraft_ic->Load(SGPath("reset00.xml"));
+      break;
+    default: break;
+  }
 
   // Load initial conditions
   aircraft_fdmexec->RunIC();
@@ -112,4 +123,6 @@ void load_meshes(
 
     _meshes[model_name] = std::move(model_parts);
   }
+}
+
 }

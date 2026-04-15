@@ -21,7 +21,9 @@
 
 #include "../types/types.h"
 
-void _construct_tmp_jsbsim_dir(
+namespace utils {
+
+extern void _construct_tmp_jsbsim_dir(
   Corrade::Utility::Resource& _rs,
   std::string aircraft_type = "f16"
 );
@@ -33,8 +35,7 @@ void _construct_tmp_jsbsim_dir(
 /// @param quiet 
 extern void load_aircraft(
   std::unique_ptr<JSBSim::FGFDMExec>& aircraft_fdmexec,
-  std::string aircraft_type_dir = "f16",
-  std::string aircraft_ic_file = "reset00.xml",
+  types::AircraftType aircraft_type = types::AircraftType::F16,
   bool quiet = true
 );
 
@@ -46,3 +47,5 @@ extern void load_meshes(
   std::unordered_map<std::string, std::vector<types::ModelPart>>& _meshes,
   const std::vector<std::pair<std::string, std::string>>& to_import
 );
+
+}

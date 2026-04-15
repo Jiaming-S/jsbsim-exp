@@ -112,7 +112,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     {"f16", "assets/f16/f16.glb"},
   };
   
-  load_meshes(_rs, _meshes, to_import);
+  utils::load_meshes(_rs, _meshes, to_import);
 
   // Load and setup camera
   _mount = new types::Object3D{&_scene};
@@ -129,11 +129,11 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   );
 
   // Load and setup aircraft
-  _construct_tmp_jsbsim_dir(_rs, "f16");
+  utils::_construct_tmp_jsbsim_dir(_rs, "f16");
 
   std::unique_ptr<JSBSim::FGFDMExec> red1 = std::make_unique<JSBSim::FGFDMExec>();
   types::Object3D *red1_aircraft_object = new types::Object3D{&_scene};
-  load_aircraft(red1, "f16", "reset00.xml", true);
+  utils::load_aircraft(red1, types::AircraftType::F16, true);
   _aircraft.push_back(types::AircraftHandle{std::move(red1),  red1_aircraft_object});
   for(auto& part : _meshes["f16"]) {
     types::Object3D *part_node = new types::Object3D{red1_aircraft_object};
@@ -143,7 +143,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   
   std::unique_ptr<JSBSim::FGFDMExec> blue1 = std::make_unique<JSBSim::FGFDMExec>();
   types::Object3D *blue1_aircraft_object = new types::Object3D{&_scene};
-  load_aircraft(blue1, "f16", "reset00.xml", true);
+  utils::load_aircraft(blue1, types::AircraftType::F16, true);
   _aircraft.push_back(types::AircraftHandle{std::move(blue1), blue1_aircraft_object});
   for(auto& part : _meshes["f16"]) {
     types::Object3D *part_node = new types::Object3D{red1_aircraft_object};
