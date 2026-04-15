@@ -109,7 +109,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
 
   // Load meshes and shaders
   std::vector<std::pair<std::string, std::string>> to_import = {
-    {"f16", "models/f16/f16.glb"},
+    {"f16", "assets/f16/f16.glb"},
   };
   
   load_meshes(_rs, _meshes, to_import);

@@ -13,7 +13,3 @@ mkdir -p "$BUILD_DIR"
 
 cmake -S "$PROJECT_ROOT" -B "$BUILD_DIR"
 cmake --build "$BUILD_DIR" -- -j$(nproc 2>/dev/null || echo 16)
-
-cp -r "$BUILD_DIR/_deps/jsbsim_fetch-src/aircraft" "$PROJECT_ROOT/data"
-cp -r "$BUILD_DIR/_deps/jsbsim_fetch-src/engine" "$PROJECT_ROOT/data"
-cp -r "$BUILD_DIR/_deps/jsbsim_fetch-src/systems" "$PROJECT_ROOT/data"
