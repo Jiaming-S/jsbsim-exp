@@ -1,5 +1,28 @@
 #include "utils.h"
 
+void _construct_tmp_jsbsim_dir(
+  Corrade::Utility::Resource& _rs,
+  std::string aircraft_type
+) {
+  std::string tmp_dir = "/tmp/jsbsim-flightmodels/";
+  Magnum::Utility::Path::make(tmp_dir);
+  Magnum::Utility::Path::make(tmp_dir + "aircraft/");
+  Magnum::Utility::Path::make(tmp_dir + "systems/");
+  Magnum::Utility::Path::make(tmp_dir + "engine/");
+
+  Magnum::Utility::Path::make(tmp_dir + "aircraft/" + aircraft_type);
+  if (aircraft_type == "f16") {
+    Magnum::Utility::Path::write(tmp_dir + "aircraft/f16/f16.xml",     _rs.getString("data/aircraft/f16/f16.xml"));
+    Magnum::Utility::Path::write(tmp_dir + "aircraft/f16/reset00.xml", _rs.getString("data/aircraft/f16/reset00.xml"));
+    
+    Magnum::Utility::Path::write(tmp_dir + "systems/hook.xml", _rs.getString("data/aircraft/f16/Systems/hook.xml"));
+    Magnum::Utility::Path::write(tmp_dir + "systems/pushback.xml", _rs.getString("data/aircraft/f16/Systems/pushback.xml"));
+
+    Magnum::Utility::Path::write(tmp_dir + "engine/F100-PW-229.xml", _rs.getString("data/engine/F100-PW-229.xml"));
+    Magnum::Utility::Path::write(tmp_dir + "engine/direct.xml", _rs.getString("data/engine/direct.xml"));
+  }
+}
+
 void load_aircraft(
   std::unique_ptr<JSBSim::FGFDMExec>& aircraft_fdmexec,
   std::string aircraft_type_dir,
@@ -10,11 +33,10 @@ void load_aircraft(
   short orig_debug_level = JSBSim::FGJSBBase::debug_lvl;
   if (quiet) JSBSim::FGJSBBase::debug_lvl = 0; 
   
-  // Import aircraft type (default "f16")
-  aircraft_fdmexec->SetAircraftPath(SGPath("data/aircraft"));
-  aircraft_fdmexec->SetEnginePath(SGPath("data/engine"));
-  aircraft_fdmexec->SetSystemsPath(SGPath("data/systems"));
-  aircraft_fdmexec->SetOutputPath(SGPath("output"));
+  // Import aircraft (default "f16")
+  aircraft_fdmexec->SetAircraftPath(SGPath("/tmp/jsbsim-flightmodels/aircraft"));
+  aircraft_fdmexec->SetEnginePath(SGPath("/tmp/jsbsim-flightmodels/engine"));
+  aircraft_fdmexec->SetSystemsPath(SGPath("/tmp/jsbsim-flightmodels/systems"));
   aircraft_fdmexec->LoadModel(aircraft_type_dir);
 
   // Import aircraft initial conditions (default "reset00.xml")
@@ -52,18 +74,19 @@ void flatten_gltf_nodes(
 }
 
 void load_meshes(
+  Corrade::Utility::Resource& _rs,
   std::unordered_map<std::string, std::vector<types::ModelPart>>& _meshes,
   const std::vector<std::pair<std::string, std::string>>& to_import
 ) {
   Corrade::PluginManager::Manager<Magnum::Trade::AbstractImporter> manager;
-  Corrade::Containers::Pointer<Magnum::Trade::AbstractImporter> importer = manager.loadAndInstantiate("AnySceneImporter");
+  Corrade::Containers::Pointer<Magnum::Trade::AbstractImporter> importer = manager.loadAndInstantiate("TinyGltfImporter");
   assert(importer);
 
   for (const auto& item : to_import) {
     const std::string& model_name = item.first;
     const std::string& model_filepath = item.second;
 
-    if (!importer->openFile(model_filepath)) continue;
+    if (!importer->openData(_rs.getRaw(model_filepath))) continue;
 
     std::vector<types::ModelPart> model_parts;
 

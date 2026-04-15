@@ -18,6 +18,7 @@
 #include <Magnum/Trade/AbstractImporter.h>
 #include <Magnum/Trade/SceneData.h>
 #include <Magnum/GL/Texture.h>
+#include <Corrade/Utility/Resource.h>
 
 // JSBSim
 #include <FGFDMExec.h>
@@ -93,6 +94,9 @@ class JSBSimVisualizer: public Magnum::Platform::Application {
     types::Object3D *_mount, *_revolut;
     Magnum::SceneGraph::Camera3D *_camera;
 
+    // Resource manager
+    Corrade::Utility::Resource _rs{"assets"};
+
     // JSBSim
     std::vector<types::AircraftHandle> _aircraft;
 };
@@ -105,10 +109,10 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
 
   // Load meshes and shaders
   std::vector<std::pair<std::string, std::string>> to_import = {
-    {"f16", "models/f16_low_poly/scene.gltf"},
+    {"f16", "models/f16/f16.glb"},
   };
   
-  load_meshes(_meshes, to_import);
+  load_meshes(_rs, _meshes, to_import);
 
   // Load and setup camera
   _mount = new types::Object3D{&_scene};
@@ -125,6 +129,8 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   );
 
   // Load and setup aircraft
+  _construct_tmp_jsbsim_dir(_rs, "f16");
+
   std::unique_ptr<JSBSim::FGFDMExec> red1 = std::make_unique<JSBSim::FGFDMExec>();
   types::Object3D *red1_aircraft_object = new types::Object3D{&_scene};
   load_aircraft(red1, "f16", "reset00.xml", true);

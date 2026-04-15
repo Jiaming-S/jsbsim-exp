@@ -34,6 +34,7 @@ FetchContent_Declare(
 set(CORRADE_WITH_INTERCONNECT OFF CACHE BOOL "Disable Corrade Interconnect" FORCE)
 set(CORRADE_WITH_TESTSUITE OFF CACHE BOOL "Disable Corrade TestSuite" FORCE)
 set(CORRADE_BUILD_TESTS OFF CACHE BOOL "Disable Corrade Tests" FORCE)
+set(CORRADE_WITH_RC ON CACHE BOOL "Enable Corrade Resource Compiler" FORCE)
 
 FetchContent_MakeAvailable(corrade_fetch)
 
@@ -67,11 +68,15 @@ set(MAGNUM_WITH_TINYGLTFIMPORTER ON CACHE BOOL "Enable TinyGltfImporter plugin" 
 
 FetchContent_MakeAvailable(magnum_plugins_fetch)
 
+# Point to resources.conf file with files be packaged into binary
+corrade_add_resource(app_resources resources.conf)
+
 # Build and link jsbsimexp executable
 add_executable(jsbsimexp 
   src/main.cpp
   src/sim.cpp
   src/utils.cpp
+  ${app_resources}
 )
 
 target_include_directories(jsbsimexp PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/types)
@@ -88,6 +93,7 @@ target_link_libraries(jsbsimexp PRIVATE
   Magnum::Trade
   AnySceneImporter
   TinyGltfImporter
+  Corrade::Utility
   SDL2::SDL2
 )
 

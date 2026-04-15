@@ -9,6 +9,8 @@
 #include <Corrade/PluginManager/Manager.h>
 #include <Corrade/Containers/Optional.h>
 #include <Corrade/Utility/Debug.h>
+#include <Corrade/Utility/Path.h>
+#include <Corrade/Utility/Resource.h>
 #include <FGFDMExec.h>
 #include <initialization/FGInitialCondition.h>
 
@@ -18,6 +20,11 @@
 #include <string>
 
 #include "../types/types.h"
+
+void _construct_tmp_jsbsim_dir(
+  Corrade::Utility::Resource& _rs,
+  std::string aircraft_type = "f16"
+);
 
 /// @brief Loads and initializes an aircraft FGFDMExec
 /// @param aircraft_fdmexec 
@@ -35,6 +42,7 @@ extern void load_aircraft(
 /// @param _meshes 
 /// @param to_import 
 extern void load_meshes(
+  Corrade::Utility::Resource& _rs,
   std::unordered_map<std::string, std::vector<types::ModelPart>>& _meshes,
   const std::vector<std::pair<std::string, std::string>>& to_import
 );

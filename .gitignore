@@ -36,3 +36,6 @@ build/
 
 # JSBSim Data Directory
 data/
+
+# Models Data Directory
+models/
