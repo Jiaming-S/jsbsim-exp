@@ -17,9 +17,19 @@ enum AircraftType {
   F16,
 };
 
-struct AircraftHandle {
-  std::unique_ptr<JSBSim::FGFDMExec> fdmexec;
-  types::Object3D *model;
+enum AircraftInitialConditionType {
+  DEFAULT,
+  DEFAULT_OPPONENT,
+  ON_GROUND,
+  CUSTOM
+};
+
+struct AircraftInitialConditionConfig {
+  double altitude_agl_ft;
+  double true_airspeed_fps;
+  double roll_deg;
+  double pitch_deg;
+  double heading_deg;
 };
 
 struct ModelPart {

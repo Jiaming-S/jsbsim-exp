@@ -1,5 +1,11 @@
 #include "utils.h"
 
+#define PUSH_JSBSIM_DEBUG_LEVEL \
+  short orig_debug_level = JSBSim::FGJSBBase::debug_lvl; \
+  if (quiet) JSBSim::FGJSBBase::debug_lvl = 0; 
+#define POP_JSBSIM_DEBUG_LEVEL \
+  JSBSim::FGJSBBase::debug_lvl = orig_debug_level;
+
 namespace utils {
 
 void _construct_tmp_jsbsim_dir(
@@ -30,49 +36,45 @@ void _construct_tmp_jsbsim_dir(
   }
 }
 
-void load_aircraft(
-  std::unique_ptr<JSBSim::FGFDMExec>& aircraft_fdmexec,
+std::unique_ptr<JSBSim::FGFDMExec> load_aircraft(
   types::AircraftType aircraft_type,
+  std::string aircraft_type_string,
   bool quiet
 ) {
-  // Store original debug level
-  short orig_debug_level = JSBSim::FGJSBBase::debug_lvl;
-  if (quiet) JSBSim::FGJSBBase::debug_lvl = 0; 
+  PUSH_JSBSIM_DEBUG_LEVEL
+  std::unique_ptr<JSBSim::FGFDMExec> aircraft_fdmexec = std::make_unique<JSBSim::FGFDMExec>();
 
-  // Load from tmp dir
+  // Load and attach to tmp dir
   std::string tmp_dir = (*Corrade::Utility::Path::temporaryDirectory()) + "/jsbsim-flightmodels/";
-  
-  // Import aircraft (default "f16")
   aircraft_fdmexec->SetAircraftPath(SGPath(tmp_dir + "aircraft/"));
   aircraft_fdmexec->SetEnginePath(SGPath(tmp_dir + "engine/"));
   aircraft_fdmexec->SetSystemsPath(SGPath(tmp_dir + "systems/"));
-  switch (aircraft_type) {
-    case types::F16:
-      aircraft_fdmexec->LoadModel("f16");
-      break;
-    default: break;
+
+  // Import aircraft (default "f16")
+  if (!aircraft_fdmexec->LoadModel(aircraft_type_string)) {
+    std::cerr << "Failed to load model \"" << aircraft_type_string << "\" from tmp_dir \`" << tmp_dir << "\`" << std::endl;
+    return nullptr;
   }
 
-  // Import aircraft initial conditions (default "reset00.xml")
-  std::shared_ptr<JSBSim::FGInitialCondition> aircraft_ic = aircraft_fdmexec->GetIC();
+  POP_JSBSIM_DEBUG_LEVEL
+  
+  // Return unique_ptr
+  return std::move(aircraft_fdmexec);
+}
+
+void load_aircraft_ic_config(
+  std::shared_ptr<JSBSim::FGInitialCondition>& aircraft_ic,
+  types::AircraftInitialConditionConfig& config,
+  bool quiet
+) {
+  PUSH_JSBSIM_DEBUG_LEVEL
   aircraft_ic->InitializeIC();
-  switch (aircraft_type) {
-    case types::F16:
-      aircraft_ic->Load(SGPath("reset00.xml"));
-      aircraft_ic->SetAltitudeAGLFtIC(1234.5);
-      aircraft_ic->SetPhiDegIC(12.3);
-      aircraft_ic->SetPsiDegIC(45.6);
-      aircraft_ic->SetThetaDegIC(45.0);
-      aircraft_ic->SetVgroundFpsIC(432.1);
-      break;
-    default: break;
-  }
-
-  // Load initial conditions
-  aircraft_fdmexec->RunIC();
-
-  // Restore original debug level
-  JSBSim::FGJSBBase::debug_lvl = orig_debug_level;
+  aircraft_ic->SetAltitudeAGLFtIC(config.altitude_agl_ft);
+  aircraft_ic->SetVtrueFpsIC(config.true_airspeed_fps);
+  aircraft_ic->SetPhiDegIC(config.roll_deg);
+  aircraft_ic->SetThetaDegIC(config.pitch_deg);
+  aircraft_ic->SetPsiDegIC(config.heading_deg);
+  POP_JSBSIM_DEBUG_LEVEL
 }
 
 // Recursively flatten GLTF
@@ -132,6 +134,13 @@ void load_meshes(
     }
 
     _meshes[model_name] = std::move(model_parts);
+  }
+}
+
+std::string to_type_string(types::AircraftType& t) {
+  switch (t) {
+    case types::AircraftType::F16: return "f16";
+    default: return NULL;
   }
 }
 

@@ -35,36 +35,14 @@
 #include <vector>
 
 // Project
+#include "aircrafthandle.h"
+#include "coloreddrawable.h"
 #include "sim.h"
-#include "utils.h"
-#include "../types/types.h"
+#include "utils/utils.h"
+#include "types/types.h"
 
 // Literal operators
 using namespace Magnum::Math::Literals;
-
-
-class ColoredDrawable : public Magnum::SceneGraph::Drawable3D {
-  // Magnum
-  Magnum::Shaders::PhongGL& _shader;
-  Magnum::GL::Mesh& _mesh;
-
-  public:
-    explicit ColoredDrawable(types::Object3D& object, Magnum::Shaders::PhongGL& shader, Magnum::GL::Mesh& mesh, Magnum::SceneGraph::DrawableGroup3D& group)
-      : Magnum::SceneGraph::Drawable3D{object, &group}, _shader(shader), _mesh(mesh) {}
-
-  private:
-    void draw(const Magnum::Matrix4& transformationMatrix, Magnum::SceneGraph::Camera3D& camera) override;
-};
-
-void ColoredDrawable::draw(const Magnum::Matrix4& transformationMatrix, Magnum::SceneGraph::Camera3D& camera) {
-  // Apply camera and object transformations to the shader
-  _shader.setLightPositions({{7.0f, 5.0f, 2.5f, 0.0f}})
-    .setDiffuseColor(0x3bd267_rgbf)
-    .setTransformationMatrix(transformationMatrix)
-    .setNormalMatrix(transformationMatrix.normalMatrix())
-    .setProjectionMatrix(camera.projectionMatrix());
-  _mesh.draw(_shader);
-}
 
 
 class JSBSimVisualizer: public Magnum::Platform::Application {
@@ -100,7 +78,7 @@ class JSBSimVisualizer: public Magnum::Platform::Application {
     Corrade::Utility::Resource _rs{"assets"};
 
     // JSBSim
-    std::vector<types::AircraftHandle> _aircraft;
+    std::vector<AircraftHandle> _aircraft;
 };
 
 JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
@@ -132,35 +110,31 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
       35.0_degf,
       Magnum::Vector2{windowSize()}.aspectRatio(),
       0.01f,
-      100.0f
+      INFINITY
     )
   );
 
   // Load and setup aircraft
   utils::_construct_tmp_jsbsim_dir(_rs, types::AircraftType::F16);
 
-  std::unique_ptr<JSBSim::FGFDMExec> red1 = std::make_unique<JSBSim::FGFDMExec>();
-  types::Object3D *red1_aircraft_object = new types::Object3D{&_scene};
-  utils::load_aircraft(red1, types::AircraftType::F16, true);
-  _aircraft.push_back(types::AircraftHandle{std::move(red1),  red1_aircraft_object});
-  for (auto& part : _meshes["f16"]) {
-    types::Object3D *part_node = new types::Object3D{red1_aircraft_object};
-    part_node->setTransformation(part.transformation);
-    new ColoredDrawable{*part_node, _shader, part.mesh, _drawables};
-  }
-  
-  std::unique_ptr<JSBSim::FGFDMExec> blue1 = std::make_unique<JSBSim::FGFDMExec>();
-  types::Object3D *blue1_aircraft_object = new types::Object3D{&_scene};
-  utils::load_aircraft(blue1, types::AircraftType::F16, true);
-  _aircraft.push_back(types::AircraftHandle{std::move(blue1), blue1_aircraft_object});
-  for (auto& part : _meshes["f16"]) {
-    types::Object3D *part_node = new types::Object3D{blue1_aircraft_object};
-    part_node->setTransformation(part.transformation);
-    new ColoredDrawable{*part_node, _shader, part.mesh, _drawables};
-  }
+  auto red1_config = types::AircraftInitialConditionConfig{};
+  auto blue1_config = types::AircraftInitialConditionConfig{};
 
-  blue1_aircraft_object->translate(Magnum::Vector3::zAxis(-30.0f));
-  blue1_aircraft_object->rotateLocal(180.0_degf, Magnum::Vector3::yAxis());
+  AircraftHandle red1 = AircraftHandle{types::AircraftType::F16};
+  red1.with_fdmexec()
+    .with_ic(red1_config)
+    .with_model(new types::Object3D{&_scene})
+    .with_meshes(_meshes)
+    .link(_shader, _drawables);
+  _aircraft.push_back(std::move(red1));
+
+  AircraftHandle blue1 = AircraftHandle{types::AircraftType::F16};
+  blue1.with_fdmexec()
+    .with_ic(blue1_config)
+    .with_model(new types::Object3D{&_scene})
+    .with_meshes(_meshes)
+    .link(_shader, _drawables);
+  _aircraft.push_back(std::move(blue1));
 
   // Start Magnum timeline
   _timeline.start();
@@ -170,7 +144,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
 
 void JSBSimVisualizer::tickEvent() {
   for (auto& cur : _aircraft) {
-    cur.fdmexec->Run();
+    cur._fdmexec->Run();
   }
 }
 
@@ -208,18 +182,28 @@ void JSBSimVisualizer::drawEvent() {
   Magnum::GL::defaultFramebuffer.clear(Magnum::GL::FramebufferClear::Color | Magnum::GL::FramebufferClear::Depth);
 
   for (auto& cur : _aircraft) {
-    std::shared_ptr<JSBSim::FGAircraft>  cur_aircraft =  cur.fdmexec->GetAircraft();
-    std::shared_ptr<JSBSim::FGPropagate> cur_propagate = cur.fdmexec->GetPropagate();
+    std::shared_ptr<JSBSim::FGAircraft>  cur_aircraft =  cur._fdmexec->GetAircraft();
+    std::shared_ptr<JSBSim::FGPropagate> cur_propagate = cur._fdmexec->GetPropagate();
 
     JSBSim::FGColumnVector3 euler = cur_propagate->GetEuler();
     auto pitch = Magnum::Rad(euler.Entry(1));
     auto roll  = Magnum::Rad(euler.Entry(2));
     auto yaw   = Magnum::Rad(euler.Entry(3));
-    double x = 0.0;
-    double y = 0.0;
-    double z = 0.0;
 
-    cur.model->setTransformation(Magnum::Matrix4::translation(utils::as_magnum_RUB(x, y, z)))
+    double cur_alt = cur_propagate->GetAltitudeASL();
+    double radius  = cur_propagate->GetRadius();
+
+    double starting_lat_rad  = 0 * M_PI / 180.0;
+    double starting_long_rad = 0 * M_PI / 180.0;
+
+    double dlat_rad = (cur_propagate->GetLatitude() - starting_lat_rad);
+    double dlon_rad = (cur_propagate->GetLongitude() - starting_long_rad);
+
+    double north = dlat_rad * radius;
+    double east  = dlon_rad * radius * std::cos(cur_propagate->GetLatitude());
+    double down  = 0 - cur_alt;
+
+    cur._model->setTransformation(Magnum::Matrix4::translation(utils::as_magnum_RUB(north, east, down)))
       .rotateY(-yaw)
       .rotateX(pitch)
       .rotateZ(roll);

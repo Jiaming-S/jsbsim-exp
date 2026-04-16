@@ -74,8 +74,10 @@ corrade_add_resource(app_resources resources.conf)
 # Build and link jsbsimexp executable
 add_executable(jsbsimexp 
   src/main.cpp
+  src/aircrafthandle.cpp
+  src/coloreddrawable.cpp
   src/sim.cpp
-  src/utils.cpp
+  src/utils/utils.cpp
   ${app_resources}
 )
 

@@ -29,13 +29,23 @@ extern void _construct_tmp_jsbsim_dir(
 );
 
 /// @brief Loads and initializes an aircraft FGFDMExec
-/// @param aircraft_fdmexec 
-/// @param aircraft_type_dir 
-/// @param aircraft_ic_file 
+/// @param aircraft_type 
+/// @param aircraft_type_string 
 /// @param quiet 
-extern void load_aircraft(
-  std::unique_ptr<JSBSim::FGFDMExec>& aircraft_fdmexec,
+/// @return 
+extern std::unique_ptr<JSBSim::FGFDMExec> load_aircraft(
   types::AircraftType aircraft_type = types::AircraftType::F16,
+  std::string aircraft_type_string = "f16",
+  bool quiet = true
+);
+
+/// @brief Loads aircraft initial conditions given config
+/// @param aircraft_ic 
+/// @param config 
+/// @param quiet 
+extern void load_aircraft_ic_config(
+  std::shared_ptr<JSBSim::FGInitialCondition>& aircraft_ic,
+  types::AircraftInitialConditionConfig& config,
   bool quiet = true
 );
 
@@ -47,6 +57,9 @@ extern void load_meshes(
   std::unordered_map<std::string, std::vector<types::ModelPart>>& _meshes,
   const std::vector<std::pair<std::string, std::string>>& to_import
 );
+
+/// Conert aircraft type to corresponding type_string
+extern std::string to_type_string(types::AircraftType& t);
 
 /// Right Up Back
 extern Magnum::Vector3 as_magnum_RUB(float x, float y, float z);
