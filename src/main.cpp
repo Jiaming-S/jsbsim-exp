@@ -7,6 +7,7 @@
 #include <Magnum/MeshTools/Copy.h>
 #include <Magnum/Platform/Sdl2Application.h>
 #include <Magnum/Primitives/Cube.h>
+#include <Magnum/Primitives/Grid.h>
 #include <Magnum/SceneGraph/Camera.h>
 #include <Magnum/SceneGraph/Drawable.h>
 #include <Magnum/SceneGraph/MatrixTransformation3D.h>
@@ -62,7 +63,8 @@ class JSBSimVisualizer: public Magnum::Platform::Application {
     // Magnum
     Magnum::Shaders::PhongGL _shader;
     Magnum::SceneGraph::DrawableGroup3D _drawables;
-    std::unordered_map<std::string, std::vector<types::ModelPart>> _meshes;
+    std::unordered_map<std::string, Magnum::GL::Mesh> _meshes;
+    std::unordered_map<std::string, std::vector<types::ModelPart>> _aircraft_part_meshes;
 
     Magnum::Timeline _timeline;
     types::Scene3D _scene;
@@ -92,13 +94,24 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
 {
   // Enable depth test
   Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::DepthTest);
+  
+  // Enable draw lines between polygons
+  // Magnum::GL::Renderer::setPolygonMode(Magnum::GL::Renderer::PolygonMode::Line);
 
   // Load meshes and shaders
   std::vector<std::pair<std::string, std::string>> to_import = {
     {"f16", "assets/f16/f16.glb"},
   };
   
-  utils::load_meshes(_rs, _meshes, to_import);
+  utils::load_meshes(_rs, _aircraft_part_meshes, to_import);
+
+  // Add floor
+  types::Object3D *floor = new types::Object3D{&_scene};
+  floor->scale(Magnum::Vector3{100.0f, 0.01f, 100.0f})
+    .translateLocal(Magnum::Vector3{0.0f, -0.1f, 0.0f})
+    .rotateXLocal(1.5707_radf);
+  _meshes["floor_mesh"] = Magnum::MeshTools::compile(Magnum::Primitives::grid3DWireframe({100, 100}));
+  new ColoredDrawable{*floor, _shader, _meshes["floor_mesh"], _drawables};
 
   // Load and setup camera
   _mount = new types::Object3D{&_scene};
@@ -117,14 +130,31 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   // Load and setup aircraft
   utils::_construct_tmp_jsbsim_dir(_rs, types::AircraftType::F16);
 
-  auto red1_config = types::AircraftInitialConditionConfig{};
-  auto blue1_config = types::AircraftInitialConditionConfig{};
+  auto red1_config = types::AircraftInitialConditionConfig{
+    100.0f, // Altitude AGL ft
+    20.0f, // TAS ft/s
+   -10.0f,  // Roll Degrees
+    5.0f,   // Pitch Degrees
+    0.0f,   // Heading Degrees
+    12.0f,  // AoA Degrees
+    0.0f,   // Sideslip Degrees
+  };
+  
+  auto blue1_config = types::AircraftInitialConditionConfig{
+    100.0f, // Altitude AGL ft
+    20.0f,  // TAS ft/s
+    10.0f,  // Roll Degrees
+    5.0f,   // Pitch Degrees
+    0.0f,   // Heading Degrees
+    12.0f,  // AoA Degrees
+    0.0f,   // Sideslip Degrees
+  };
 
   AircraftHandle red1 = AircraftHandle{types::AircraftType::F16};
   red1.with_fdmexec()
     .with_ic(red1_config)
     .with_model(new types::Object3D{&_scene})
-    .with_meshes(_meshes)
+    .with_meshes(_aircraft_part_meshes)
     .link(_shader, _drawables);
   _aircraft.push_back(std::move(red1));
 
@@ -132,7 +162,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   blue1.with_fdmexec()
     .with_ic(blue1_config)
     .with_model(new types::Object3D{&_scene})
-    .with_meshes(_meshes)
+    .with_meshes(_aircraft_part_meshes)
     .link(_shader, _drawables);
   _aircraft.push_back(std::move(blue1));
 
@@ -149,8 +179,10 @@ void JSBSimVisualizer::tickEvent() {
 }
 
 void JSBSimVisualizer::_moveCameraMount() {
-  const float speed = 0.1f;
-  const auto speed_rotation = 1.0_degf;
+  float speed = 0.1f;
+  auto speed_rotation = 1.0_degf;
+
+  if(_keys_down[Sdl2Application::Key::LeftShift]) speed *= 5.0f;
 
   if(_keys_down[Sdl2Application::Key::Up])    _revolut->rotateLocal( speed_rotation, Magnum::Vector3::xAxis());
   if(_keys_down[Sdl2Application::Key::Down])  _revolut->rotateLocal(-speed_rotation, Magnum::Vector3::xAxis());
@@ -174,7 +206,7 @@ void JSBSimVisualizer::_moveCameraMount() {
   if(_keys_down[Sdl2Application::Key::D]) _mount->translate(right *  speed);
   
   if(_keys_down[Sdl2Application::Key::Space])     _mount->translate(Magnum::Vector3::yAxis( speed));
-  if(_keys_down[Sdl2Application::Key::LeftShift]) _mount->translate(Magnum::Vector3::yAxis(-speed));
+  if(_keys_down[Sdl2Application::Key::LeftCtrl])  _mount->translate(Magnum::Vector3::yAxis(-speed));
 }
 
 void JSBSimVisualizer::drawEvent() {
@@ -201,7 +233,7 @@ void JSBSimVisualizer::drawEvent() {
 
     double north = dlat_rad * radius;
     double east  = dlon_rad * radius * std::cos(cur_propagate->GetLatitude());
-    double down  = 0 - cur_alt;
+    double down  = 5.60f - cur_alt;
 
     cur._model->setTransformation(Magnum::Matrix4::translation(utils::as_magnum_RUB(north, east, down)))
       .rotateY(-yaw)

@@ -69,11 +69,13 @@ void load_aircraft_ic_config(
 ) {
   PUSH_JSBSIM_DEBUG_LEVEL
   aircraft_ic->InitializeIC();
-  aircraft_ic->SetAltitudeAGLFtIC(config.altitude_agl_ft);
+  aircraft_ic->SetAltitudeASLFtIC(config.altitude_asl_ft);
   aircraft_ic->SetVtrueFpsIC(config.true_airspeed_fps);
   aircraft_ic->SetPhiDegIC(config.roll_deg);
   aircraft_ic->SetThetaDegIC(config.pitch_deg);
   aircraft_ic->SetPsiDegIC(config.heading_deg);
+  aircraft_ic->SetAlphaDegIC(config.aoa_deg);
+  aircraft_ic->SetBetaDegIC(config.sideslip_deg);
   POP_JSBSIM_DEBUG_LEVEL
 }
 

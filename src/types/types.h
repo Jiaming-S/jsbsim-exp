@@ -25,11 +25,13 @@ enum AircraftInitialConditionType {
 };
 
 struct AircraftInitialConditionConfig {
-  double altitude_agl_ft;
+  double altitude_asl_ft;
   double true_airspeed_fps;
   double roll_deg;
   double pitch_deg;
   double heading_deg;
+  double aoa_deg;
+  double sideslip_deg;
 };
 
 struct ModelPart {
