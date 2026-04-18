@@ -39,4 +39,7 @@ class AircraftHandle {
     AircraftHandle& with_model(types::Object3D *model);
     AircraftHandle& with_meshes(std::unordered_map<std::string, std::vector<types::ModelPart>>& meshes);
     AircraftHandle& link(Magnum::Shaders::PhongGL& shader, Magnum::SceneGraph::DrawableGroup3D& drawables);
+
+    void update_sim();
+    void update_model();
 };

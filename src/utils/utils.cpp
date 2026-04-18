@@ -69,13 +69,13 @@ void load_aircraft_ic_config(
 ) {
   PUSH_JSBSIM_DEBUG_LEVEL
   aircraft_ic->InitializeIC();
+  aircraft_ic->SetLatitudeDegIC(config.latitude_deg);
+  aircraft_ic->SetLongitudeDegIC(config.longitude_deg);
   aircraft_ic->SetAltitudeASLFtIC(config.altitude_asl_ft);
-  aircraft_ic->SetVtrueFpsIC(config.true_airspeed_fps);
   aircraft_ic->SetPhiDegIC(config.roll_deg);
   aircraft_ic->SetThetaDegIC(config.pitch_deg);
   aircraft_ic->SetPsiDegIC(config.heading_deg);
-  aircraft_ic->SetAlphaDegIC(config.aoa_deg);
-  aircraft_ic->SetBetaDegIC(config.sideslip_deg);
+  aircraft_ic->SetVNorthFpsIC(config.true_airspeed_fps);
   POP_JSBSIM_DEBUG_LEVEL
 }
 
@@ -152,6 +152,39 @@ Magnum::Vector3 as_magnum_RUB(float x, float y, float z) {
 
 Magnum::Vector3 as_jsbsim_NED(float x, float y, float z) {
   return Magnum::Vector3{-z, x, -y};
+}
+
+types::AircraftInitialConditionConfig fetch_preset(types::AircraftInitialConditionPreset preset) {
+  switch (preset) {
+    case types::AircraftInitialConditionPreset::DEFAULT: return {
+      .altitude_asl_ft = 60.0f,
+      .true_airspeed_fps = 250.0f,
+      .roll_deg = 0.0f,
+      .pitch_deg = 5.0f,
+      .heading_deg = 0.0f,
+      .latitude_deg = 0.0f,
+      .longitude_deg = 0.0f,
+    };
+    case types::AircraftInitialConditionPreset::DEFAULT_OPPONENT: return {
+      .altitude_asl_ft = 60.0f,
+      .true_airspeed_fps = 250.0f,
+      .roll_deg = 0.0f,
+      .pitch_deg = 5.0f,
+      .heading_deg = 180.0f,
+      .latitude_deg = -1e-3f,
+      .longitude_deg = 0.0f,
+    };
+    case types::AircraftInitialConditionPreset::ON_GROUND: return {
+      .altitude_asl_ft = 0.0f,
+      .true_airspeed_fps = 0.0f,
+      .roll_deg = 0.0f,
+      .pitch_deg = 0.0f,
+      .heading_deg = 0.0f,
+      .latitude_deg = 0.0f,
+      .longitude_deg = 0.0f,
+    };
+    default: return {};
+  }
 }
 
 }

@@ -17,10 +17,10 @@ FetchContent_Declare(
 )
 
 # Disable JSBSim features we don't need
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "Disable JSBSim shared libs" FORCE)
-set(BUILD_PYTHON_MODULE OFF CACHE BOOL "Disable JSBSim Python" FORCE)
-set(BUILD_DOCS OFF CACHE BOOL "Disable JSBSim Docs" FORCE)
-set(BUILD_TESTING OFF CACHE BOOL "Disable JSBSim Tests" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(BUILD_PYTHON_MODULE OFF CACHE BOOL "" FORCE)
+set(BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(jsbsim_fetch)
 
@@ -31,9 +31,9 @@ FetchContent_Declare(
   GIT_TAG        master
 )
 
-set(CORRADE_WITH_INTERCONNECT OFF CACHE BOOL "Disable Corrade Interconnect" FORCE)
-set(CORRADE_WITH_TESTSUITE OFF CACHE BOOL "Disable Corrade TestSuite" FORCE)
-set(CORRADE_BUILD_TESTS OFF CACHE BOOL "Disable Corrade Tests" FORCE)
+set(CORRADE_WITH_INTERCONNECT OFF CACHE BOOL "" FORCE)
+set(CORRADE_WITH_TESTSUITE OFF CACHE BOOL "" FORCE)
+set(CORRADE_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(CORRADE_WITH_RC ON CACHE BOOL "Enable Corrade Resource Compiler" FORCE)
 
 FetchContent_MakeAvailable(corrade_fetch)
@@ -45,17 +45,38 @@ FetchContent_Declare(
   GIT_TAG        master
 )
 
-set(MAGNUM_WITH_SDL2APPLICATION ON CACHE BOOL "Enable SDL2 Application" FORCE)
-set(MAGNUM_WITH_GL ON CACHE BOOL "Enable OpenGL Wrapper" FORCE)
-set(MAGNUM_WITH_SHADERS ON CACHE BOOL "Enable Built-in Shaders" FORCE)
-set(MAGNUM_WITH_PRIMITIVES ON CACHE BOOL "Enable 3D Primitives" FORCE)
-set(MAGNUM_BUILD_TESTS OFF CACHE BOOL "Disable Magnum Tests" FORCE)
-set(MAGNUM_WITH_TRADE ON CACHE BOOL "Enable Trade library" FORCE)
-set(MAGNUM_BUILD_PLUGINS_STATIC ON CACHE BOOL "Bake plugins into the executable" FORCE)
+set(MAGNUM_WITH_SDL2APPLICATION ON CACHE BOOL "" FORCE)
+set(MAGNUM_WITH_GL ON CACHE BOOL "" FORCE)
+set(MAGNUM_WITH_SHADERS ON CACHE BOOL "" FORCE)
+set(MAGNUM_WITH_PRIMITIVES ON CACHE BOOL "" FORCE)
+set(MAGNUM_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(MAGNUM_WITH_TRADE ON CACHE BOOL "" FORCE)
+set(MAGNUM_BUILD_PLUGINS_STATIC ON CACHE BOOL "" FORCE)
 set(MAGNUM_WITH_ANYSCENEIMPORTER ON CACHE BOOL "Enable AnySceneImporter plugin" FORCE)
 set(MAGNUM_WITH_ANYIMAGEIMPORTER ON CACHE BOOL "Enable AnyImageImporter plugin" FORCE)
 
 FetchContent_MakeAvailable(magnum_fetch)
+
+# Fetch ImGui
+FetchContent_Declare(
+  imgui_fetch
+  GIT_REPOSITORY https://github.com/ocornut/imgui.git
+  GIT_TAG        master
+)
+
+FetchContent_MakeAvailable(imgui_fetch)
+set(IMGUI_DIR "${imgui_fetch_SOURCE_DIR}" CACHE PATH "Path to ImGui" FORCE)
+
+# Fetch Magnum Integration
+FetchContent_Declare(
+  magnum_integration_fetch
+  GIT_REPOSITORY https://github.com/mosra/magnum-integration.git
+  GIT_TAG        master
+)
+
+set(MAGNUM_WITH_IMGUIINTEGRATION ON CACHE BOOL "Enable ImGui integration wtih Magnum" FORCE)
+
+FetchContent_MakeAvailable(magnum_integration_fetch)
 
 # Fetch Magnum Plugins
 FetchContent_Declare(
@@ -68,10 +89,10 @@ set(MAGNUM_WITH_TINYGLTFIMPORTER ON CACHE BOOL "Enable TinyGltfImporter plugin" 
 
 FetchContent_MakeAvailable(magnum_plugins_fetch)
 
-# Point to resources.conf file with files be packaged into binary
+# Point to resources.conf enumeratings files to be packaged into binary
 corrade_add_resource(app_resources resources.conf)
 
-# Build and link jsbsimexp executable
+# Build and link jsbsimexp
 add_executable(jsbsimexp 
   src/main.cpp
   src/aircrafthandle.cpp
@@ -83,7 +104,6 @@ add_executable(jsbsimexp
 
 target_include_directories(jsbsimexp PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/types)
 
-# Link against libJSBSim and Magnum::*
 target_link_libraries(jsbsimexp PRIVATE 
   libJSBSim 
   Magnum::Magnum 
@@ -93,6 +113,7 @@ target_link_libraries(jsbsimexp PRIVATE
   Magnum::Primitives
   Magnum::SceneGraph
   Magnum::Trade
+  MagnumIntegration::ImGui
   AnySceneImporter
   TinyGltfImporter
   Corrade::Utility

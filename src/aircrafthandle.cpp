@@ -53,3 +53,35 @@ AircraftHandle& AircraftHandle::link(Magnum::Shaders::PhongGL& shader, Magnum::S
   return *this;
 }
 
+void AircraftHandle::update_sim() {
+  _fdmexec->Run();
+}
+
+void AircraftHandle::update_model() {
+  std::shared_ptr<JSBSim::FGAircraft>  cur_aircraft =  _fdmexec->GetAircraft();
+  std::shared_ptr<JSBSim::FGPropagate> cur_propagate = _fdmexec->GetPropagate();
+
+  JSBSim::FGColumnVector3 euler = cur_propagate->GetEuler();
+  auto pitch = Magnum::Rad(euler.Entry(1));
+  auto roll  = Magnum::Rad(euler.Entry(2));
+  auto yaw   = Magnum::Rad(euler.Entry(3));
+
+  double cur_alt = cur_propagate->GetAltitudeASL();
+  double radius  = cur_propagate->GetRadius();
+
+  double starting_lat_rad  = 0 * M_PI / 180.0;
+  double starting_long_rad = 0 * M_PI / 180.0;
+
+  double dlat_rad = (cur_propagate->GetLatitude() - starting_lat_rad);
+  double dlon_rad = (cur_propagate->GetLongitude() - starting_long_rad);
+
+  double north = dlat_rad * radius;
+  double east  = dlon_rad * radius * std::cos(cur_propagate->GetLatitude());
+  double down  = 5.60f - cur_alt;
+
+  _model->setTransformation(Magnum::Matrix4::translation(utils::as_magnum_RUB(north, east, down)))
+    .rotateY(-yaw)
+    .rotateX(pitch)
+    .rotateZ(roll);
+}
+

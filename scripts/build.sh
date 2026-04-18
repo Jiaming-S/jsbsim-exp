@@ -11,5 +11,5 @@ echo "Wiping and rebuilding..."
 rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
 
-cmake -S "$PROJECT_ROOT" -B "$BUILD_DIR"
-cmake --build "$BUILD_DIR" -- -j$(nproc 2>/dev/null || echo 16)
+cmake -S "$PROJECT_ROOT" -B "$BUILD_DIR" || exit
+cmake --build "$BUILD_DIR" -- -j$(nproc 2>/dev/null || echo 16) || exit

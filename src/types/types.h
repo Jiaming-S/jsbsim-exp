@@ -17,21 +17,20 @@ enum AircraftType {
   F16,
 };
 
-enum AircraftInitialConditionType {
-  DEFAULT,
-  DEFAULT_OPPONENT,
-  ON_GROUND,
-  CUSTOM
-};
-
 struct AircraftInitialConditionConfig {
   double altitude_asl_ft;
   double true_airspeed_fps;
   double roll_deg;
   double pitch_deg;
   double heading_deg;
-  double aoa_deg;
-  double sideslip_deg;
+  double latitude_deg;
+  double longitude_deg;
+};
+
+enum AircraftInitialConditionPreset {
+  DEFAULT,
+  DEFAULT_OPPONENT,
+  ON_GROUND
 };
 
 struct ModelPart {

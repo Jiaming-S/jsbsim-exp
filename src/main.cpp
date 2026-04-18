@@ -120,7 +120,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   _camera = new Magnum::SceneGraph::Camera3D{*_revolut};
   _camera->setProjectionMatrix(
     Magnum::Matrix4::perspectiveProjection(
-      35.0_degf,
+      90.0_degf,
       Magnum::Vector2{windowSize()}.aspectRatio(),
       0.01f,
       INFINITY
@@ -130,25 +130,8 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   // Load and setup aircraft
   utils::_construct_tmp_jsbsim_dir(_rs, types::AircraftType::F16);
 
-  auto red1_config = types::AircraftInitialConditionConfig{
-    100.0f, // Altitude AGL ft
-    20.0f, // TAS ft/s
-   -10.0f,  // Roll Degrees
-    5.0f,   // Pitch Degrees
-    0.0f,   // Heading Degrees
-    12.0f,  // AoA Degrees
-    0.0f,   // Sideslip Degrees
-  };
-  
-  auto blue1_config = types::AircraftInitialConditionConfig{
-    100.0f, // Altitude AGL ft
-    20.0f,  // TAS ft/s
-    10.0f,  // Roll Degrees
-    5.0f,   // Pitch Degrees
-    0.0f,   // Heading Degrees
-    12.0f,  // AoA Degrees
-    0.0f,   // Sideslip Degrees
-  };
+  auto red1_config  = utils::fetch_preset(types::AircraftInitialConditionPreset::DEFAULT);
+  auto blue1_config = utils::fetch_preset(types::AircraftInitialConditionPreset::DEFAULT_OPPONENT);
 
   AircraftHandle red1 = AircraftHandle{types::AircraftType::F16};
   red1.with_fdmexec()
@@ -156,7 +139,6 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     .with_model(new types::Object3D{&_scene})
     .with_meshes(_aircraft_part_meshes)
     .link(_shader, _drawables);
-  _aircraft.push_back(std::move(red1));
 
   AircraftHandle blue1 = AircraftHandle{types::AircraftType::F16};
   blue1.with_fdmexec()
@@ -164,17 +146,20 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     .with_model(new types::Object3D{&_scene})
     .with_meshes(_aircraft_part_meshes)
     .link(_shader, _drawables);
+
+  _aircraft.push_back(std::move(red1));
   _aircraft.push_back(std::move(blue1));
 
   // Start Magnum timeline
   _timeline.start();
+  
   // Enable VSync
   setSwapInterval(1);
 }
 
 void JSBSimVisualizer::tickEvent() {
   for (auto& cur : _aircraft) {
-    cur._fdmexec->Run();
+    cur.update_sim();
   }
 }
 
@@ -214,31 +199,7 @@ void JSBSimVisualizer::drawEvent() {
   Magnum::GL::defaultFramebuffer.clear(Magnum::GL::FramebufferClear::Color | Magnum::GL::FramebufferClear::Depth);
 
   for (auto& cur : _aircraft) {
-    std::shared_ptr<JSBSim::FGAircraft>  cur_aircraft =  cur._fdmexec->GetAircraft();
-    std::shared_ptr<JSBSim::FGPropagate> cur_propagate = cur._fdmexec->GetPropagate();
-
-    JSBSim::FGColumnVector3 euler = cur_propagate->GetEuler();
-    auto pitch = Magnum::Rad(euler.Entry(1));
-    auto roll  = Magnum::Rad(euler.Entry(2));
-    auto yaw   = Magnum::Rad(euler.Entry(3));
-
-    double cur_alt = cur_propagate->GetAltitudeASL();
-    double radius  = cur_propagate->GetRadius();
-
-    double starting_lat_rad  = 0 * M_PI / 180.0;
-    double starting_long_rad = 0 * M_PI / 180.0;
-
-    double dlat_rad = (cur_propagate->GetLatitude() - starting_lat_rad);
-    double dlon_rad = (cur_propagate->GetLongitude() - starting_long_rad);
-
-    double north = dlat_rad * radius;
-    double east  = dlon_rad * radius * std::cos(cur_propagate->GetLatitude());
-    double down  = 5.60f - cur_alt;
-
-    cur._model->setTransformation(Magnum::Matrix4::translation(utils::as_magnum_RUB(north, east, down)))
-      .rotateY(-yaw)
-      .rotateX(pitch)
-      .rotateZ(roll);
+    cur.update_model();
   }
 
   _moveCameraMount();

@@ -67,4 +67,7 @@ extern Magnum::Vector3 as_magnum_RUB(float x, float y, float z);
 /// North East Down
 extern Magnum::Vector3 as_jsbsim_NED(float x, float y, float z);
 
+/// Fetch a preset initial condition
+extern types::AircraftInitialConditionConfig fetch_preset(types::AircraftInitialConditionPreset preset);
+
 }
