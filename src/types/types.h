@@ -30,7 +30,9 @@ struct AircraftInitialConditionConfig {
 enum AircraftInitialConditionPreset {
   DEFAULT,
   DEFAULT_OPPONENT,
-  ON_GROUND
+  ON_GROUND,
+  TAKEOFF_ROLL,
+  TAKEOFF_ROLL_ROTATION,
 };
 
 struct ModelPart {

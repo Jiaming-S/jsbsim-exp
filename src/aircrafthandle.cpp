@@ -10,7 +10,7 @@ AircraftHandle& AircraftHandle::with_fdmexec(bool quiet) {
   return *this;
 }
 
-AircraftHandle& AircraftHandle::with_ic(types::AircraftInitialConditionConfig& config, bool quiet) {
+AircraftHandle& AircraftHandle::with_ic(types::AircraftInitialConditionConfig config, bool quiet) {
   assert(_ic);
 
   utils::load_aircraft_ic_config(_ic, config);
@@ -58,15 +58,22 @@ void AircraftHandle::update_sim() {
 }
 
 void AircraftHandle::update_model() {
+  _AircraftStateInfo state = this->to_aircraft_state();
+  _model->setTransformation(Magnum::Matrix4::translation(utils::as_magnum_RUB(state.north, state.east, state.down)))
+    .rotateX( state.pitch)
+    .rotateZ( state.roll)
+    .rotateY(-state.yaw);
+}
+
+_AircraftStateInfo AircraftHandle::to_aircraft_state() {
   std::shared_ptr<JSBSim::FGAircraft>  cur_aircraft =  _fdmexec->GetAircraft();
   std::shared_ptr<JSBSim::FGPropagate> cur_propagate = _fdmexec->GetPropagate();
 
-  JSBSim::FGColumnVector3 euler = cur_propagate->GetEuler();
-  auto pitch = Magnum::Rad(euler.Entry(1));
-  auto roll  = Magnum::Rad(euler.Entry(2));
-  auto yaw   = Magnum::Rad(euler.Entry(3));
+  Magnum::Rad pitch = Magnum::Rad(cur_propagate->GetEuler(1));
+  Magnum::Rad roll  = Magnum::Rad(cur_propagate->GetEuler(2));
+  Magnum::Rad yaw   = Magnum::Rad(cur_propagate->GetEuler(3));
 
-  double cur_alt = cur_propagate->GetAltitudeASL();
+  double alt = cur_propagate->GetAltitudeASL();
   double radius  = cur_propagate->GetRadius();
 
   double starting_lat_rad  = 0 * M_PI / 180.0;
@@ -77,11 +84,22 @@ void AircraftHandle::update_model() {
 
   double north = dlat_rad * radius;
   double east  = dlon_rad * radius * std::cos(cur_propagate->GetLatitude());
-  double down  = 5.60f - cur_alt;
+  double down  = 5.60f - alt;
 
-  _model->setTransformation(Magnum::Matrix4::translation(utils::as_magnum_RUB(north, east, down)))
-    .rotateY(-yaw)
-    .rotateX(pitch)
-    .rotateZ(roll);
+  double v_north = cur_propagate->GetVel(1);
+  double v_east  = cur_propagate->GetVel(2);
+  double v_down  = cur_propagate->GetVel(3);
+
+  return _AircraftStateInfo {
+    .pitch = pitch,
+    .roll = roll,
+    .yaw = yaw,
+    .alt = alt,
+    .north = north,
+    .east = east,
+    .down = down,
+    .v_north = v_north,
+    .v_east = v_east,
+    .v_down = v_down,
+  };
 }
-

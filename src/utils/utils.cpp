@@ -159,7 +159,7 @@ types::AircraftInitialConditionConfig fetch_preset(types::AircraftInitialConditi
     case types::AircraftInitialConditionPreset::DEFAULT: return {
       .altitude_asl_ft = 60.0f,
       .true_airspeed_fps = 250.0f,
-      .roll_deg = 0.0f,
+      .roll_deg = -5.0f,
       .pitch_deg = 5.0f,
       .heading_deg = 0.0f,
       .latitude_deg = 0.0f,
@@ -168,19 +168,37 @@ types::AircraftInitialConditionConfig fetch_preset(types::AircraftInitialConditi
     case types::AircraftInitialConditionPreset::DEFAULT_OPPONENT: return {
       .altitude_asl_ft = 60.0f,
       .true_airspeed_fps = 250.0f,
-      .roll_deg = 0.0f,
+      .roll_deg = 5.0f,
       .pitch_deg = 5.0f,
       .heading_deg = 180.0f,
       .latitude_deg = -1e-3f,
       .longitude_deg = 0.0f,
     };
     case types::AircraftInitialConditionPreset::ON_GROUND: return {
-      .altitude_asl_ft = 0.0f,
+      .altitude_asl_ft = 5.6f,
       .true_airspeed_fps = 0.0f,
       .roll_deg = 0.0f,
       .pitch_deg = 0.0f,
       .heading_deg = 0.0f,
       .latitude_deg = 0.0f,
+      .longitude_deg = 0.0f,
+    };
+    case types::AircraftInitialConditionPreset::TAKEOFF_ROLL: return {
+      .altitude_asl_ft = 5.6f,
+      .true_airspeed_fps = 20.0f,
+      .roll_deg = 0.0f,
+      .pitch_deg = 0.0f,
+      .heading_deg = 0.0f,
+      .latitude_deg = 0.0f,
+      .longitude_deg = 0.0f,
+    };
+    case types::AircraftInitialConditionPreset::TAKEOFF_ROLL_ROTATION: return {
+      .altitude_asl_ft = 5.6f,
+      .true_airspeed_fps = 245.0f,
+      .roll_deg = 0.0f,
+      .pitch_deg = 15.0f,
+      .heading_deg = 0.0f,
+      .latitude_deg = -2e-3f,
       .longitude_deg = 0.0f,
     };
     default: return {};

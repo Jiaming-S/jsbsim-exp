@@ -3,6 +3,7 @@
 #include <Magnum/GL/Mesh.h>
 #include <Magnum/SceneGraph/Object.h>
 #include <Magnum/SceneGraph/MatrixTransformation3D.h>
+#include <Magnum/ImGuiIntegration/Context.hpp>
 
 #include <FGFDMExec.h>
 
@@ -16,6 +17,19 @@
 struct _NodeMeshPair {
   types::Object3D *node;
   Magnum::GL::Mesh *mesh;
+};
+
+struct _AircraftStateInfo {
+  Magnum::Rad pitch;
+  Magnum::Rad roll;
+  Magnum::Rad yaw;
+  double alt;
+  double north;
+  double east;
+  double down;
+  double v_north;
+  double v_east;
+  double v_down;
 };
 
 class AircraftHandle {
@@ -35,10 +49,12 @@ class AircraftHandle {
       : _aircraft_type{aircraft_type}, _aircraft_type_string{utils::to_type_string(aircraft_type)} {}
 
     AircraftHandle& with_fdmexec(bool quiet = true);
-    AircraftHandle& with_ic(types::AircraftInitialConditionConfig& config, bool quiet = true);
+    AircraftHandle& with_ic(types::AircraftInitialConditionConfig config, bool quiet = true);
     AircraftHandle& with_model(types::Object3D *model);
     AircraftHandle& with_meshes(std::unordered_map<std::string, std::vector<types::ModelPart>>& meshes);
     AircraftHandle& link(Magnum::Shaders::PhongGL& shader, Magnum::SceneGraph::DrawableGroup3D& drawables);
+
+    _AircraftStateInfo to_aircraft_state();
 
     void update_sim();
     void update_model();

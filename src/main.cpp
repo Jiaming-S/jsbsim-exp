@@ -19,6 +19,7 @@
 #include <Magnum/Trade/AbstractImporter.h>
 #include <Magnum/Trade/SceneData.h>
 #include <Magnum/GL/Texture.h>
+#include <Magnum/ImGuiIntegration/Context.hpp>
 #include <Corrade/Utility/Resource.h>
 
 // JSBSim
@@ -39,8 +40,9 @@
 #include "aircrafthandle.h"
 #include "coloreddrawable.h"
 #include "sim.h"
-#include "utils/utils.h"
+#include "gui/gui.h"
 #include "types/types.h"
+#include "utils/utils.h"
 
 // Literal operators
 using namespace Magnum::Math::Literals;
@@ -56,6 +58,9 @@ class JSBSimVisualizer: public Magnum::Platform::Application {
     void drawEvent() override;
     void keyPressEvent(KeyEvent& event) override;
     void keyReleaseEvent(KeyEvent& event) override;
+    void pointerPressEvent(PointerEvent& event) override;
+    void pointerReleaseEvent(PointerEvent& event) override;
+    void pointerMoveEvent(PointerMoveEvent& event) override;
 
     // Private Methods
     void _moveCameraMount();
@@ -79,6 +84,9 @@ class JSBSimVisualizer: public Magnum::Platform::Application {
     // Resource manager
     Corrade::Utility::Resource _rs{"assets"};
 
+    // ImGui
+    Magnum::ImGuiIntegration::Context _imgui{Magnum::NoCreate};
+
     // JSBSim
     std::vector<AircraftHandle> _aircraft;
 };
@@ -97,6 +105,20 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   
   // Enable draw lines between polygons
   // Magnum::GL::Renderer::setPolygonMode(Magnum::GL::Renderer::PolygonMode::Line);
+
+  // Initialize ImGui
+  _imgui = Magnum::ImGuiIntegration::Context(
+    Magnum::Vector2{windowSize()} / dpiScaling(),
+    windowSize(),
+    framebufferSize()
+  );
+
+  // Disable ImGui imgui.ini file
+  ImGui::GetIO().IniFilename = nullptr;
+
+  // Enable ImGui blend equations for text
+  Magnum::GL::Renderer::setBlendEquation(Magnum::GL::Renderer::BlendEquation::Add, Magnum::GL::Renderer::BlendEquation::Add);
+  Magnum::GL::Renderer::setBlendFunction(Magnum::GL::Renderer::BlendFunction::SourceAlpha, Magnum::GL::Renderer::BlendFunction::OneMinusSourceAlpha);
 
   // Load meshes and shaders
   std::vector<std::pair<std::string, std::string>> to_import = {
@@ -130,25 +152,26 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   // Load and setup aircraft
   utils::_construct_tmp_jsbsim_dir(_rs, types::AircraftType::F16);
 
-  auto red1_config  = utils::fetch_preset(types::AircraftInitialConditionPreset::DEFAULT);
-  auto blue1_config = utils::fetch_preset(types::AircraftInitialConditionPreset::DEFAULT_OPPONENT);
+  std::vector<types::AircraftInitialConditionPreset> presets = {
+    types::AircraftInitialConditionPreset::DEFAULT,
+    types::AircraftInitialConditionPreset::DEFAULT_OPPONENT,
+    types::AircraftInitialConditionPreset::ON_GROUND,
+    types::AircraftInitialConditionPreset::TAKEOFF_ROLL,
+    types::AircraftInitialConditionPreset::TAKEOFF_ROLL_ROTATION,
+  };
 
-  AircraftHandle red1 = AircraftHandle{types::AircraftType::F16};
-  red1.with_fdmexec()
-    .with_ic(red1_config)
-    .with_model(new types::Object3D{&_scene})
-    .with_meshes(_aircraft_part_meshes)
-    .link(_shader, _drawables);
+  for (auto preset : presets) {
+    AircraftHandle aircraft = AircraftHandle{types::AircraftType::F16};
+    aircraft.with_fdmexec()
+      .with_ic(utils::fetch_preset(preset))
+      .with_model(new types::Object3D{&_scene})
+      .with_meshes(_aircraft_part_meshes)
+      .link(_shader, _drawables);
 
-  AircraftHandle blue1 = AircraftHandle{types::AircraftType::F16};
-  blue1.with_fdmexec()
-    .with_ic(blue1_config)
-    .with_model(new types::Object3D{&_scene})
-    .with_meshes(_aircraft_part_meshes)
-    .link(_shader, _drawables);
-
-  _aircraft.push_back(std::move(red1));
-  _aircraft.push_back(std::move(blue1));
+    aircraft._fdmexec->GetPropertyManager()->GetNode("fcs/throttle-cmd-norm[0]")->setDoubleValue(1.0);
+    aircraft._fdmexec->GetPropertyManager()->GetNode("propulsion/engine[0]/set-running")->setIntValue(1);
+    _aircraft.push_back(std::move(aircraft));
+  }
 
   // Start Magnum timeline
   _timeline.start();
@@ -157,9 +180,13 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   setSwapInterval(1);
 }
 
+// Tick Controller and Update Model
 void JSBSimVisualizer::tickEvent() {
   for (auto& cur : _aircraft) {
+    // Tick Controller
     cur.update_sim();
+    // Update Model
+    cur.update_model();
   }
 }
 
@@ -194,29 +221,70 @@ void JSBSimVisualizer::_moveCameraMount() {
   if(_keys_down[Sdl2Application::Key::LeftCtrl])  _mount->translate(Magnum::Vector3::yAxis(-speed));
 }
 
+// Update View
 void JSBSimVisualizer::drawEvent() {
-  _timeline.nextFrame();
+  // Clear framebuffer
   Magnum::GL::defaultFramebuffer.clear(Magnum::GL::FramebufferClear::Color | Magnum::GL::FramebufferClear::Depth);
+  
+  // Next frame
+  _timeline.nextFrame();
+  _imgui.newFrame();
 
-  for (auto& cur : _aircraft) {
-    cur.update_model();
-  }
+  // ImGui settings
+  if ( ImGui::GetIO().WantTextInput && !isTextInputActive()) startTextInput();
+  if (!ImGui::GetIO().WantTextInput &&  isTextInputActive()) stopTextInput();
 
+  // Update camera
   _moveCameraMount();
+
+  // Do draw
   _camera->draw(_drawables);
   
+
+  // Push ImGui required settings
+  Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::Blending);
+  Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::ScissorTest);
+  Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::FaceCulling);
+  Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::DepthTest);
+
+  // Draw ImGui
+  gui::gui_aircraft(_aircraft);
+  _imgui.updateApplicationCursor(*this);
+  _imgui.drawFrame();
+
+  // Pop ImGui required settings
+  Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::DepthTest);
+  Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::FaceCulling);
+  Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::ScissorTest);
+  Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::Blending);
+
+  // Next
   swapBuffers();
   redraw();
 }
 
 void JSBSimVisualizer::keyPressEvent(KeyEvent& event) {
+  if(_imgui.handleKeyPressEvent(event)) return;
   _keys_down[event.key()] = true;
   event.setAccepted();
 }
 
 void JSBSimVisualizer::keyReleaseEvent(KeyEvent& event) {
+  if(_imgui.handleKeyReleaseEvent(event)) return;
   _keys_down[event.key()] = false;
   event.setAccepted();
+}
+
+void JSBSimVisualizer::pointerPressEvent(PointerEvent& event) {
+  if(_imgui.handlePointerPressEvent(event)) return;
+}
+
+void JSBSimVisualizer::pointerReleaseEvent(PointerEvent& event) {
+  if(_imgui.handlePointerReleaseEvent(event)) return;
+}
+
+void JSBSimVisualizer::pointerMoveEvent(PointerMoveEvent& event) {
+  if(_imgui.handlePointerMoveEvent(event)) return;
 }
 
 int main(int argc, char** argv) {
