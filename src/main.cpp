@@ -38,6 +38,7 @@
 
 // Project
 #include "aircrafthandle.h"
+#include "camerahandle.h"
 #include "coloreddrawable.h"
 #include "sim.h"
 #include "gui/gui.h"
@@ -61,9 +62,7 @@ class JSBSimVisualizer: public Magnum::Platform::Application {
     void pointerPressEvent(PointerEvent& event) override;
     void pointerReleaseEvent(PointerEvent& event) override;
     void pointerMoveEvent(PointerMoveEvent& event) override;
-
-    // Private Methods
-    void _moveCameraMount();
+    void scrollEvent(ScrollEvent& event) override;
 
     // Magnum
     Magnum::Shaders::PhongGL _shader;
@@ -78,8 +77,7 @@ class JSBSimVisualizer: public Magnum::Platform::Application {
     std::unordered_map<Sdl2Application::Key, bool> _keys_down;
 
     // Camera
-    types::Object3D *_mount, *_revolut;
-    Magnum::SceneGraph::Camera3D *_camera;
+    std::unique_ptr<CameraHandle> _cam;
 
     // Resource manager
     Corrade::Utility::Resource _rs{"assets"};
@@ -136,11 +134,9 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   new ColoredDrawable{*floor, _shader, _meshes["floor_mesh"], _drawables};
 
   // Load and setup camera
-  _mount = new types::Object3D{&_scene};
-  _revolut = new types::Object3D{_mount};
-
-  _camera = new Magnum::SceneGraph::Camera3D{*_revolut};
-  _camera->setProjectionMatrix(
+  _cam = std::make_unique<CameraHandle>();
+  _cam->attach_to(
+    &_scene,
     Magnum::Matrix4::perspectiveProjection(
       90.0_degf,
       Magnum::Vector2{windowSize()}.aspectRatio(),
@@ -190,37 +186,6 @@ void JSBSimVisualizer::tickEvent() {
   }
 }
 
-void JSBSimVisualizer::_moveCameraMount() {
-  float speed = 0.1f;
-  auto speed_rotation = 1.0_degf;
-
-  if(_keys_down[Sdl2Application::Key::LeftShift]) speed *= 5.0f;
-
-  if(_keys_down[Sdl2Application::Key::Up])    _revolut->rotateLocal( speed_rotation, Magnum::Vector3::xAxis());
-  if(_keys_down[Sdl2Application::Key::Down])  _revolut->rotateLocal(-speed_rotation, Magnum::Vector3::xAxis());
-  
-  if(_keys_down[Sdl2Application::Key::Left]) {
-    Magnum::Matrix4 rot = Magnum::Matrix4::rotation(speed_rotation, Magnum::Vector3::yAxis());
-    _revolut->setTransformation(rot * _revolut->transformation());
-  }
-
-  if(_keys_down[Sdl2Application::Key::Right]) {
-    Magnum::Matrix4 rot = Magnum::Matrix4::rotation(-speed_rotation, Magnum::Vector3::yAxis());
-    _revolut->setTransformation(rot * _revolut->transformation());
-  }
-
-  Magnum::Vector3 forward = _revolut->transformation().backward();
-  Magnum::Vector3 right   = _revolut->transformation().right();
-
-  if(_keys_down[Sdl2Application::Key::W]) _mount->translate(forward * -speed);
-  if(_keys_down[Sdl2Application::Key::S]) _mount->translate(forward *  speed);
-  if(_keys_down[Sdl2Application::Key::A]) _mount->translate(right * -speed);
-  if(_keys_down[Sdl2Application::Key::D]) _mount->translate(right *  speed);
-  
-  if(_keys_down[Sdl2Application::Key::Space])     _mount->translate(Magnum::Vector3::yAxis( speed));
-  if(_keys_down[Sdl2Application::Key::LeftCtrl])  _mount->translate(Magnum::Vector3::yAxis(-speed));
-}
-
 // Update View
 void JSBSimVisualizer::drawEvent() {
   // Clear framebuffer
@@ -235,11 +200,11 @@ void JSBSimVisualizer::drawEvent() {
   if (!ImGui::GetIO().WantTextInput &&  isTextInputActive()) stopTextInput();
 
   // Update camera
-  _moveCameraMount();
+  _cam->handle_keypress(_keys_down);
 
   // Do draw
-  _camera->draw(_drawables);
-  
+  // TODO: make a method for this
+  _cam->_camera->draw(_drawables);
 
   // Push ImGui required settings
   Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::Blending);
@@ -264,27 +229,35 @@ void JSBSimVisualizer::drawEvent() {
 }
 
 void JSBSimVisualizer::keyPressEvent(KeyEvent& event) {
-  if(_imgui.handleKeyPressEvent(event)) return;
+  if (_imgui.handleKeyPressEvent(event)) return;
   _keys_down[event.key()] = true;
   event.setAccepted();
 }
 
 void JSBSimVisualizer::keyReleaseEvent(KeyEvent& event) {
-  if(_imgui.handleKeyReleaseEvent(event)) return;
+  if (_imgui.handleKeyReleaseEvent(event)) return;
   _keys_down[event.key()] = false;
   event.setAccepted();
 }
 
 void JSBSimVisualizer::pointerPressEvent(PointerEvent& event) {
-  if(_imgui.handlePointerPressEvent(event)) return;
+  if (_imgui.handlePointerPressEvent(event)) return;
 }
 
 void JSBSimVisualizer::pointerReleaseEvent(PointerEvent& event) {
-  if(_imgui.handlePointerReleaseEvent(event)) return;
+  if (_imgui.handlePointerReleaseEvent(event)) return;
 }
 
 void JSBSimVisualizer::pointerMoveEvent(PointerMoveEvent& event) {
-  if(_imgui.handlePointerMoveEvent(event)) return;
+  if (_imgui.handlePointerMoveEvent(event)) return;
+}
+
+void JSBSimVisualizer::scrollEvent(ScrollEvent& event) {
+  // Don't scroll if we are scrolling an ImGui window
+  if (_imgui.handleScrollEvent(event)) {
+    event.setAccepted();
+    return;
+  }
 }
 
 int main(int argc, char** argv) {
