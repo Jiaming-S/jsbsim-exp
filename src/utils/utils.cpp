@@ -211,7 +211,7 @@ void apply_preset(
       break;
     case types::AircraftInitialConditionPreset::TAKEOFF_ROLL_ROTATION: 
       fdmexec_raw_ptr.GetFCS()->SetThrottleCmd(0, 1.0);
-      fdmexec_raw_ptr.GetFCS()->SetDeCmd(-0.3);
+      fdmexec_raw_ptr.GetFCS()->SetDeCmd(-0.2);
       fdmexec_raw_ptr.GetPropulsion()->SetEngineRunning(0);
       break;
   }

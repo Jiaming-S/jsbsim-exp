@@ -82,21 +82,18 @@ types::AircraftStateInfo AircraftHandle::to_aircraft_state() {
   std::shared_ptr<JSBSim::FGAircraft>  cur_aircraft =  _fdmexec->GetAircraft();
   std::shared_ptr<JSBSim::FGPropagate> cur_propagate = _fdmexec->GetPropagate();
 
-  Magnum::Rad pitch = Magnum::Rad(cur_propagate->GetEuler(1));
-  Magnum::Rad roll  = Magnum::Rad(cur_propagate->GetEuler(2));
+  Magnum::Rad roll  = Magnum::Rad(cur_propagate->GetEuler(1));
+  Magnum::Rad pitch = Magnum::Rad(cur_propagate->GetEuler(2));
   Magnum::Rad yaw   = Magnum::Rad(cur_propagate->GetEuler(3));
 
   double alt = cur_propagate->GetAltitudeASL();
   double radius  = cur_propagate->GetRadius();
 
-  double starting_lat_rad  = 0 * M_PI / 180.0;
-  double starting_long_rad = 0 * M_PI / 180.0;
+  double lat_rad = cur_propagate->GetLatitude();
+  double lon_rad = cur_propagate->GetLongitude();
 
-  double dlat_rad = (cur_propagate->GetLatitude() - starting_lat_rad);
-  double dlon_rad = (cur_propagate->GetLongitude() - starting_long_rad);
-
-  double north = dlat_rad * radius;
-  double east  = dlon_rad * radius * std::cos(cur_propagate->GetLatitude());
+  double north = lat_rad * radius;
+  double east  = lon_rad * radius * std::cos(cur_propagate->GetLatitude());
   double down  = 5.60f - alt;
 
   double v_north = cur_propagate->GetVel(1);
