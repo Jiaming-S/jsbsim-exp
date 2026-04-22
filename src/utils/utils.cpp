@@ -62,23 +62,6 @@ std::unique_ptr<JSBSim::FGFDMExec> load_aircraft(
   return std::move(aircraft_fdmexec);
 }
 
-void load_aircraft_ic_config(
-  std::shared_ptr<JSBSim::FGInitialCondition>& aircraft_ic,
-  types::AircraftInitialConditionConfig& config,
-  bool quiet
-) {
-  PUSH_JSBSIM_DEBUG_LEVEL
-  aircraft_ic->InitializeIC();
-  aircraft_ic->SetLatitudeDegIC(config.latitude_deg);
-  aircraft_ic->SetLongitudeDegIC(config.longitude_deg);
-  aircraft_ic->SetAltitudeASLFtIC(config.altitude_asl_ft);
-  aircraft_ic->SetPhiDegIC(config.roll_deg);
-  aircraft_ic->SetThetaDegIC(config.pitch_deg);
-  aircraft_ic->SetPsiDegIC(config.heading_deg);
-  aircraft_ic->SetVNorthFpsIC(config.true_airspeed_fps);
-  POP_JSBSIM_DEBUG_LEVEL
-}
-
 // Recursively flatten GLTF
 void flatten_gltf_nodes(
   Magnum::Trade::AbstractImporter& importer, 
@@ -202,6 +185,35 @@ types::AircraftInitialConditionConfig fetch_preset(types::AircraftInitialConditi
       .longitude_deg = 0.0f,
     };
     default: return {};
+  }
+}
+
+void apply_preset(
+  types::AircraftInitialConditionPreset preset,
+  JSBSim::FGFDMExec& fdmexec_raw_ptr
+) {
+  switch (preset) {
+    case types::AircraftInitialConditionPreset::DEFAULT:
+      fdmexec_raw_ptr.GetFCS()->SetThrottleCmd(0, 1.0);
+      fdmexec_raw_ptr.GetPropulsion()->SetEngineRunning(0);
+      break;
+    case types::AircraftInitialConditionPreset::DEFAULT_OPPONENT:
+      fdmexec_raw_ptr.GetFCS()->SetThrottleCmd(0, 1.0);
+      fdmexec_raw_ptr.GetPropulsion()->SetEngineRunning(0);
+      break;
+    case types::AircraftInitialConditionPreset::ON_GROUND:
+      fdmexec_raw_ptr.GetFCS()->SetThrottleCmd(0, 0.0);
+      fdmexec_raw_ptr.GetPropulsion()->SetEngineRunning(0);
+      break;
+    case types::AircraftInitialConditionPreset::TAKEOFF_ROLL:
+      fdmexec_raw_ptr.GetFCS()->SetThrottleCmd(0, 1.0);
+      fdmexec_raw_ptr.GetPropulsion()->SetEngineRunning(0);
+      break;
+    case types::AircraftInitialConditionPreset::TAKEOFF_ROLL_ROTATION: 
+      fdmexec_raw_ptr.GetFCS()->SetThrottleCmd(0, 1.0);
+      fdmexec_raw_ptr.GetFCS()->SetDeCmd(-0.3);
+      fdmexec_raw_ptr.GetPropulsion()->SetEngineRunning(0);
+      break;
   }
 }
 

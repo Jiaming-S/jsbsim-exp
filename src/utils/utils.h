@@ -11,8 +11,11 @@
 #include <Corrade/Utility/Debug.h>
 #include <Corrade/Utility/Path.h>
 #include <Corrade/Utility/Resource.h>
+
 #include <FGFDMExec.h>
 #include <initialization/FGInitialCondition.h>
+#include <models/FGFCS.h>
+#include <models/FGPropulsion.h>
 
 #include <memory>
 #include <unordered_map>
@@ -58,7 +61,7 @@ extern void load_meshes(
   const std::vector<std::pair<std::string, std::string>>& to_import
 );
 
-/// Conert aircraft type to corresponding type_string
+/// Convert aircraft type to corresponding type_string
 extern std::string to_type_string(types::AircraftType& t);
 
 /// Right Up Back
@@ -67,7 +70,10 @@ extern Magnum::Vector3 as_magnum_RUB(float x, float y, float z);
 /// North East Down
 extern Magnum::Vector3 as_jsbsim_NED(float x, float y, float z);
 
-/// Fetch a preset initial condition
+/// Fetch a preset initial condition struct
 extern types::AircraftInitialConditionConfig fetch_preset(types::AircraftInitialConditionPreset preset);
+
+// Apply a preset initial condition to a FGFDMExec
+extern void apply_preset(types::AircraftInitialConditionPreset preset, JSBSim::FGFDMExec& fdmexec_raw_ptr);
 
 }

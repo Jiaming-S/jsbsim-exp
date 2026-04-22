@@ -10,11 +10,24 @@ AircraftHandle& AircraftHandle::with_fdmexec(bool quiet) {
   return *this;
 }
 
-AircraftHandle& AircraftHandle::with_ic(types::AircraftInitialConditionConfig config, bool quiet) {
-  assert(_ic);
+AircraftHandle& AircraftHandle::with_ic(types::AircraftInitialConditionPreset preset) {
+  // Fetch preset IC struct with relevant info
+  types::AircraftInitialConditionConfig config = utils::fetch_preset(preset);
 
-  utils::load_aircraft_ic_config(_ic, config);
+  // Load and Run IC
+  _ic->InitializeIC();
+  _ic->SetLatitudeDegIC(config.latitude_deg);
+  _ic->SetLongitudeDegIC(config.longitude_deg);
+  _ic->SetAltitudeASLFtIC(config.altitude_asl_ft);
+  _ic->SetPhiDegIC(config.roll_deg);
+  _ic->SetThetaDegIC(config.pitch_deg);
+  _ic->SetPsiDegIC(config.heading_deg);
+  _ic->SetVNorthFpsIC(config.true_airspeed_fps);
   _fdmexec->RunIC();
+
+  // Apply control and throttle presets
+  JSBSim::FGFDMExec *fdmexec_raw_ptr = _fdmexec.get();
+  utils::apply_preset(preset, *fdmexec_raw_ptr);
 
   return *this;
 }

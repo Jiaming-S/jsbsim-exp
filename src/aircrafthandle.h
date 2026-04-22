@@ -6,6 +6,8 @@
 #include <Magnum/ImGuiIntegration/Context.hpp>
 
 #include <FGFDMExec.h>
+#include <models/FGFCS.h>
+#include <models/FGPropulsion.h>
 
 #include <memory>
 
@@ -36,7 +38,7 @@ class AircraftHandle {
       : _aircraft_type{aircraft_type}, _aircraft_type_string{utils::to_type_string(aircraft_type)} {}
 
     AircraftHandle& with_fdmexec(bool quiet = true);
-    AircraftHandle& with_ic(types::AircraftInitialConditionConfig config, bool quiet = true);
+    AircraftHandle& with_ic(types::AircraftInitialConditionPreset preset);
     AircraftHandle& with_model(types::Object3D *model);
     AircraftHandle& with_meshes(std::unordered_map<std::string, std::vector<types::ModelPart>>& meshes);
     AircraftHandle& link(Magnum::Shaders::PhongGL& shader, Magnum::SceneGraph::DrawableGroup3D& drawables);

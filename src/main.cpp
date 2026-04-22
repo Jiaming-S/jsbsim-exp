@@ -159,13 +159,10 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   for (auto preset : presets) {
     AircraftHandle aircraft = AircraftHandle{types::AircraftType::F16};
     aircraft.with_fdmexec()
-      .with_ic(utils::fetch_preset(preset))
+      .with_ic(preset)
       .with_model(new types::Object3D{&_scene})
       .with_meshes(_aircraft_part_meshes)
       .link(_shader, _drawables);
-
-    aircraft._fdmexec->GetPropertyManager()->GetNode("fcs/throttle-cmd-norm[0]")->setDoubleValue(0.2);
-    aircraft._fdmexec->GetPropertyManager()->GetNode("propulsion/engine[0]/set-running")->setIntValue(1);
     _aircraft.push_back(std::move(aircraft));
   }
 
