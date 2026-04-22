@@ -73,9 +73,6 @@ class JSBSimVisualizer: public Magnum::Platform::Application {
     Magnum::Timeline _timeline;
     types::Scene3D _scene;
 
-    // Input
-    std::unordered_map<Sdl2Application::Key, bool> _keys_down;
-
     // Camera
     std::unique_ptr<CameraHandle> _cam;
 
@@ -87,6 +84,7 @@ class JSBSimVisualizer: public Magnum::Platform::Application {
 
     // JSBSim
     std::vector<AircraftHandle> _aircraft;
+    types::SimState _jsbsim_state;
 };
 
 JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
@@ -166,6 +164,9 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     _aircraft.push_back(std::move(aircraft));
   }
 
+  // Start sim at normal 1x speed
+  _jsbsim_state = types::SimState::NORMAL;
+
   // Start Magnum timeline
   _timeline.start();
   
@@ -177,7 +178,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
 void JSBSimVisualizer::tickEvent() {
   for (auto& cur : _aircraft) {
     // Tick Controller
-    cur.update_sim();
+    if (_jsbsim_state != types::SimState::PAUSED) cur.update_sim();
     // Update Model
     cur.update_model();
   }
@@ -197,7 +198,7 @@ void JSBSimVisualizer::drawEvent() {
   if (!ImGui::GetIO().WantTextInput &&  isTextInputActive()) stopTextInput();
 
   // Update camera
-  _cam->handle_keypress(_keys_down);
+  _cam->handle_keyboard_input();
 
   // Do draw
   // TODO: make a method for this
@@ -228,13 +229,19 @@ void JSBSimVisualizer::drawEvent() {
 
 void JSBSimVisualizer::keyPressEvent(KeyEvent& event) {
   if (_imgui.handleKeyPressEvent(event)) return;
-  _keys_down[event.key()] = true;
+  _cam->set_key_pressed(event.key());
+  
+  if (event.key() == Sdl2Application::Key::P) {
+    if      (_jsbsim_state == types::SimState::NORMAL) _jsbsim_state = types::SimState::PAUSED;
+    else if (_jsbsim_state == types::SimState::PAUSED) _jsbsim_state = types::SimState::NORMAL;
+  }
+
   event.setAccepted();
 }
 
 void JSBSimVisualizer::keyReleaseEvent(KeyEvent& event) {
   if (_imgui.handleKeyReleaseEvent(event)) return;
-  _keys_down[event.key()] = false;
+  _cam->set_key_unpressed(event.key());
   event.setAccepted();
 }
 

@@ -14,6 +14,7 @@
 
 #include <FGFDMExec.h>
 #include <initialization/FGInitialCondition.h>
+#include <initialization/FGTrim.h>
 #include <models/FGFCS.h>
 #include <models/FGPropulsion.h>
 

@@ -53,4 +53,10 @@ struct ModelPart {
   Magnum::Matrix4 transformation;
 };
 
+enum SimState {
+  NORMAL,
+  CUSTOM,
+  PAUSED,
+};
+
 }

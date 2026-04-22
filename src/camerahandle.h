@@ -23,12 +23,17 @@ class CameraHandle {
     Magnum::Vector2 _mouse_prev_position;
     bool _mouse_held = false;
 
+    std::unordered_map<Sdl2Application::Key, bool> _keys_down;
 
     CameraHandle(float speed = 0.1f, Magnum::Deg rotation_speed = 1.0_degf, float mouse_sensitivity = 0.2f)
       : _camera{}, _default_speed{speed}, _default_rotation_speed{rotation_speed}, _mouse_sensitivity{mouse_sensitivity} {};
 
     void attach_to(types::Object3D* root, Magnum::Matrix4 projection_matrix);
-    void handle_keypress(std::unordered_map<Sdl2Application::Key, bool>& keys_down);
+
+    void handle_keyboard_input();
+    void set_key_pressed(Sdl2Application::Key key);
+    void set_key_unpressed(Sdl2Application::Key key);
+
     void handle_mouse_move(Magnum::Vector2 position);
     void set_held(Magnum::Vector2 position);
     void set_unheld();
