@@ -58,14 +58,14 @@ void AircraftHandle::update_sim() {
 }
 
 void AircraftHandle::update_model() {
-  _AircraftStateInfo state = this->to_aircraft_state();
+  types::AircraftStateInfo state = this->to_aircraft_state();
   _model->setTransformation(Magnum::Matrix4::translation(utils::as_magnum_RUB(state.north, state.east, state.down)))
     .rotateX( state.pitch)
     .rotateZ( state.roll)
     .rotateY(-state.yaw);
 }
 
-_AircraftStateInfo AircraftHandle::to_aircraft_state() {
+types::AircraftStateInfo AircraftHandle::to_aircraft_state() {
   std::shared_ptr<JSBSim::FGAircraft>  cur_aircraft =  _fdmexec->GetAircraft();
   std::shared_ptr<JSBSim::FGPropagate> cur_propagate = _fdmexec->GetPropagate();
 
@@ -90,7 +90,7 @@ _AircraftStateInfo AircraftHandle::to_aircraft_state() {
   double v_east  = cur_propagate->GetVel(2);
   double v_down  = cur_propagate->GetVel(3);
 
-  return _AircraftStateInfo {
+  return types::AircraftStateInfo {
     .pitch = pitch,
     .roll = roll,
     .yaw = yaw,

@@ -13,7 +13,9 @@ class CameraHandle {
     Magnum::SceneGraph::Camera3D *_camera;
     types::Object3D *_mount, *_revolut;
 
-    const float SHIFT_SPEED_MULTIPLIER = 5.0f;
+    const float SHIFT_SPEED_MULTIPLIER = 10.0f;
+    const float SHIFT_ROTATION_SPEED_MULTIPLIER = 2.0f;
+
     const float _default_speed;
     const Magnum::Deg _default_rotation_speed;
 

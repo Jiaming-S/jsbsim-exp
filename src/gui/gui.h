@@ -14,7 +14,7 @@ void gui_aircraft_debug_collapse(
   ImGuiTableFlags table_flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders
 ) {
   if (ImGui::CollapsingHeader(header_name.c_str(), header_flags)) {
-    _AircraftStateInfo state = ac.to_aircraft_state();
+    types::AircraftStateInfo state = ac.to_aircraft_state();
     if (ImGui::BeginTable("Aircraft Info", 2, table_flags)) {
       ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed);
       ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
@@ -71,12 +71,10 @@ void gui_aircraft_debug_collapse(
 
       ImGui::EndTable();
     }
-
-    ImGui::Button("Bind Camera");
   }
 }
 
-void gui_aircraft(std::vector<AircraftHandle>& aircraft) {
+void gui_aircraft_debug(std::vector<AircraftHandle>& aircraft) {
   ImGui::SetNextWindowSize(ImVec2(200, 1000), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowPos(ImVec2(20, 20), ImGuiCond_FirstUseEver);
   ImGui::Begin("Debug");
@@ -84,6 +82,54 @@ void gui_aircraft(std::vector<AircraftHandle>& aircraft) {
   for (size_t i = 0; i < aircraft.size(); i++) {
     auto& ac = aircraft[i];
     gui_aircraft_debug_collapse(ac, std::to_string(i) + ": " + ac._aircraft_type_string);
+  }
+
+  ImGui::End();
+}
+
+
+void gui_camera_selection(
+  std::vector<AircraftHandle>& aircraft,
+  std::unique_ptr<CameraHandle>& cam,
+  types::Scene3D& scene
+) {
+  ImGui::SetNextWindowSize(ImVec2(200, 400), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowPos(ImVec2(300, 20), ImGuiCond_FirstUseEver);
+  ImGui::Begin("Camera Selection");
+
+  if (ImGui::BeginTable("Aircraft", 2)) {
+    ImGui::TableSetupColumn("Choice");
+    ImGui::TableSetupColumn("Button");
+
+    ImGui::TableNextColumn();
+    ImGui::Text("Reset Camera");
+    ImGui::TableNextColumn();
+    
+    ImGui::PushID(-1);
+    if (ImGui::Button("Reset")) {
+      cam->attach_to(&scene, cam->_camera->projectionMatrix());
+    }
+    ImGui::PopID();
+
+    for (size_t i = 0; i < aircraft.size(); i++) {
+      auto& ac = aircraft[i];
+      std::string aircraft_string_id = std::to_string(i) + ": " + ac._aircraft_type_string;
+
+      ImGui::TableNextColumn();
+      ImGui::Text("%s", aircraft_string_id.c_str());
+      ImGui::TableNextColumn();
+      
+      ImGui::PushID(i);
+      if (ImGui::Button("Bind Camera")) {
+        cam->attach_to(
+          ac._model,
+          cam->_camera->projectionMatrix()
+        );
+      }
+      ImGui::PopID();
+    }
+
+    ImGui::EndTable();
   }
 
   ImGui::End();

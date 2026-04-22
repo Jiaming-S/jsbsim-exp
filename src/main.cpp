@@ -127,10 +127,10 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
 
   // Add floor
   types::Object3D *floor = new types::Object3D{&_scene};
-  floor->scale(Magnum::Vector3{100.0f, 0.01f, 100.0f})
+  floor->scale(Magnum::Vector3{10000.0f, 0.01f, 10000.0f})
     .translateLocal(Magnum::Vector3{0.0f, -0.1f, 0.0f})
     .rotateXLocal(1.5707_radf);
-  _meshes["floor_mesh"] = Magnum::MeshTools::compile(Magnum::Primitives::grid3DWireframe({100, 100}));
+  _meshes["floor_mesh"] = Magnum::MeshTools::compile(Magnum::Primitives::grid3DWireframe({1000, 1000}));
   new ColoredDrawable{*floor, _shader, _meshes["floor_mesh"], _drawables};
 
   // Load and setup camera
@@ -164,7 +164,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
       .with_meshes(_aircraft_part_meshes)
       .link(_shader, _drawables);
 
-    aircraft._fdmexec->GetPropertyManager()->GetNode("fcs/throttle-cmd-norm[0]")->setDoubleValue(1.0);
+    aircraft._fdmexec->GetPropertyManager()->GetNode("fcs/throttle-cmd-norm[0]")->setDoubleValue(0.2);
     aircraft._fdmexec->GetPropertyManager()->GetNode("propulsion/engine[0]/set-running")->setIntValue(1);
     _aircraft.push_back(std::move(aircraft));
   }
@@ -213,7 +213,8 @@ void JSBSimVisualizer::drawEvent() {
   Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::DepthTest);
 
   // Draw ImGui
-  gui::gui_aircraft(_aircraft);
+  gui::gui_aircraft_debug(_aircraft);
+  gui::gui_camera_selection(_aircraft, _cam, _scene);
   _imgui.updateApplicationCursor(*this);
   _imgui.drawFrame();
 

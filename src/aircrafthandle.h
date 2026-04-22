@@ -19,19 +19,6 @@ struct _NodeMeshPair {
   Magnum::GL::Mesh *mesh;
 };
 
-struct _AircraftStateInfo {
-  Magnum::Rad pitch;
-  Magnum::Rad roll;
-  Magnum::Rad yaw;
-  double alt;
-  double north;
-  double east;
-  double down;
-  double v_north;
-  double v_east;
-  double v_down;
-};
-
 class AircraftHandle {
   public:
     const types::AircraftType _aircraft_type;
@@ -54,7 +41,7 @@ class AircraftHandle {
     AircraftHandle& with_meshes(std::unordered_map<std::string, std::vector<types::ModelPart>>& meshes);
     AircraftHandle& link(Magnum::Shaders::PhongGL& shader, Magnum::SceneGraph::DrawableGroup3D& drawables);
 
-    _AircraftStateInfo to_aircraft_state();
+    types::AircraftStateInfo to_aircraft_state();
 
     void update_sim();
     void update_model();

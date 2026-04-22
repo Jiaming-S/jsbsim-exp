@@ -35,6 +35,19 @@ enum AircraftInitialConditionPreset {
   TAKEOFF_ROLL_ROTATION,
 };
 
+struct AircraftStateInfo {
+  Magnum::Rad pitch;
+  Magnum::Rad roll;
+  Magnum::Rad yaw;
+  double alt;
+  double north;
+  double east;
+  double down;
+  double v_north;
+  double v_east;
+  double v_down;
+};
+
 struct ModelPart {
   Magnum::GL::Mesh mesh;
   Magnum::Matrix4 transformation;
