@@ -38,3 +38,17 @@ void CameraHandle::handle_keypress(std::unordered_map<Sdl2Application::Key, bool
   if (keys_down[Sdl2Application::Key::Space])     _mount->translate(Magnum::Vector3::yAxis( speed));
   if (keys_down[Sdl2Application::Key::LeftCtrl])  _mount->translate(Magnum::Vector3::yAxis(-speed));
 }
+
+void CameraHandle::handle_mouse_move(Magnum::Vector2 position) {
+  if (!_mouse_held) return;
+  Magnum::Vector2 d_position = Magnum::Vector2(position - _mouse_prev_position) * _mouse_sensitivity;
+
+  Magnum::Matrix4 rot = Magnum::Matrix4::rotation(Magnum::Deg(-d_position.x()), Magnum::Vector3::yAxis());
+  _revolut->setTransformation(rot * _revolut->transformation());
+  _revolut->rotateLocal(Magnum::Deg(-d_position.y()), Magnum::Vector3::xAxis());
+
+  _mouse_prev_position = position;
+}
+
+void CameraHandle::set_held(Magnum::Vector2 position) { _mouse_held = true; _mouse_prev_position = position; }
+void CameraHandle::set_unheld() { _mouse_held = false; }

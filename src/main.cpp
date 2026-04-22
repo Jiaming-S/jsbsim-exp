@@ -243,14 +243,27 @@ void JSBSimVisualizer::keyReleaseEvent(KeyEvent& event) {
 
 void JSBSimVisualizer::pointerPressEvent(PointerEvent& event) {
   if (_imgui.handlePointerPressEvent(event)) return;
+  
+  if (event.pointer() == Sdl2Application::Pointer::MouseLeft) {
+    _cam->set_held(event.position());
+    event.setAccepted();
+  }
 }
 
 void JSBSimVisualizer::pointerReleaseEvent(PointerEvent& event) {
   if (_imgui.handlePointerReleaseEvent(event)) return;
+
+  if (event.pointer() == Sdl2Application::Pointer::MouseLeft) {
+    _cam->set_unheld();
+    event.setAccepted();
+  }
 }
 
 void JSBSimVisualizer::pointerMoveEvent(PointerMoveEvent& event) {
   if (_imgui.handlePointerMoveEvent(event)) return;
+
+  _cam->handle_mouse_move(event.position());
+  event.setAccepted();
 }
 
 void JSBSimVisualizer::scrollEvent(ScrollEvent& event) {
