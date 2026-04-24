@@ -137,82 +137,116 @@ Magnum::Vector3 as_jsbsim_NED(float x, float y, float z) {
   return Magnum::Vector3{-z, x, -y};
 }
 
-types::AircraftInitialConditionConfig fetch_preset(types::AircraftInitialConditionPreset preset) {
-  switch (preset) {
-    case types::AircraftInitialConditionPreset::DEFAULT: return {
-      .altitude_asl_ft = 60.0f,
-      .true_airspeed_fps = 250.0f,
-      .roll_deg = 0.0f,
-      .pitch_deg = 0.0f,
-      .heading_deg = 0.0f,
-      .latitude_deg = 0.0f,
-      .longitude_deg = 0.0f,
-    };
-    case types::AircraftInitialConditionPreset::DEFAULT_OPPONENT: return {
-      .altitude_asl_ft = 60.0f,
-      .true_airspeed_fps = 250.0f,
-      .roll_deg = 0.0f,
-      .pitch_deg = 0.0f,
-      .heading_deg = 180.0f,
-      .latitude_deg = -1e-3f,
-      .longitude_deg = 0.0f,
-    };
-    case types::AircraftInitialConditionPreset::ON_GROUND: return {
-      .altitude_asl_ft = 5.6f,
-      .true_airspeed_fps = 0.0f,
-      .roll_deg = 0.0f,
-      .pitch_deg = 0.0f,
-      .heading_deg = 0.0f,
-      .latitude_deg = 0.0f,
-      .longitude_deg = 0.0f,
-    };
-    case types::AircraftInitialConditionPreset::TAKEOFF_ROLL: return {
-      .altitude_asl_ft = 5.6f,
-      .true_airspeed_fps = 20.0f,
-      .roll_deg = 0.0f,
-      .pitch_deg = 0.0f,
-      .heading_deg = 0.0f,
-      .latitude_deg = 0.0f,
-      .longitude_deg = 0.0f,
-    };
-    case types::AircraftInitialConditionPreset::TAKEOFF_ROLL_ROTATION: return {
-      .altitude_asl_ft = 5.6f,
-      .true_airspeed_fps = 245.0f,
-      .roll_deg = 0.0f,
-      .pitch_deg = 0.0f,
-      .heading_deg = 0.0f,
-      .latitude_deg = -2e-3f,
-      .longitude_deg = 0.0f,
-    };
-    default: return {};
-  }
-}
-
-void apply_preset(
+void apply_preset_ic(
   types::AircraftInitialConditionPreset preset,
-  JSBSim::FGFDMExec& fdmexec_raw_ptr
+  JSBSim::FGFDMExec& fdmexec
 ) {
   switch (preset) {
     case types::AircraftInitialConditionPreset::DEFAULT:
-      fdmexec_raw_ptr.GetFCS()->SetThrottleCmd(0, 1.0);
-      fdmexec_raw_ptr.GetPropulsion()->SetEngineRunning(0);
+      fdmexec.GetIC()->SetAltitudeASLFtIC(60.0f);
+      fdmexec.GetIC()->SetVNorthFpsIC(450.0f);
+      fdmexec.GetIC()->SetPhiDegIC(0.0f);
+      fdmexec.GetIC()->SetThetaDegIC(0.0f);
+      fdmexec.GetIC()->SetPsiDegIC(0.0f);
+      fdmexec.GetIC()->SetLatitudeDegIC(0.0f);
+      fdmexec.GetIC()->SetLongitudeDegIC(0.0f);
       break;
     case types::AircraftInitialConditionPreset::DEFAULT_OPPONENT:
-      fdmexec_raw_ptr.GetFCS()->SetThrottleCmd(0, 1.0);
-      fdmexec_raw_ptr.GetPropulsion()->SetEngineRunning(0);
+      fdmexec.GetIC()->SetAltitudeASLFtIC(60.0f);
+      fdmexec.GetIC()->SetVNorthFpsIC(450.0f);
+      fdmexec.GetIC()->SetPhiDegIC(0.0f);
+      fdmexec.GetIC()->SetThetaDegIC(0.0f);
+      fdmexec.GetIC()->SetPsiDegIC(180.0f);
+      fdmexec.GetIC()->SetLatitudeDegIC(-1e-3f);
+      fdmexec.GetIC()->SetLongitudeDegIC(0.0f);
       break;
     case types::AircraftInitialConditionPreset::ON_GROUND:
-      fdmexec_raw_ptr.GetFCS()->SetThrottleCmd(0, 0.0);
-      fdmexec_raw_ptr.GetPropulsion()->SetEngineRunning(0);
+      fdmexec.GetIC()->SetAltitudeASLFtIC(5.6f);
+      fdmexec.GetIC()->SetVNorthFpsIC(0.0f);
+      fdmexec.GetIC()->SetPhiDegIC(0.0f);
+      fdmexec.GetIC()->SetThetaDegIC(0.0f);
+      fdmexec.GetIC()->SetPsiDegIC(0.0f);
+      fdmexec.GetIC()->SetLatitudeDegIC(0.0f);
+      fdmexec.GetIC()->SetLongitudeDegIC(0.0f);
       break;
     case types::AircraftInitialConditionPreset::TAKEOFF_ROLL:
-      fdmexec_raw_ptr.GetFCS()->SetThrottleCmd(0, 1.0);
-      fdmexec_raw_ptr.GetPropulsion()->SetEngineRunning(0);
+      fdmexec.GetIC()->SetAltitudeASLFtIC(5.6f);
+      fdmexec.GetIC()->SetVNorthFpsIC(20.0f);
+      fdmexec.GetIC()->SetPhiDegIC(0.0f);
+      fdmexec.GetIC()->SetThetaDegIC(0.0f);
+      fdmexec.GetIC()->SetPsiDegIC(0.0f);
+      fdmexec.GetIC()->SetLatitudeDegIC(0.0f);
+      fdmexec.GetIC()->SetLongitudeDegIC(0.0f);
+      break;
+    case types::AircraftInitialConditionPreset::TAKEOFF_ROLL_ROTATION:
+      fdmexec.GetIC()->SetAltitudeASLFtIC(5.6f);
+      fdmexec.GetIC()->SetVNorthFpsIC(200.0f);
+      fdmexec.GetIC()->SetPhiDegIC(0.0f);
+      fdmexec.GetIC()->SetThetaDegIC(3.0f);
+      fdmexec.GetIC()->SetPsiDegIC(0.0f);
+      fdmexec.GetIC()->SetLatitudeDegIC(-2e-3f);
+      fdmexec.GetIC()->SetLongitudeDegIC(0.0f);
+      break;
+    case types::AircraftInitialConditionPreset::LEFT_SPIRAL:
+      fdmexec.GetIC()->SetAltitudeASLFtIC(200.0f);
+      fdmexec.GetIC()->SetVNorthFpsIC(450.0f);
+      fdmexec.GetIC()->SetPhiDegIC(45.0f);
+      fdmexec.GetIC()->SetThetaDegIC(0.0f);
+      fdmexec.GetIC()->SetPsiDegIC(0.0f);
+      fdmexec.GetIC()->SetLatitudeDegIC(0.0f);
+      fdmexec.GetIC()->SetLongitudeDegIC(0.0f);
+      break;
+    case types::AircraftInitialConditionPreset::RIGHT_SPIRAL:
+      fdmexec.GetIC()->SetAltitudeASLFtIC(200.0f);
+      fdmexec.GetIC()->SetVNorthFpsIC(450.0f);
+      fdmexec.GetIC()->SetPhiDegIC(-45.0f);
+      fdmexec.GetIC()->SetThetaDegIC(0.0f);
+      fdmexec.GetIC()->SetPsiDegIC(0.0f);
+      fdmexec.GetIC()->SetLatitudeDegIC(0.0f);
+      fdmexec.GetIC()->SetLongitudeDegIC(0.0f);
+      break;
+  }
+}
+
+void apply_preset_controls(
+  types::AircraftInitialConditionPreset preset,
+  JSBSim::FGFDMExec& fdmexec
+) {
+  switch (preset) {
+    case types::AircraftInitialConditionPreset::DEFAULT:
+      fdmexec.GetFCS()->SetThrottleCmd(0, 1.0);
+      fdmexec.GetPropulsion()->SetEngineRunning(0);
+      break;
+    case types::AircraftInitialConditionPreset::DEFAULT_OPPONENT:
+      fdmexec.GetFCS()->SetThrottleCmd(0, 1.0);
+      fdmexec.GetPropulsion()->SetEngineRunning(0);
+      break;
+    case types::AircraftInitialConditionPreset::ON_GROUND:
+      fdmexec.GetFCS()->SetThrottleCmd(0, 0.0);
+      fdmexec.GetPropulsion()->SetEngineRunning(0);
+      break;
+    case types::AircraftInitialConditionPreset::TAKEOFF_ROLL:
+      fdmexec.GetFCS()->SetThrottleCmd(0, 1.0);
+      fdmexec.GetPropulsion()->SetEngineRunning(0);
       break;
     case types::AircraftInitialConditionPreset::TAKEOFF_ROLL_ROTATION: 
-      fdmexec_raw_ptr.GetFCS()->SetThrottleCmd(0, 1.0);
-      fdmexec_raw_ptr.GetFCS()->SetDeCmd(-0.2);
-      fdmexec_raw_ptr.GetPropulsion()->SetEngineRunning(0);
+      fdmexec.GetFCS()->SetThrottleCmd(0, 1.0);
+      fdmexec.GetFCS()->SetDeCmd(-0.2);
+      fdmexec.GetPropulsion()->SetEngineRunning(0);
+      break;
+    case types::AircraftInitialConditionPreset::LEFT_SPIRAL: 
+      fdmexec.GetFCS()->SetThrottleCmd(0, 1.0);
+      fdmexec.GetFCS()->SetDeCmd(-0.9);
+      fdmexec.GetFCS()->SetDaCmd(0.25);
+      fdmexec.GetFCS()->SetDrCmd(-0.25);
+      fdmexec.GetPropulsion()->SetEngineRunning(0);
+      break;
+    case types::AircraftInitialConditionPreset::RIGHT_SPIRAL: 
+      fdmexec.GetFCS()->SetThrottleCmd(0, 1.0);
+      fdmexec.GetFCS()->SetDeCmd(-0.9);
+      fdmexec.GetFCS()->SetDaCmd(-0.25);
+      fdmexec.GetFCS()->SetDrCmd(0.25);
+      fdmexec.GetPropulsion()->SetEngineRunning(0);
       break;
   }
 }

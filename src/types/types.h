@@ -33,6 +33,8 @@ enum AircraftInitialConditionPreset {
   ON_GROUND,
   TAKEOFF_ROLL,
   TAKEOFF_ROLL_ROTATION,
+  LEFT_SPIRAL,
+  RIGHT_SPIRAL,
 };
 
 struct AircraftStateInfo {
@@ -48,6 +50,13 @@ struct AircraftStateInfo {
   double v_down;
 };
 
+enum AircraftKeyPoints {
+  NOSE,
+  LANDING_GEAR_BOTTOM,
+  WINGTIP_L,
+  WINGTIP_R,
+};
+
 struct ModelPart {
   Magnum::GL::Mesh mesh;
   Magnum::Matrix4 transformation;
@@ -55,7 +64,6 @@ struct ModelPart {
 
 enum SimState {
   NORMAL,
-  CUSTOM,
   PAUSED,
 };
 

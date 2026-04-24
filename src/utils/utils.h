@@ -71,10 +71,10 @@ extern Magnum::Vector3 as_magnum_RUB(float x, float y, float z);
 /// North East Down
 extern Magnum::Vector3 as_jsbsim_NED(float x, float y, float z);
 
-/// Fetch a preset initial condition struct
-extern types::AircraftInitialConditionConfig fetch_preset(types::AircraftInitialConditionPreset preset);
+/// Apply a preset initial condition
+extern void apply_preset_ic(types::AircraftInitialConditionPreset preset, JSBSim::FGFDMExec& fdmexec);
 
-// Apply a preset initial condition to a FGFDMExec
-extern void apply_preset(types::AircraftInitialConditionPreset preset, JSBSim::FGFDMExec& fdmexec_raw_ptr);
+/// Apply a preset initial condition
+extern void apply_preset_controls(types::AircraftInitialConditionPreset preset, JSBSim::FGFDMExec& fdmexec);
 
 }

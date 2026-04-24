@@ -11,23 +11,15 @@ AircraftHandle& AircraftHandle::with_fdmexec(bool quiet) {
 }
 
 AircraftHandle& AircraftHandle::with_ic(types::AircraftInitialConditionPreset preset) {
-  // Fetch preset IC struct with relevant info
-  types::AircraftInitialConditionConfig config = utils::fetch_preset(preset);
-
-  // Load and Run IC
-  _ic->InitializeIC();
-  _ic->SetLatitudeDegIC(config.latitude_deg);
-  _ic->SetLongitudeDegIC(config.longitude_deg);
-  _ic->SetAltitudeASLFtIC(config.altitude_asl_ft);
-  _ic->SetPhiDegIC(config.roll_deg);
-  _ic->SetThetaDegIC(config.pitch_deg);
-  _ic->SetPsiDegIC(config.heading_deg);
-  _ic->SetVNorthFpsIC(config.true_airspeed_fps);
-  _fdmexec->RunIC();
-
-  // Apply control and throttle presets
   JSBSim::FGFDMExec *fdmexec_raw_ptr = _fdmexec.get();
-  utils::apply_preset(preset, *fdmexec_raw_ptr);
+  
+  // Apply initial condition presets
+  _fdmexec->GetIC()->InitializeIC();
+  utils::apply_preset_ic(preset, *fdmexec_raw_ptr);
+  _fdmexec->RunIC();
+  
+  // Apply control and throttle presets
+  utils::apply_preset_controls(preset, *fdmexec_raw_ptr);
 
   return *this;
 }
@@ -73,9 +65,9 @@ void AircraftHandle::update_sim() {
 void AircraftHandle::update_model() {
   types::AircraftStateInfo state = this->to_aircraft_state();
   _model->setTransformation(Magnum::Matrix4::translation(utils::as_magnum_RUB(state.north, state.east, state.down)))
+    .rotateY(-state.yaw)
     .rotateX( state.pitch)
-    .rotateZ( state.roll)
-    .rotateY(-state.yaw);
+    .rotateZ( state.roll);
 }
 
 types::AircraftStateInfo AircraftHandle::to_aircraft_state() {

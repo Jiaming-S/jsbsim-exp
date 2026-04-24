@@ -152,6 +152,8 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     types::AircraftInitialConditionPreset::ON_GROUND,
     types::AircraftInitialConditionPreset::TAKEOFF_ROLL,
     types::AircraftInitialConditionPreset::TAKEOFF_ROLL_ROTATION,
+    types::AircraftInitialConditionPreset::LEFT_SPIRAL,
+    types::AircraftInitialConditionPreset::RIGHT_SPIRAL,
   };
 
   for (auto preset : presets) {

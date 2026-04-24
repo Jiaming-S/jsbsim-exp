@@ -26,6 +26,8 @@ class AircraftHandle {
     const types::AircraftType _aircraft_type;
     const std::string _aircraft_type_string;
 
+    std::unordered_map<types::AircraftKeyPoints, types::Object3D *> _keypoints_mapping;
+
     // JSBSim
     std::unique_ptr<JSBSim::FGFDMExec> _fdmexec;
     std::shared_ptr<JSBSim::FGInitialCondition> _ic;
