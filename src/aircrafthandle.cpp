@@ -69,7 +69,7 @@ void AircraftHandle::update_model() {
   _model->resetTransformation()
     .rotateY(-state.yaw)
     .rotateX( state.pitch)
-    .rotateZ( state.roll)
+    .rotateZ(-state.roll)
     .translate(utils::as_magnum_RUB(state.north, state.east, state.down));
 }
 

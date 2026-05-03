@@ -238,16 +238,16 @@ void apply_preset_controls(
       break;
     case types::AircraftInitialConditionPreset::LEFT_SPIRAL: 
       fdmexec.GetFCS()->SetThrottleCmd(0, 1.0);
-      fdmexec.GetFCS()->SetDeCmd(0.6);
-      // fdmexec.GetFCS()->SetDaCmd(-0.15);
-      // fdmexec.GetFCS()->SetDrCmd(-0.15);
+      fdmexec.GetFCS()->SetDeCmd(-0.3);
+      // fdmexec.GetFCS()->SetDaCmd(0.12);
+      fdmexec.GetFCS()->SetDrCmd(-0.15);
       fdmexec.GetPropulsion()->SetEngineRunning(0);
       break;
     case types::AircraftInitialConditionPreset::RIGHT_SPIRAL: 
       fdmexec.GetFCS()->SetThrottleCmd(0, 1.0);
-      fdmexec.GetFCS()->SetDeCmd(0.6);
-      // fdmexec.GetFCS()->SetDaCmd(0.15);
-      // fdmexec.GetFCS()->SetDrCmd(0.15);
+      fdmexec.GetFCS()->SetDeCmd(-0.3);
+      // fdmexec.GetFCS()->SetDaCmd(-0.12);
+      fdmexec.GetFCS()->SetDrCmd(0.15);
       fdmexec.GetPropulsion()->SetEngineRunning(0);
       break;
   }
