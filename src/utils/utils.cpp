@@ -191,21 +191,21 @@ void apply_preset_ic(
       break;
     case types::AircraftInitialConditionPreset::LEFT_SPIRAL:
       fdmexec.GetIC()->SetAltitudeASLFtIC(200.0f);
-      fdmexec.GetIC()->SetVNorthFpsIC(450.0f);
+      fdmexec.GetIC()->SetVNorthFpsIC(650.0f);
       fdmexec.GetIC()->SetPhiDegIC(45.0f);
       fdmexec.GetIC()->SetThetaDegIC(0.0f);
       fdmexec.GetIC()->SetPsiDegIC(0.0f);
       fdmexec.GetIC()->SetLatitudeDegIC(0.0f);
-      fdmexec.GetIC()->SetLongitudeDegIC(0.0f);
+      fdmexec.GetIC()->SetLongitudeDegIC(2e-3f);
       break;
     case types::AircraftInitialConditionPreset::RIGHT_SPIRAL:
       fdmexec.GetIC()->SetAltitudeASLFtIC(200.0f);
-      fdmexec.GetIC()->SetVNorthFpsIC(450.0f);
+      fdmexec.GetIC()->SetVNorthFpsIC(650.0f);
       fdmexec.GetIC()->SetPhiDegIC(-45.0f);
       fdmexec.GetIC()->SetThetaDegIC(0.0f);
       fdmexec.GetIC()->SetPsiDegIC(0.0f);
       fdmexec.GetIC()->SetLatitudeDegIC(0.0f);
-      fdmexec.GetIC()->SetLongitudeDegIC(0.0f);
+      fdmexec.GetIC()->SetLongitudeDegIC(-2e-3f);
       break;
   }
 }
@@ -238,16 +238,16 @@ void apply_preset_controls(
       break;
     case types::AircraftInitialConditionPreset::LEFT_SPIRAL: 
       fdmexec.GetFCS()->SetThrottleCmd(0, 1.0);
-      fdmexec.GetFCS()->SetDeCmd(0.4);
-      fdmexec.GetFCS()->SetDaCmd(0.25);
-      fdmexec.GetFCS()->SetDrCmd(-0.25);
+      fdmexec.GetFCS()->SetDeCmd(0.6);
+      // fdmexec.GetFCS()->SetDaCmd(-0.15);
+      // fdmexec.GetFCS()->SetDrCmd(-0.15);
       fdmexec.GetPropulsion()->SetEngineRunning(0);
       break;
     case types::AircraftInitialConditionPreset::RIGHT_SPIRAL: 
       fdmexec.GetFCS()->SetThrottleCmd(0, 1.0);
-      fdmexec.GetFCS()->SetDeCmd(0.4);
-      fdmexec.GetFCS()->SetDaCmd(-0.25);
-      fdmexec.GetFCS()->SetDrCmd(0.25);
+      fdmexec.GetFCS()->SetDeCmd(0.6);
+      // fdmexec.GetFCS()->SetDaCmd(0.15);
+      // fdmexec.GetFCS()->SetDrCmd(0.15);
       fdmexec.GetPropulsion()->SetEngineRunning(0);
       break;
   }

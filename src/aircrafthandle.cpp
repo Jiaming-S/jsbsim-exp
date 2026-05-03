@@ -68,7 +68,7 @@ void AircraftHandle::update_model() {
   types::AircraftStateInfo state = this->to_aircraft_state();
   _model->resetTransformation()
     .rotateY(-state.yaw)
-    .rotateX(-state.pitch)
+    .rotateX( state.pitch)
     .rotateZ( state.roll)
     .translate(utils::as_magnum_RUB(state.north, state.east, state.down));
 }
