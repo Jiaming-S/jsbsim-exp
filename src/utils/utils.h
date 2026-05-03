@@ -43,16 +43,6 @@ extern std::unique_ptr<JSBSim::FGFDMExec> load_aircraft(
   bool quiet = true
 );
 
-/// @brief Loads aircraft initial conditions given config
-/// @param aircraft_ic 
-/// @param config 
-/// @param quiet 
-extern void load_aircraft_ic_config(
-  std::shared_ptr<JSBSim::FGInitialCondition>& aircraft_ic,
-  types::AircraftInitialConditionConfig& config,
-  bool quiet = true
-);
-
 /// @brief Loads all meshes of a gltf as ModelParts into a vector, then publishes to shared _meshes hashmap
 /// @param _meshes 
 /// @param to_import 
@@ -74,7 +64,7 @@ extern Magnum::Vector3 as_jsbsim_NED(float x, float y, float z);
 /// Apply a preset initial condition
 extern void apply_preset_ic(types::AircraftInitialConditionPreset preset, JSBSim::FGFDMExec& fdmexec);
 
-/// Apply a preset initial condition
+/// Apply a preset initial control
 extern void apply_preset_controls(types::AircraftInitialConditionPreset preset, JSBSim::FGFDMExec& fdmexec);
 
 }

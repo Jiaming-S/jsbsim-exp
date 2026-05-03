@@ -106,7 +106,9 @@ void load_meshes(
       Corrade::Containers::Optional<Magnum::Trade::SceneData> scene = importer->scene(importer->defaultScene());
       if (scene) {
         for(Magnum::UnsignedInt root_id : scene->children3D()) {
-          flatten_gltf_nodes(*importer, root_id, Magnum::Matrix4{}, model_parts);
+          // TODO: export from blender better?
+          Magnum::Matrix4 tmp = Magnum::Matrix4::rotationY(Magnum::Deg(90.0f));
+          flatten_gltf_nodes(*importer, root_id, tmp, model_parts);
         }
       }
     }
@@ -236,14 +238,14 @@ void apply_preset_controls(
       break;
     case types::AircraftInitialConditionPreset::LEFT_SPIRAL: 
       fdmexec.GetFCS()->SetThrottleCmd(0, 1.0);
-      fdmexec.GetFCS()->SetDeCmd(-0.9);
+      fdmexec.GetFCS()->SetDeCmd(0.4);
       fdmexec.GetFCS()->SetDaCmd(0.25);
       fdmexec.GetFCS()->SetDrCmd(-0.25);
       fdmexec.GetPropulsion()->SetEngineRunning(0);
       break;
     case types::AircraftInitialConditionPreset::RIGHT_SPIRAL: 
       fdmexec.GetFCS()->SetThrottleCmd(0, 1.0);
-      fdmexec.GetFCS()->SetDeCmd(-0.9);
+      fdmexec.GetFCS()->SetDeCmd(0.4);
       fdmexec.GetFCS()->SetDaCmd(-0.25);
       fdmexec.GetFCS()->SetDrCmd(0.25);
       fdmexec.GetPropulsion()->SetEngineRunning(0);

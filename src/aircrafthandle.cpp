@@ -11,6 +11,8 @@ AircraftHandle& AircraftHandle::with_fdmexec(bool quiet) {
 }
 
 AircraftHandle& AircraftHandle::with_ic(types::AircraftInitialConditionPreset preset) {
+  assert(_fdmexec);
+
   JSBSim::FGFDMExec *fdmexec_raw_ptr = _fdmexec.get();
   
   // Apply initial condition presets
@@ -64,14 +66,15 @@ void AircraftHandle::update_sim() {
 
 void AircraftHandle::update_model() {
   types::AircraftStateInfo state = this->to_aircraft_state();
-  _model->setTransformation(Magnum::Matrix4::translation(utils::as_magnum_RUB(state.north, state.east, state.down)))
+  _model->resetTransformation()
     .rotateY(-state.yaw)
-    .rotateX( state.pitch)
-    .rotateZ( state.roll);
+    .rotateX(-state.pitch)
+    .rotateZ( state.roll)
+    .translate(utils::as_magnum_RUB(state.north, state.east, state.down));
 }
 
 types::AircraftStateInfo AircraftHandle::to_aircraft_state() {
-  std::shared_ptr<JSBSim::FGAircraft>  cur_aircraft =  _fdmexec->GetAircraft();
+  std::shared_ptr<JSBSim::FGAircraft>  cur_aircraft  = _fdmexec->GetAircraft();
   std::shared_ptr<JSBSim::FGPropagate> cur_propagate = _fdmexec->GetPropagate();
 
   Magnum::Rad roll  = Magnum::Rad(cur_propagate->GetEuler(1));
@@ -86,7 +89,7 @@ types::AircraftStateInfo AircraftHandle::to_aircraft_state() {
 
   double north = lat_rad * radius;
   double east  = lon_rad * radius * std::cos(cur_propagate->GetLatitude());
-  double down  = 5.60f - alt;
+  double down  = -alt;
 
   double v_north = cur_propagate->GetVel(1);
   double v_east  = cur_propagate->GetVel(2);

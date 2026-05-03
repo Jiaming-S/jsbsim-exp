@@ -17,16 +17,6 @@ enum AircraftType {
   F16,
 };
 
-struct AircraftInitialConditionConfig {
-  double altitude_asl_ft;
-  double true_airspeed_fps;
-  double roll_deg;
-  double pitch_deg;
-  double heading_deg;
-  double latitude_deg;
-  double longitude_deg;
-};
-
 enum AircraftInitialConditionPreset {
   DEFAULT,
   DEFAULT_OPPONENT,
