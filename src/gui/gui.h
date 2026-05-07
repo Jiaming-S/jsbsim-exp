@@ -122,7 +122,7 @@ void gui_camera_selection(
       ImGui::PushID(i);
       if (ImGui::Button("Bind Camera")) {
         cam->attach_to(
-          ac._model,
+          ac._visual_root_object,
           cam->_camera->projectionMatrix()
         );
       }

@@ -39,9 +39,11 @@
 // Project
 #include "aircrafthandle.h"
 #include "camerahandle.h"
-#include "coloreddrawable.h"
 #include "sim.h"
 #include "gui/gui.h"
+#include "model/model.h"
+#include "model/coloreddrawable.h"
+#include "model/textureddrawable.h"
 #include "types/types.h"
 #include "utils/utils.h"
 
@@ -67,17 +69,20 @@ class JSBSimVisualizer: public Magnum::Platform::Application {
     // Magnum
     Magnum::Shaders::PhongGL _shader;
     Magnum::SceneGraph::DrawableGroup3D _drawables;
-    std::unordered_map<std::string, Magnum::GL::Mesh> _meshes;
-    std::unordered_map<std::string, std::vector<types::ModelPart>> _aircraft_part_meshes;
+
+    Magnum::GL::Mesh _floor_mesh;
 
     Magnum::Timeline _timeline;
     types::Scene3D _scene;
 
-    // Camera
+    // Magnum Camera
     std::unique_ptr<CameraHandle> _cam;
 
     // Resource manager
     Corrade::Utility::Resource _rs{"assets"};
+
+    // 3D Model Repository
+    model::ModelRepository _model_repo;
 
     // ImGui
     Magnum::ImGuiIntegration::Context _imgui{Magnum::NoCreate};
@@ -116,20 +121,24 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   Magnum::GL::Renderer::setBlendEquation(Magnum::GL::Renderer::BlendEquation::Add, Magnum::GL::Renderer::BlendEquation::Add);
   Magnum::GL::Renderer::setBlendFunction(Magnum::GL::Renderer::BlendFunction::SourceAlpha, Magnum::GL::Renderer::BlendFunction::OneMinusSourceAlpha);
 
-  // Load meshes and shaders
-  std::vector<std::pair<std::string, std::string>> to_import = {
+  // Load and ingest GLTF models
+  std::vector<std::pair<std::string, std::string>> models_to_import = {
     {"f16", "assets/f16/f16.glb"},
   };
-  
-  utils::load_meshes(_rs, _aircraft_part_meshes, to_import);
+
+  for (auto& p : models_to_import) {
+    std::string asset_name = p.first;
+    std::string asset_filepath = p.second;
+    _model_repo.ingest_asset_glb(asset_name, asset_filepath);
+  }
 
   // Add floor
   types::Object3D *floor = new types::Object3D{&_scene};
   floor->scale(Magnum::Vector3{10000.0f, 0.01f, 10000.0f})
     .translateLocal(Magnum::Vector3{0.0f, -0.1f, 0.0f})
     .rotateXLocal(1.5707_radf);
-  _meshes["floor_mesh"] = Magnum::MeshTools::compile(Magnum::Primitives::grid3DWireframe({1000, 1000}));
-  new ColoredDrawable{*floor, _shader, _meshes["floor_mesh"], _drawables};
+  _floor_mesh = Magnum::MeshTools::compile(Magnum::Primitives::grid3DWireframe({1000, 1000}));
+  new model::ColoredDrawable{*floor, _shader, _floor_mesh, _drawables};
 
   // Load and setup camera
   _cam = std::make_unique<CameraHandle>();
@@ -158,10 +167,11 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
 
   for (auto preset : presets) {
     AircraftHandle aircraft = AircraftHandle{types::AircraftType::F16};
-    aircraft.with_fdmexec()
+    aircraft
+      .with_fdmexec()
       .with_ic(preset)
-      .with_model(new types::Object3D{&_scene})
-      .with_meshes(_aircraft_part_meshes)
+      .with_visual_root(new types::Object3D{&_scene})
+      .with_model(_model_repo)
       .link(_shader, _drawables);
     _aircraft.push_back(std::move(aircraft));
   }
@@ -182,7 +192,7 @@ void JSBSimVisualizer::tickEvent() {
     // Tick Controller
     if (_jsbsim_state != types::SimState::PAUSED) cur.update_sim();
     // Update Model
-    cur.update_model();
+    cur.update_vis();
   }
 }
 

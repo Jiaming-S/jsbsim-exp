@@ -43,15 +43,6 @@ extern std::unique_ptr<JSBSim::FGFDMExec> load_aircraft(
   bool quiet = true
 );
 
-/// @brief Loads all meshes of a gltf as ModelParts into a vector, then publishes to shared _meshes hashmap
-/// @param _meshes 
-/// @param to_import 
-extern void load_meshes(
-  Corrade::Utility::Resource& _rs,
-  std::unordered_map<std::string, std::vector<types::ModelPart>>& _meshes,
-  const std::vector<std::pair<std::string, std::string>>& to_import
-);
-
 /// Convert aircraft type to corresponding type_string
 extern std::string to_type_string(types::AircraftType& t);
 

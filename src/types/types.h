@@ -13,6 +13,12 @@ namespace types {
 using Object3D = Magnum::SceneGraph::Object<Magnum::SceneGraph::MatrixTransformation3D>;
 using Scene3D = Magnum::SceneGraph::Scene<Magnum::SceneGraph::MatrixTransformation3D>;
 
+struct Object3DRenderable {
+  types::Object3D *node;
+  Magnum::GL::Mesh *mesh;
+  Magnum::GL::Texture2D* texture;
+};
+
 enum AircraftType {
   F16,
 };
@@ -45,11 +51,6 @@ enum AircraftKeyPoints {
   LANDING_GEAR_BOTTOM,
   WINGTIP_L,
   WINGTIP_R,
-};
-
-struct ModelPart {
-  Magnum::GL::Mesh mesh;
-  Magnum::Matrix4 transformation;
 };
 
 enum SimState {

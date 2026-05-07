@@ -11,15 +11,11 @@
 
 #include <memory>
 
-#include "coloreddrawable.h"
+#include "model/model.h"
+#include "model/textureddrawable.h"
 #include "utils/utils.h"
 #include "types/types.h"
 
-
-struct _NodeMeshPair {
-  types::Object3D *node;
-  Magnum::GL::Mesh *mesh;
-};
 
 class AircraftHandle {
   public:
@@ -33,20 +29,20 @@ class AircraftHandle {
     std::shared_ptr<JSBSim::FGInitialCondition> _ic;
     
     // Magnum
-    types::Object3D *_model;
-    std::vector<_NodeMeshPair> _model_parts;
+    types::Object3D *_visual_root_object;
+    std::vector<types::Object3DRenderable> _rendered_objects;
 
     explicit AircraftHandle(types::AircraftType aircraft_type)
       : _aircraft_type{aircraft_type}, _aircraft_type_string{utils::to_type_string(aircraft_type)} {}
 
     AircraftHandle& with_fdmexec(bool quiet = true);
     AircraftHandle& with_ic(types::AircraftInitialConditionPreset preset);
-    AircraftHandle& with_model(types::Object3D *model);
-    AircraftHandle& with_meshes(std::unordered_map<std::string, std::vector<types::ModelPart>>& meshes);
+    AircraftHandle& with_visual_root(types::Object3D *object);
+    AircraftHandle& with_model(model::ModelRepository& model_repo);
     AircraftHandle& link(Magnum::Shaders::PhongGL& shader, Magnum::SceneGraph::DrawableGroup3D& drawables);
 
     types::AircraftStateInfo to_aircraft_state();
 
     void update_sim();
-    void update_model();
+    void update_vis();
 };

@@ -26,33 +26,39 @@ AircraftHandle& AircraftHandle::with_ic(types::AircraftInitialConditionPreset pr
   return *this;
 }
 
-AircraftHandle& AircraftHandle::with_model(types::Object3D *model) {
-  _model = model;
+AircraftHandle& AircraftHandle::with_visual_root(types::Object3D *object) {
+  _visual_root_object = object;
   return *this;
 }
 
-AircraftHandle& AircraftHandle::with_meshes(std::unordered_map<std::string, std::vector<types::ModelPart>>& meshes) {
-  assert(_aircraft_type_string.size());
-  assert(meshes[_aircraft_type_string].size());
+AircraftHandle& AircraftHandle::with_model(model::ModelRepository& model_repo) {
+  assert(_visual_root_object);
 
-  for (auto& part : meshes[_aircraft_type_string]) {
-    types::Object3D* part_node = new types::Object3D{_model};
-    part_node->setTransformation(part.transformation);
-    _model_parts.push_back(_NodeMeshPair{
+  std::shared_ptr<model::ModelMultipartTextured> model = model_repo.get_aircraft_model(_aircraft_type);
+
+  for (auto& component : model->_components) {
+    types::Object3D* part_node = new types::Object3D{_visual_root_object};
+    part_node->setTransformation(component.local_transformation);
+    Magnum::GL::Mesh* mesh_ptr = &model->_meshes[component.mesh_idx];
+    Magnum::GL::Texture2D* texture_ptr = &model->_textures[component.texture_idx];
+
+    _rendered_objects.push_back(types::Object3DRenderable {
       part_node,
-      &(part.mesh)
-    }); 
+      mesh_ptr,
+      texture_ptr
+    });
   }
 
   return *this;
 }
 
 AircraftHandle& AircraftHandle::link(Magnum::Shaders::PhongGL& shader, Magnum::SceneGraph::DrawableGroup3D& drawables) {
-  for (auto& model_part : _model_parts) {
-    new ColoredDrawable{
+  for (auto& model_part : _rendered_objects) {
+    new model::TexturedDrawable {
       *model_part.node,
       shader,
       *model_part.mesh,
+      model_part.texture,
       drawables
     };
   }
@@ -64,9 +70,9 @@ void AircraftHandle::update_sim() {
   _fdmexec->Run();
 }
 
-void AircraftHandle::update_model() {
+void AircraftHandle::update_vis() {
   types::AircraftStateInfo state = this->to_aircraft_state();
-  _model->resetTransformation()
+  _visual_root_object->resetTransformation()
     .rotateY(-state.yaw)
     .rotateX( state.pitch)
     .rotateZ(-state.roll)
