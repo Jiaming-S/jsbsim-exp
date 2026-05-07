@@ -40,9 +40,12 @@ void _traverse_scene_graph(
   }
 }
 
-void ModelRepository::ingest_asset_glb(std::string asset_name, std::string asset_filepath) {
+void ModelRepository::ingest_asset_glb(Corrade::Utility::Resource& rs, std::string asset_name, std::string asset_filepath) {
   Corrade::PluginManager::Manager<Magnum::Trade::AbstractImporter> manager;
   Corrade::Containers::Pointer<Magnum::Trade::AbstractImporter> importer = manager.loadAndInstantiate("TinyGltfImporter");
+
+  // Read asset from Corrade resource manager
+  importer->openData(rs.getRaw(asset_filepath));
 
   auto target_model = std::make_shared<ModelMultipartTextured>();
   target_model->_textures.reserve(importer->textureCount());
@@ -56,10 +59,10 @@ void ModelRepository::ingest_asset_glb(std::string asset_name, std::string asset
       Corrade::Containers::Optional<Magnum::Trade::ImageData2D> image_data = importer->image2D(texture_data->image());
       if (image_data) {
         texture.setMagnificationFilter(texture_data->magnificationFilter())
-               .setMinificationFilter(texture_data->minificationFilter(), texture_data->mipmapFilter())
-               .setWrapping(texture_data->wrapping().xy())
-               .setStorage(1, Magnum::GL::textureFormat(image_data->format()), image_data->size())
-               .setSubImage(0, Magnum::Vector2i{}, *image_data);
+          .setMinificationFilter(texture_data->minificationFilter(), texture_data->mipmapFilter())
+          .setWrapping(texture_data->wrapping().xy())
+          .setStorage(1, Magnum::GL::textureFormat(image_data->format()), image_data->size())
+          .setSubImage(0, Magnum::Vector2i{}, *image_data);
       }
     }
     target_model->_textures.push_back(std::move(texture));
@@ -81,7 +84,7 @@ void ModelRepository::ingest_asset_glb(std::string asset_name, std::string asset
     Corrade::Containers::Optional<Magnum::Trade::SceneData> scene_data = importer->scene(importer->defaultScene());
     
     if (scene_data) {
-      Magnum::Matrix4 root_correction = Magnum::Matrix4::rotationX(Magnum::Deg(-90.0f));
+      Magnum::Matrix4 root_correction = Magnum::Matrix4::rotationY(Magnum::Deg(90.0f));
       for (Magnum::UnsignedInt root_id : scene_data->children3D()) {
         _traverse_scene_graph(*importer, root_id, root_correction, target_model);
       }

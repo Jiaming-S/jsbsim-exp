@@ -46,7 +46,7 @@ class ModelRepository {
     std::unordered_map<std::string, std::shared_ptr<ModelMultipartTextured>> _all_models;
 
   public:
-    void ingest_asset_glb(std::string asset_name, std::string asset_filepath);
+    void ingest_asset_glb(Corrade::Utility::Resource& rs, std::string asset_name, std::string asset_filepath);
     std::shared_ptr<ModelMultipartTextured> get_aircraft_model(types::AircraftType type = types::AircraftType::F16);
 };
 

@@ -22,7 +22,7 @@ class ColoredDrawable : public Magnum::SceneGraph::Drawable3D {
     ) : Magnum::SceneGraph::Drawable3D{object, &group}, _shader(shader), _mesh(mesh) {}
 
   private:
-    void draw(const Magnum::Matrix4& transformation_maxtrix, Magnum::SceneGraph::Camera3D& camera) override;
+    void draw(const Magnum::Matrix4& transformation_matrix, Magnum::SceneGraph::Camera3D& camera) override;
 };
 
 };

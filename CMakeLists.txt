@@ -85,6 +85,7 @@ FetchContent_Declare(
   GIT_TAG        master
 )
 
+set(MAGNUM_WITH_PNGIMPORTER ON CACHE BOOL "Enable PngImporter plugin" FORCE)
 set(MAGNUM_WITH_TINYGLTFIMPORTER ON CACHE BOOL "Enable TinyGltfImporter plugin" FORCE)
 
 FetchContent_MakeAvailable(magnum_plugins_fetch)
@@ -118,6 +119,7 @@ target_link_libraries(jsbsimexp PRIVATE
   Magnum::Trade
   MagnumIntegration::ImGui
   AnySceneImporter
+  PngImporter
   TinyGltfImporter
   Corrade::Utility
   SDL2::SDL2

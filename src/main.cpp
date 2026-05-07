@@ -103,9 +103,11 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
 {
   // Enable depth test
   Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::DepthTest);
-  
-  // Enable draw lines between polygons
-  // Magnum::GL::Renderer::setPolygonMode(Magnum::GL::Renderer::PolygonMode::Line);
+
+  // Initialize Magnum shader
+  _shader = Magnum::Shaders::PhongGL {
+    Magnum::Shaders::PhongGL::Configuration{}.setFlags(Magnum::Shaders::PhongGL::Flag::DiffuseTexture)
+  };
 
   // Initialize ImGui
   _imgui = Magnum::ImGuiIntegration::Context(
@@ -129,7 +131,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   for (auto& p : models_to_import) {
     std::string asset_name = p.first;
     std::string asset_filepath = p.second;
-    _model_repo.ingest_asset_glb(asset_name, asset_filepath);
+    _model_repo.ingest_asset_glb(_rs, asset_name, asset_filepath);
   }
 
   // Add floor
@@ -153,7 +155,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   );
 
   // Load and setup aircraft
-  utils::_construct_tmp_jsbsim_dir(_rs, types::AircraftType::F16);
+  utils::_populate_tmp_jsbsim_dir(_rs, types::AircraftType::F16);
 
   std::vector<types::AircraftInitialConditionPreset> presets = {
     types::AircraftInitialConditionPreset::DEFAULT,
