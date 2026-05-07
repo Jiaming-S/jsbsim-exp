@@ -39,7 +39,6 @@
 // Project
 #include "aircrafthandle.h"
 #include "camerahandle.h"
-#include "sim.h"
 #include "gui/gui.h"
 #include "model/model.h"
 #include "model/coloreddrawable.h"
@@ -165,6 +164,8 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     types::AircraftInitialConditionPreset::TAKEOFF_ROLL_ROTATION,
     types::AircraftInitialConditionPreset::LEFT_SPIRAL,
     types::AircraftInitialConditionPreset::RIGHT_SPIRAL,
+    types::AircraftInitialConditionPreset::LEFT_TAXI,
+    types::AircraftInitialConditionPreset::RIGHT_TAXI,
   };
 
   for (auto preset : presets) {
@@ -173,7 +174,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
       .with_fdmexec()
       .with_ic(preset)
       .with_visual_root(new types::Object3D{&_scene})
-      .with_model(_model_repo)
+      .with_model(_model_repo.get_aircraft_model(types::AircraftType::F16))
       .link(_shader, _drawables);
     _aircraft.push_back(std::move(aircraft));
   }
@@ -188,12 +189,12 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   setSwapInterval(1);
 }
 
-// Tick Controller and Update Model
+// Tick Controller and Update Visual Model
 void JSBSimVisualizer::tickEvent() {
   for (auto& cur : _aircraft) {
     // Tick Controller
     if (_jsbsim_state != types::SimState::PAUSED) cur.update_sim();
-    // Update Model
+    // Update VIsual Model
     cur.update_vis();
   }
 }
@@ -211,10 +212,8 @@ void JSBSimVisualizer::drawEvent() {
   if ( ImGui::GetIO().WantTextInput && !isTextInputActive()) startTextInput();
   if (!ImGui::GetIO().WantTextInput &&  isTextInputActive()) stopTextInput();
 
-  // Update camera
+  // Update camera and do draw
   _cam->handle_keyboard_input();
-
-  // Do draw
   // TODO: make a method for this
   _cam->_camera->draw(_drawables);
 
@@ -227,6 +226,7 @@ void JSBSimVisualizer::drawEvent() {
   // Draw ImGui
   gui::gui_aircraft_debug(_aircraft);
   gui::gui_camera_selection(_aircraft, _cam, _scene);
+  gui::gui_input_and_control(_cam);
   _imgui.updateApplicationCursor(*this);
   _imgui.drawFrame();
 

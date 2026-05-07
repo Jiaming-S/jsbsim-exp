@@ -93,11 +93,11 @@ void apply_preset_ic(
       break;
     case types::AircraftInitialConditionPreset::DEFAULT_OPPONENT:
       fdmexec.GetIC()->SetAltitudeASLFtIC(60.0f);
-      fdmexec.GetIC()->SetVNorthFpsIC(450.0f);
+      fdmexec.GetIC()->SetVNorthFpsIC(-450.0f);
       fdmexec.GetIC()->SetPhiDegIC(0.0f);
       fdmexec.GetIC()->SetThetaDegIC(0.0f);
       fdmexec.GetIC()->SetPsiDegIC(180.0f);
-      fdmexec.GetIC()->SetLatitudeDegIC(-1e-3f);
+      fdmexec.GetIC()->SetLatitudeDegIC(3e-3f);
       fdmexec.GetIC()->SetLongitudeDegIC(0.0f);
       break;
     case types::AircraftInitialConditionPreset::ON_GROUND:
@@ -130,7 +130,7 @@ void apply_preset_ic(
     case types::AircraftInitialConditionPreset::LEFT_SPIRAL:
       fdmexec.GetIC()->SetAltitudeASLFtIC(200.0f);
       fdmexec.GetIC()->SetVNorthFpsIC(650.0f);
-      fdmexec.GetIC()->SetPhiDegIC(45.0f);
+      fdmexec.GetIC()->SetPhiDegIC(-45.0f);
       fdmexec.GetIC()->SetThetaDegIC(0.0f);
       fdmexec.GetIC()->SetPsiDegIC(0.0f);
       fdmexec.GetIC()->SetLatitudeDegIC(0.0f);
@@ -139,9 +139,21 @@ void apply_preset_ic(
     case types::AircraftInitialConditionPreset::RIGHT_SPIRAL:
       fdmexec.GetIC()->SetAltitudeASLFtIC(200.0f);
       fdmexec.GetIC()->SetVNorthFpsIC(650.0f);
-      fdmexec.GetIC()->SetPhiDegIC(-45.0f);
+      fdmexec.GetIC()->SetPhiDegIC(45.0f);
       fdmexec.GetIC()->SetThetaDegIC(0.0f);
       fdmexec.GetIC()->SetPsiDegIC(0.0f);
+      fdmexec.GetIC()->SetLatitudeDegIC(0.0f);
+      fdmexec.GetIC()->SetLongitudeDegIC(-2e-3f);
+      break;
+    case types::AircraftInitialConditionPreset::LEFT_TAXI:
+      fdmexec.GetIC()->SetAltitudeASLFtIC(5.6f);
+      fdmexec.GetIC()->SetVNorthFpsIC(20.0f);
+      fdmexec.GetIC()->SetLatitudeDegIC(0.0f);
+      fdmexec.GetIC()->SetLongitudeDegIC(2e-3f);
+      break;
+    case types::AircraftInitialConditionPreset::RIGHT_TAXI:
+      fdmexec.GetIC()->SetAltitudeASLFtIC(5.6f);
+      fdmexec.GetIC()->SetVNorthFpsIC(62.0f);
       fdmexec.GetIC()->SetLatitudeDegIC(0.0f);
       fdmexec.GetIC()->SetLongitudeDegIC(-2e-3f);
       break;
@@ -177,15 +189,27 @@ void apply_preset_controls(
     case types::AircraftInitialConditionPreset::LEFT_SPIRAL: 
       fdmexec.GetFCS()->SetThrottleCmd(0, 1.0);
       fdmexec.GetFCS()->SetDeCmd(-0.3);
-      // fdmexec.GetFCS()->SetDaCmd(0.12);
-      fdmexec.GetFCS()->SetDrCmd(-0.15);
+      fdmexec.GetFCS()->SetDaCmd(-0.05);
+      fdmexec.GetFCS()->SetDrCmd(0.15);
       fdmexec.GetPropulsion()->SetEngineRunning(0);
       break;
     case types::AircraftInitialConditionPreset::RIGHT_SPIRAL: 
       fdmexec.GetFCS()->SetThrottleCmd(0, 1.0);
       fdmexec.GetFCS()->SetDeCmd(-0.3);
-      // fdmexec.GetFCS()->SetDaCmd(-0.12);
-      fdmexec.GetFCS()->SetDrCmd(0.15);
+      fdmexec.GetFCS()->SetDaCmd(0.05);
+      fdmexec.GetFCS()->SetDrCmd(-0.15);
+      fdmexec.GetPropulsion()->SetEngineRunning(0);
+      break;
+    case types::AircraftInitialConditionPreset::LEFT_TAXI:
+      fdmexec.GetFCS()->SetThrottleCmd(0, 0.3);
+      fdmexec.GetFCS()->SetDrCmd(0.6);
+      fdmexec.GetFCS()->SetDsCmd(-0.1);
+      fdmexec.GetPropulsion()->SetEngineRunning(0);
+      break;
+    case types::AircraftInitialConditionPreset::RIGHT_TAXI:
+      fdmexec.GetFCS()->SetThrottleCmd(0, 0.3);
+      fdmexec.GetFCS()->SetDrCmd(-0.6);
+      fdmexec.GetFCS()->SetDsCmd(0.1);
       fdmexec.GetPropulsion()->SetEngineRunning(0);
       break;
   }

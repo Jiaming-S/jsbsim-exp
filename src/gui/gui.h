@@ -76,7 +76,7 @@ void gui_aircraft_debug_collapse(
 
 void gui_aircraft_debug(std::vector<AircraftHandle>& aircraft) {
   ImGui::SetNextWindowSize(ImVec2(200, 1000), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowPos(ImVec2(20, 20), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowPos(ImVec2(25, 25), ImGuiCond_FirstUseEver);
   ImGui::Begin("Debug");
 
   for (size_t i = 0; i < aircraft.size(); i++) {
@@ -94,7 +94,7 @@ void gui_camera_selection(
   types::Scene3D& scene
 ) {
   ImGui::SetNextWindowSize(ImVec2(200, 400), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowPos(ImVec2(300, 20), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowPos(ImVec2(230, 25), ImGuiCond_FirstUseEver);
   ImGui::Begin("Camera Selection");
 
   if (ImGui::BeginTable("Aircraft", 2)) {
@@ -128,6 +128,19 @@ void gui_camera_selection(
       }
       ImGui::PopID();
     }
+
+    ImGui::EndTable();
+  }
+
+  ImGui::End();
+}
+
+void gui_input_and_control(std::unique_ptr<CameraHandle>& cam) {
+  ImGui::SetNextWindowSize(ImVec2(200, 400), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowPos(ImVec2(435, 25), ImGuiCond_FirstUseEver);
+  ImGui::Begin("Input and Control");
+
+  if (ImGui::BeginTable("ControlMethod", 2)) {
 
     ImGui::EndTable();
   }

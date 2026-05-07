@@ -38,7 +38,7 @@ class AircraftHandle {
     AircraftHandle& with_fdmexec(bool quiet = true);
     AircraftHandle& with_ic(types::AircraftInitialConditionPreset preset);
     AircraftHandle& with_visual_root(types::Object3D *object);
-    AircraftHandle& with_model(model::ModelRepository& model_repo);
+    AircraftHandle& with_model(std::shared_ptr<model::ModelMultipartTextured> model);
     AircraftHandle& link(Magnum::Shaders::PhongGL& shader, Magnum::SceneGraph::DrawableGroup3D& drawables);
 
     types::AircraftStateInfo to_aircraft_state();

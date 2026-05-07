@@ -31,6 +31,8 @@ enum AircraftInitialConditionPreset {
   TAKEOFF_ROLL_ROTATION,
   LEFT_SPIRAL,
   RIGHT_SPIRAL,
+  LEFT_TAXI,
+  RIGHT_TAXI,
 };
 
 struct AircraftStateInfo {
@@ -56,6 +58,16 @@ enum AircraftKeyPoints {
 enum SimState {
   NORMAL,
   PAUSED,
+};
+
+enum SimCameraType {
+  FREE,
+  LOCKED,
+};
+
+enum SimControlType {
+  CAMERA,
+  MODEL,
 };
 
 }

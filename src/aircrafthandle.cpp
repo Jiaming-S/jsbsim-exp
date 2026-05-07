@@ -31,10 +31,9 @@ AircraftHandle& AircraftHandle::with_visual_root(types::Object3D *object) {
   return *this;
 }
 
-AircraftHandle& AircraftHandle::with_model(model::ModelRepository& model_repo) {
+AircraftHandle& AircraftHandle::with_model(std::shared_ptr<model::ModelMultipartTextured> model) {
   assert(_visual_root_object);
-
-  std::shared_ptr<model::ModelMultipartTextured> model = model_repo.get_aircraft_model(_aircraft_type);
+  assert(model);
 
   for (auto& component : model->_components) {
     types::Object3D* part_node = new types::Object3D{_visual_root_object};
