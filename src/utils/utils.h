@@ -27,7 +27,7 @@
 
 namespace utils {
 
-extern void _populate_tmp_jsbsim_dir(
+extern void populate_tmp_jsbsim_dir(
   Corrade::Utility::Resource& _rs,
   types::AircraftType aircraft_type = types::AircraftType::F16
 );

@@ -98,6 +98,7 @@ add_executable(jsbsimexp
   src/main.cpp
   src/aircrafthandle.cpp
   src/camerahandle.cpp
+  src/input/input.cpp
   src/model/model.cpp
   src/model/coloreddrawable.cpp
   src/model/textureddrawable.cpp

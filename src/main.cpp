@@ -40,6 +40,7 @@
 #include "aircrafthandle.h"
 #include "camerahandle.h"
 #include "gui/gui.h"
+#include "input/input.h"
 #include "model/model.h"
 #include "model/coloreddrawable.h"
 #include "model/textureddrawable.h"
@@ -74,17 +75,20 @@ class JSBSimVisualizer: public Magnum::Platform::Application {
     Magnum::Timeline _timeline;
     types::Scene3D _scene;
 
-    // Magnum Camera
-    std::unique_ptr<CameraHandle> _cam;
-
     // Resource manager
     Corrade::Utility::Resource _rs{"assets"};
 
     // 3D Model Repository
     model::ModelRepository _model_repo;
 
+    // Input
+    input::GlobalInputHandler _input_handler;
+
     // ImGui
     Magnum::ImGuiIntegration::Context _imgui{Magnum::NoCreate};
+
+    // Camera
+    std::unique_ptr<CameraHandle> _cam;
 
     // JSBSim
     std::vector<AircraftHandle> _aircraft;
@@ -142,8 +146,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   new model::ColoredDrawable{*floor, _shader, _floor_mesh, _drawables};
 
   // Load and setup camera
-  _cam = std::make_unique<CameraHandle>();
-  _cam->attach_to(
+  _cam = std::make_unique<CameraHandle>(
     &_scene,
     Magnum::Matrix4::perspectiveProjection(
       90.0_degf,
@@ -153,9 +156,10 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     )
   );
 
-  // Load and setup aircraft
-  utils::_populate_tmp_jsbsim_dir(_rs, types::AircraftType::F16);
+  // Load and populate aircraft configs
+  utils::populate_tmp_jsbsim_dir(_rs, types::AircraftType::F16);
 
+  // Load initial conditions
   std::vector<types::AircraftInitialConditionPreset> presets = {
     types::AircraftInitialConditionPreset::DEFAULT,
     types::AircraftInitialConditionPreset::DEFAULT_OPPONENT,
@@ -212,8 +216,10 @@ void JSBSimVisualizer::drawEvent() {
   if ( ImGui::GetIO().WantTextInput && !isTextInputActive()) startTextInput();
   if (!ImGui::GetIO().WantTextInput &&  isTextInputActive()) stopTextInput();
 
-  // Update camera and do draw
-  _cam->handle_keyboard_input();
+  // Do camera update
+  _input_handler.perform_camera_move(*_cam);
+
+  // Do camera draw
   // TODO: make a method for this
   _cam->_camera->draw(_drawables);
 
@@ -243,19 +249,13 @@ void JSBSimVisualizer::drawEvent() {
 
 void JSBSimVisualizer::keyPressEvent(KeyEvent& event) {
   if (_imgui.handleKeyPressEvent(event)) return;
-  _cam->set_key_pressed(event.key());
-  
-  if (event.key() == Sdl2Application::Key::P) {
-    if      (_jsbsim_state == types::SimState::NORMAL) _jsbsim_state = types::SimState::PAUSED;
-    else if (_jsbsim_state == types::SimState::PAUSED) _jsbsim_state = types::SimState::NORMAL;
-  }
-
+  _input_handler.handle_key_press_event(event);
   event.setAccepted();
 }
 
 void JSBSimVisualizer::keyReleaseEvent(KeyEvent& event) {
   if (_imgui.handleKeyReleaseEvent(event)) return;
-  _cam->set_key_unpressed(event.key());
+  _input_handler.handle_key_release_event(event);
   event.setAccepted();
 }
 
@@ -263,7 +263,7 @@ void JSBSimVisualizer::pointerPressEvent(PointerEvent& event) {
   if (_imgui.handlePointerPressEvent(event)) return;
   
   if (event.pointer() == Sdl2Application::Pointer::MouseLeft) {
-    _cam->set_held(event.position());
+    _input_handler.handle_pointer_press_event(event);
     event.setAccepted();
   }
 }
@@ -272,15 +272,14 @@ void JSBSimVisualizer::pointerReleaseEvent(PointerEvent& event) {
   if (_imgui.handlePointerReleaseEvent(event)) return;
 
   if (event.pointer() == Sdl2Application::Pointer::MouseLeft) {
-    _cam->set_unheld();
+    _input_handler.handle_pointer_release_event(event);
     event.setAccepted();
   }
 }
 
 void JSBSimVisualizer::pointerMoveEvent(PointerMoveEvent& event) {
   if (_imgui.handlePointerMoveEvent(event)) return;
-
-  _cam->handle_mouse_move(event.position());
+  _input_handler.handle_pointer_move_event(event);
   event.setAccepted();
 }
 

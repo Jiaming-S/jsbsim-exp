@@ -107,7 +107,7 @@ void gui_camera_selection(
     
     ImGui::PushID(-1);
     if (ImGui::Button("Reset")) {
-      cam->attach_to(&scene, cam->_camera->projectionMatrix());
+      cam->reattach_to(&scene);
     }
     ImGui::PopID();
 
@@ -120,12 +120,7 @@ void gui_camera_selection(
       ImGui::TableNextColumn();
       
       ImGui::PushID(i);
-      if (ImGui::Button("Bind Camera")) {
-        cam->attach_to(
-          ac._visual_root_object,
-          cam->_camera->projectionMatrix()
-        );
-      }
+      if (ImGui::Button("Bind Camera")) cam->reattach_to(ac._visual_root_object);
       ImGui::PopID();
     }
 

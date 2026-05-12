@@ -1,57 +1,14 @@
 #include "camerahandle.h"
 
-void CameraHandle::attach_to(types::Object3D* root, Magnum::Matrix4 projection_matrix) {
+CameraHandle::CameraHandle(types::Object3D* root, Magnum::Matrix4 projection_matrix) {
   _mount = new types::Object3D{root};
   _revolut = new types::Object3D{_mount};
   _camera = new Magnum::SceneGraph::Camera3D{*_revolut};
   _camera->setProjectionMatrix(projection_matrix);
 }
 
-void CameraHandle::handle_keyboard_input() {
-  float speed = _default_speed;
-  Magnum::Deg rotation_speed = _default_rotation_speed;
-
-  if (_keys_down[Sdl2Application::Key::LeftShift]) speed *= SHIFT_SPEED_MULTIPLIER;
-  if (_keys_down[Sdl2Application::Key::LeftShift]) rotation_speed *= SHIFT_ROTATION_SPEED_MULTIPLIER;
-
-  if (_keys_down[Sdl2Application::Key::Up])   _revolut->rotateLocal( rotation_speed, Magnum::Vector3::xAxis());
-  if (_keys_down[Sdl2Application::Key::Down]) _revolut->rotateLocal(-rotation_speed, Magnum::Vector3::xAxis());
-  
-  if (_keys_down[Sdl2Application::Key::Left]) {
-    Magnum::Matrix4 rot = Magnum::Matrix4::rotation(rotation_speed, Magnum::Vector3::yAxis());
-    _revolut->setTransformation(rot * _revolut->transformation());
-  }
-
-  if (_keys_down[Sdl2Application::Key::Right]) {
-    Magnum::Matrix4 rot = Magnum::Matrix4::rotation(-rotation_speed, Magnum::Vector3::yAxis());
-    _revolut->setTransformation(rot * _revolut->transformation());
-  }
-
-  Magnum::Vector3 forward = _revolut->transformation().backward();
-  Magnum::Vector3 right   = _revolut->transformation().right();
-
-  if (_keys_down[Sdl2Application::Key::W]) _mount->translate(forward * -speed);
-  if (_keys_down[Sdl2Application::Key::S]) _mount->translate(forward *  speed);
-  if (_keys_down[Sdl2Application::Key::A]) _mount->translate(right * -speed);
-  if (_keys_down[Sdl2Application::Key::D]) _mount->translate(right *  speed);
-
-  if (_keys_down[Sdl2Application::Key::Space])     _mount->translate(Magnum::Vector3::yAxis( speed));
-  if (_keys_down[Sdl2Application::Key::LeftCtrl])  _mount->translate(Magnum::Vector3::yAxis(-speed));
+void CameraHandle::reattach_to(types::Object3D* root) {
+  _mount->setParent(root);
+  _mount->setTransformation(Magnum::Matrix4{});
+  _revolut->setTransformation(Magnum::Matrix4{});
 }
-
-void CameraHandle::set_key_pressed(Sdl2Application::Key key)   { _keys_down[key] = true; }
-void CameraHandle::set_key_unpressed(Sdl2Application::Key key) { _keys_down[key] = false; };
-
-void CameraHandle::handle_mouse_move(Magnum::Vector2 position) {
-  if (!_mouse_held) return;
-  Magnum::Vector2 d_position = Magnum::Vector2(position - _mouse_prev_position) * _mouse_sensitivity;
-
-  Magnum::Matrix4 rot = Magnum::Matrix4::rotation(Magnum::Deg(-d_position.x()), Magnum::Vector3::yAxis());
-  _revolut->setTransformation(rot * _revolut->transformation());
-  _revolut->rotateLocal(Magnum::Deg(-d_position.y()), Magnum::Vector3::xAxis());
-
-  _mouse_prev_position = position;
-}
-
-void CameraHandle::set_held(Magnum::Vector2 position) { _mouse_held = true; _mouse_prev_position = position; }
-void CameraHandle::set_unheld() { _mouse_held = false; }

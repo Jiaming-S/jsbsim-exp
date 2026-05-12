@@ -8,7 +8,7 @@
 
 namespace utils {
 
-void _populate_tmp_jsbsim_dir(
+void populate_tmp_jsbsim_dir(
   Corrade::Utility::Resource& _rs,
   types::AircraftType aircraft_type
 ) {
