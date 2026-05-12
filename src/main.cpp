@@ -75,6 +75,9 @@ class JSBSimVisualizer: public Magnum::Platform::Application {
     Magnum::Timeline _timeline;
     types::Scene3D _scene;
 
+    // Meta
+    std::shared_ptr<types::SimContext> _sim_context;
+
     // Resource manager
     Corrade::Utility::Resource _rs{"assets"};
 
@@ -92,7 +95,6 @@ class JSBSimVisualizer: public Magnum::Platform::Application {
 
     // JSBSim
     std::vector<AircraftHandle> _aircraft;
-    types::SimState _jsbsim_state;
 };
 
 JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
@@ -125,6 +127,16 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   // Enable ImGui blend equations for text
   Magnum::GL::Renderer::setBlendEquation(Magnum::GL::Renderer::BlendEquation::Add, Magnum::GL::Renderer::BlendEquation::Add);
   Magnum::GL::Renderer::setBlendFunction(Magnum::GL::Renderer::BlendFunction::SourceAlpha, Magnum::GL::Renderer::BlendFunction::OneMinusSourceAlpha);
+
+  // Initialize simulation app context
+  _sim_context = std::make_shared<types::SimContext>();
+  
+  // Use standard 1x speed 
+  _sim_context->state = types::SimContext::State::NORMAL;
+  // Free camera (bound to &scene) 
+  _sim_context->camera_type = types::SimContext::CameraType::FREE;
+  // Input controls camera (not the JSBSim flight model) 
+  _sim_context->control_type = types::SimContext::ControlType::CAMERA;
 
   // Load and ingest GLTF models
   std::vector<std::pair<std::string, std::string>> models_to_import = {
@@ -183,9 +195,6 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     _aircraft.push_back(std::move(aircraft));
   }
 
-  // Start sim at normal 1x speed
-  _jsbsim_state = types::SimState::NORMAL;
-
   // Start Magnum timeline
   _timeline.start();
   
@@ -197,8 +206,8 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
 void JSBSimVisualizer::tickEvent() {
   for (auto& cur : _aircraft) {
     // Tick Controller
-    if (_jsbsim_state != types::SimState::PAUSED) cur.update_sim();
-    // Update VIsual Model
+    if (_sim_context->state != types::SimContext::State::PAUSED) cur.update_sim();
+    // Update Visual Model
     cur.update_vis();
   }
 }
@@ -250,6 +259,10 @@ void JSBSimVisualizer::drawEvent() {
 void JSBSimVisualizer::keyPressEvent(KeyEvent& event) {
   if (_imgui.handleKeyPressEvent(event)) return;
   _input_handler.handle_key_press_event(event);
+
+  // Update sim state (paused / normal / custom time delta)
+  _input_handler.mutate_sim_state(_sim_context);
+
   event.setAccepted();
 }
 

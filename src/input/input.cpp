@@ -24,6 +24,20 @@ void GlobalInputHandler::handle_pointer_move_event(Magnum::Platform::Sdl2Applica
   _mouse_cur_position = event.position();
 }
 
+void GlobalInputHandler::mutate_sim_state(std::shared_ptr<types::SimContext> sim_context) {
+  if (_keys_down[Sdl2Application::Key::P]) {
+    // Pressing P while NORMAL or CUSTOM will force to PAUSED
+    if (sim_context->state == types::SimContext::State::NORMAL ||
+        sim_context->state == types::SimContext::State::CUSTOM) {
+      sim_context->state = types::SimContext::State::PAUSED;
+    }
+    // Pressing P while PAUSED will always go to NORMAL
+    else if (sim_context->state == types::SimContext::State::PAUSED) {
+      sim_context->state = types::SimContext::State::NORMAL;
+    }
+  }
+}
+
 void GlobalInputHandler::perform_camera_move(
   CameraHandle& cam,
   float mouse_sensitivity,

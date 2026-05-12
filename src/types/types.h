@@ -55,19 +55,26 @@ enum AircraftKeyPoints {
   WINGTIP_R,
 };
 
-enum SimState {
-  NORMAL,
-  PAUSED,
-};
+struct SimContext {
+  enum State {
+    NORMAL,
+    PAUSED,
+    CUSTOM,
+  };
 
-enum SimCameraType {
-  FREE,
-  LOCKED,
-};
+  enum CameraType {
+    FREE,
+    LOCKED,
+  };
 
-enum SimControlType {
-  CAMERA,
-  MODEL,
+  enum ControlType {
+    CAMERA,
+    MODEL,
+  };
+  
+  SimContext::State state;
+  SimContext::CameraType camera_type;
+  SimContext::ControlType control_type;
 };
 
 }

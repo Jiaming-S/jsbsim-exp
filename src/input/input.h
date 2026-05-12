@@ -26,6 +26,8 @@ class GlobalInputHandler {
     void handle_pointer_release_event(Magnum::Platform::Sdl2Application::PointerEvent& event);
     void handle_pointer_move_event(Magnum::Platform::Sdl2Application::PointerMoveEvent& event);
 
+    void mutate_sim_state(std::shared_ptr<types::SimContext> sim_context);
+
     void perform_camera_move(
       CameraHandle& cam,
       float mouse_sensitivity = 0.2f,
