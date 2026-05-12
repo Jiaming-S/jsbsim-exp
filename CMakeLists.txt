@@ -9,6 +9,15 @@ find_package(SDL2 REQUIRED)
 # Setup FetchContent
 include(FetchContent)
 
+# Fetch magic_enum
+FetchContent_Declare(
+  magic_enum
+  GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
+  GIT_TAG        v0.9.5
+)
+
+FetchContent_MakeAvailable(magic_enum)
+
 # Fetch JSBSim
 FetchContent_Declare(
   jsbsim_fetch
@@ -109,6 +118,7 @@ add_executable(jsbsimexp
 target_include_directories(jsbsimexp PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/types)
 
 target_link_libraries(jsbsimexp PRIVATE 
+  magic_enum::magic_enum
   libJSBSim 
   Magnum::Magnum 
   Magnum::Sdl2Application 

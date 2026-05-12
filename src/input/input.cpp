@@ -79,7 +79,7 @@ void GlobalInputHandler::perform_camera_move(
 
   // MOUSE CONTROLS
   if (_mouse_held) {
-    Magnum::Vector2 delta_pos = Magnum::Vector2(_mouse_cur_position - _mouse_prev_position) * _mouse_sensitivity;
+    Magnum::Vector2 delta_pos = Magnum::Vector2(_mouse_cur_position - _mouse_prev_position) * mouse_sensitivity;
     Magnum::Matrix4 delta_rot = Magnum::Matrix4::rotation(Magnum::Deg(-delta_pos.x()), Magnum::Vector3::yAxis());
     cam._revolut->setTransformation(delta_rot * cam._revolut->transformation());
     cam._revolut->rotateLocal(Magnum::Deg(-delta_pos.y()), Magnum::Vector3::xAxis());

@@ -240,8 +240,8 @@ void JSBSimVisualizer::drawEvent() {
 
   // Draw ImGui
   gui::gui_aircraft_debug(_aircraft);
-  gui::gui_camera_selection(_aircraft, _cam, _scene);
-  gui::gui_input_and_control(_cam);
+  gui::gui_camera_selection(_aircraft, *_cam, _scene);
+  gui::gui_input_and_control(*_cam, _sim_context);
   _imgui.updateApplicationCursor(*this);
   _imgui.drawFrame();
 

@@ -16,8 +16,7 @@ class GlobalInputHandler {
   
   Magnum::Vector2 _mouse_cur_position;
   Magnum::Vector2 _mouse_prev_position;
-  bool  _mouse_held = false;
-  float _mouse_sensitivity = 0.2f;
+  bool _mouse_held = false;
 
   public:
     void handle_key_press_event(Magnum::Platform::Sdl2Application::KeyEvent& event);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Magnum/ImGuiIntegration/Context.hpp>
+#include <magic_enum.hpp>
 
 #include "../aircrafthandle.h"
 
@@ -90,7 +91,7 @@ void gui_aircraft_debug(std::vector<AircraftHandle>& aircraft) {
 
 void gui_camera_selection(
   std::vector<AircraftHandle>& aircraft,
-  std::unique_ptr<CameraHandle>& cam,
+  CameraHandle& cam,
   types::Scene3D& scene
 ) {
   ImGui::SetNextWindowSize(ImVec2(200, 400), ImGuiCond_FirstUseEver);
@@ -107,7 +108,7 @@ void gui_camera_selection(
     
     ImGui::PushID(-1);
     if (ImGui::Button("Reset")) {
-      cam->reattach_to(&scene);
+      cam.reattach_to(&scene);
     }
     ImGui::PopID();
 
@@ -120,7 +121,7 @@ void gui_camera_selection(
       ImGui::TableNextColumn();
       
       ImGui::PushID(i);
-      if (ImGui::Button("Bind Camera")) cam->reattach_to(ac._visual_root_object);
+      if (ImGui::Button("Bind Camera")) cam.reattach_to(ac._visual_root_object);
       ImGui::PopID();
     }
 
@@ -130,12 +131,32 @@ void gui_camera_selection(
   ImGui::End();
 }
 
-void gui_input_and_control(std::unique_ptr<CameraHandle>& cam) {
+void gui_input_and_control(
+  CameraHandle& cam,
+  std::shared_ptr<types::SimContext> sim_context
+) {
   ImGui::SetNextWindowSize(ImVec2(200, 400), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowPos(ImVec2(435, 25), ImGuiCond_FirstUseEver);
   ImGui::Begin("Input and Control");
 
   if (ImGui::BeginTable("ControlMethod", 2)) {
+    ImGui::TableSetupColumn("State");
+    ImGui::TableSetupColumn("Status");
+
+    ImGui::TableNextColumn();
+    ImGui::Text("State");
+    ImGui::TableNextColumn();
+    ImGui::Text("%s", magic_enum::enum_name(sim_context->state).data());
+
+    ImGui::TableNextColumn();
+    ImGui::Text("Camera Type");
+    ImGui::TableNextColumn();
+    ImGui::Text("%s", magic_enum::enum_name(sim_context->camera_type).data());
+
+    ImGui::TableNextColumn();
+    ImGui::Text("Control Type");
+    ImGui::TableNextColumn();
+    ImGui::Text("%s", magic_enum::enum_name(sim_context->control_type).data());
 
     ImGui::EndTable();
   }
