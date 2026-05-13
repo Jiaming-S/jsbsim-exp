@@ -14,10 +14,17 @@ using namespace Magnum::Platform;
 namespace input {
 
 struct CommandedMovement {
-  Magnum::Vector3 translation;
-  Magnum::Deg roll;
-  Magnum::Deg yaw;
-  Magnum::Deg pitch;
+  Magnum::Vector3 translation{0.0f};
+  Magnum::Float roll{0.0f};
+  Magnum::Float yaw{0.0f};
+  Magnum::Float pitch{0.0f};
+
+  Magnum::Float& x;
+  Magnum::Float& y;
+  Magnum::Float& z;
+
+  CommandedMovement()
+   : x{translation.x()}, y{translation.y()}, z{translation.z()} {}
 };
 
 class GlobalInputHandler {
@@ -36,13 +43,7 @@ class GlobalInputHandler {
 
     void mutate_sim_state(std::shared_ptr<types::SimContext> sim_context);
     
-    CommandedMovement get_commanded_movement(
-      float default_translation_speed = 0.1f,
-      float shift_translation_speed_multiplier = 20.0f,
-      float mouse_sensitivity = 0.2f,
-      Magnum::Deg default_rotation_speed = 1.0_degf,
-      float shift_rotation_speed_multiplier = 4.0f
-    );
+    CommandedMovement get_commanded_movement();
 };
 
 }

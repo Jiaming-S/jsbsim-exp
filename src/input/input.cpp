@@ -38,50 +38,45 @@ void GlobalInputHandler::mutate_sim_state(std::shared_ptr<types::SimContext> sim
   }
 }
 
-CommandedMovement GlobalInputHandler::get_commanded_movement(
-  float default_translation_speed, 
-  float shift_translation_speed_multiplier,
-  float mouse_sensitivity, 
-  Magnum::Deg default_rotation_speed, 
-  float shift_rotation_speed_multiplier
-) {
+CommandedMovement GlobalInputHandler::get_commanded_movement() {
   CommandedMovement cmd;
 
-  float translation_speed = default_translation_speed;
-  Magnum::Deg rotation_speed = default_rotation_speed;
-
-  // Multipliers
-  if (_keys_down[Sdl2Application::Key::LeftShift]) {
-    translation_speed *= shift_translation_speed_multiplier;
-    rotation_speed  *= shift_rotation_speed_multiplier;
-  }
-
   // Translation
-  if (_keys_down[Sdl2Application::Key::A]) cmd.translation.x() -= translation_speed;
-  if (_keys_down[Sdl2Application::Key::D]) cmd.translation.x() += translation_speed;
-  
-  if (_keys_down[Sdl2Application::Key::LeftCtrl]) cmd.translation.y() -= translation_speed;
-  if (_keys_down[Sdl2Application::Key::Space])    cmd.translation.y() += translation_speed;
-  
-  if (_keys_down[Sdl2Application::Key::W]) cmd.translation.z() -= translation_speed; // -Z is forward
-  if (_keys_down[Sdl2Application::Key::S]) cmd.translation.z() += translation_speed;
+  if (_keys_down[Sdl2Application::Key::W]) cmd.z -= 1.0f;
+  if (_keys_down[Sdl2Application::Key::S]) cmd.z += 1.0f;
 
-  // Rotation
-  if (_keys_down[Sdl2Application::Key::Right]) cmd.yaw -= rotation_speed;
-  if (_keys_down[Sdl2Application::Key::Left])  cmd.yaw += rotation_speed;
+  if (_keys_down[Sdl2Application::Key::A]) cmd.x -= 1.0f;
+  if (_keys_down[Sdl2Application::Key::D]) cmd.x += 1.0f;
   
-  if (_keys_down[Sdl2Application::Key::Down]) cmd.pitch -= rotation_speed;
-  if (_keys_down[Sdl2Application::Key::Up])   cmd.pitch += rotation_speed;
+  if (_keys_down[Sdl2Application::Key::Space])    cmd.y += 1.0f;  
+  if (_keys_down[Sdl2Application::Key::LeftCtrl]) cmd.y -= 1.0f;
 
-  if (_keys_down[Sdl2Application::Key::Q]) cmd.roll += rotation_speed;
-  if (_keys_down[Sdl2Application::Key::E]) cmd.roll -= rotation_speed;
+  // Keyboard rotation
+  if (_keys_down[Sdl2Application::Key::Down]) cmd.pitch += 1.0f;
+  if (_keys_down[Sdl2Application::Key::Up])   cmd.pitch -= 1.0f;
 
+  if (_keys_down[Sdl2Application::Key::Left])  cmd.yaw += 1.0f;
+  if (_keys_down[Sdl2Application::Key::Right]) cmd.yaw -= 1.0f;
+
+  if (_keys_down[Sdl2Application::Key::Q]) cmd.roll += 1.0f;
+  if (_keys_down[Sdl2Application::Key::E]) cmd.roll -= 1.0f;
+
+  // Mouse rotation
   if (_mouse_held) {
-    Magnum::Vector2 mouse_delta = Magnum::Vector2(_mouse_cur_position - _mouse_prev_position) * mouse_sensitivity;
-    cmd.yaw   -= Magnum::Deg(mouse_delta.x());
-    cmd.pitch -= Magnum::Deg(mouse_delta.y());
+    Magnum::Vector2 mouse_delta = Magnum::Vector2(_mouse_cur_position - _mouse_prev_position);
+    cmd.yaw   -= mouse_delta.x();
+    cmd.pitch -= mouse_delta.y();
     _mouse_prev_position = _mouse_cur_position; 
   }
+
+  // Clamp values between -1.0 to 1.0 
+  // TODO: roll/pitch/yaw might need to be clamped s.t. ||translation|| = 1.0f
+  cmd.roll  = Magnum::Math::clamp(cmd.roll,  -1.0f, 1.0f);
+  cmd.yaw   = Magnum::Math::clamp(cmd.yaw,   -1.0f, 1.0f);
+  cmd.pitch = Magnum::Math::clamp(cmd.pitch, -1.0f, 1.0f);
+  cmd.x = Magnum::Math::clamp(cmd.x, -1.0f, 1.0f);
+  cmd.y = Magnum::Math::clamp(cmd.y, -1.0f, 1.0f);
+  cmd.z = Magnum::Math::clamp(cmd.z, -1.0f, 1.0f);
 
   return cmd;
 }

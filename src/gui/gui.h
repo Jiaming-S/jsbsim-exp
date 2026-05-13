@@ -206,12 +206,12 @@ void gui_input_and_control(
   
   ImGui::Text("Commanded Controls");
 
-  float commanded_yaw   = Magnum::Float(-commanded_movement.yaw);
-  float commanded_pitch = Magnum::Float( commanded_movement.pitch);
-  float commanded_roll  = Magnum::Float(-commanded_movement.roll);
-  float commanded_forward = -commanded_movement.translation.z();
-  float commanded_right   =  commanded_movement.translation.x();
-  float commanded_up      =  commanded_movement.translation.y();
+  float commanded_yaw     = -commanded_movement.yaw;
+  float commanded_pitch   =  commanded_movement.pitch;
+  float commanded_roll    = -commanded_movement.roll;
+  float commanded_forward = -commanded_movement.z;
+  float commanded_right   =  commanded_movement.x;
+  float commanded_up      =  commanded_movement.y;
 
   if (ImGui::BeginTable("CommandedControls", 2, table_flags)) {
     ImGui::TableSetupColumn("Control");
@@ -274,6 +274,7 @@ void gui_input_and_control(
   ImGui::SameLine(0, 20.0f);
   
   ImGui::BeginGroup();
+  ImGui::Text("Throttle");
   ImGui::VSliderFloat(
     "##ThrottleSlider",
     ImVec2(20, 45),
