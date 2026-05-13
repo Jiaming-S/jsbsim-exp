@@ -12,8 +12,6 @@ void GlobalInputHandler::handle_key_release_event(Sdl2Application::KeyEvent& eve
 
 void GlobalInputHandler::handle_pointer_press_event(Sdl2Application::PointerEvent& event) {
   _mouse_held = true;
-  _mouse_cur_position = event.position(); 
-  _mouse_prev_position = _mouse_cur_position;
 }
 
 void GlobalInputHandler::handle_pointer_release_event(Sdl2Application::PointerEvent& event) {
@@ -64,9 +62,10 @@ CommandedMovement GlobalInputHandler::get_commanded_movement() {
   // Mouse rotation
   if (_mouse_held) {
     Magnum::Vector2 mouse_delta = Magnum::Vector2(_mouse_cur_position - _mouse_prev_position);
-    cmd.yaw   -= mouse_delta.x();
-    cmd.pitch -= mouse_delta.y();
-    _mouse_prev_position = _mouse_cur_position; 
+    cmd.yaw   -= mouse_delta.x() * _mouse_sensitivity;
+    cmd.pitch -= mouse_delta.y() * _mouse_sensitivity;
+    cmd.mouse_delta = mouse_delta;
+    _mouse_prev_position = _mouse_cur_position;
   }
 
   // Clamp values between -1.0 to 1.0 

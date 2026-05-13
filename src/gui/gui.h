@@ -263,7 +263,7 @@ void gui_input_and_control(
   ImGui::SameLine(0, 20.0f);
 
   ImGui::BeginGroup();
-  Magnum::Deg commanded_yaw_rad = Magnum::Rad(commanded_yaw / 4.0f * M_PI_2 - M_PI_2);
+  Magnum::Deg commanded_yaw_rad = Magnum::Rad(commanded_yaw * M_PI_2 - M_PI_2);
   gui_directional_radar_plot(
     "Rudder",
     commanded_yaw_rad,
@@ -279,12 +279,59 @@ void gui_input_and_control(
     "##ThrottleSlider",
     ImVec2(20, 45),
     &commanded_forward,
-    0.0f,
+    -1.0f,
     1.0f
   );
   ImGui::EndGroup();
 
   ImGui::End();
+}
+
+void gui_hud(
+  std::shared_ptr<types::SimContext> sim_context,
+  input::CommandedMovement& commanded_movement,
+  float crosshair_len = 5.0f
+) {
+  ImGuiViewport* viewport = ImGui::GetMainViewport();
+  ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
+
+  // Draw crosshair
+  ImVec2 center = ImVec2(
+    viewport->Pos.x + viewport->Size.x * 0.5f,
+    viewport->Pos.y + viewport->Size.y * 0.5f
+  );
+
+  draw_list->AddLine(
+    ImVec2(center.x - crosshair_len, center.y),
+    ImVec2(center.x + crosshair_len, center.y),
+    IM_COL32(255, 255, 255, 255),
+    1.0f
+  );
+  
+  draw_list->AddLine(
+    ImVec2(center.x, center.y - crosshair_len),
+    ImVec2(center.x, center.y + crosshair_len),
+    IM_COL32(255, 255, 255, 255),
+    1.0f
+  );
+
+  // Draw mouse movement line
+  ImVec2 mouse_move_end_point = ImVec2(
+    center.x + commanded_movement.mouse_delta.x(),
+    center.y + commanded_movement.mouse_delta.y()
+  );
+
+  draw_list->AddLine(
+    center,
+    mouse_move_end_point,
+    IM_COL32(128, 0, 0, 128),
+    2.0f
+  );
+  draw_list->AddCircleFilled(
+    mouse_move_end_point,
+    4.0f,
+    IM_COL32(128, 0, 0, 128)
+  );
 }
 
 }
