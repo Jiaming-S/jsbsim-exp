@@ -225,8 +225,9 @@ void JSBSimVisualizer::drawEvent() {
   if ( ImGui::GetIO().WantTextInput && !isTextInputActive()) startTextInput();
   if (!ImGui::GetIO().WantTextInput &&  isTextInputActive()) stopTextInput();
 
-  // Do camera update
-  _input_handler.perform_camera_move(*_cam);
+  // Capture and apply user keyboard and mouse input
+  input::CommandedMovement commanded_movement = _input_handler.get_commanded_movement();
+  _cam->apply_commanded_movement(commanded_movement);
 
   // Do camera draw
   // TODO: make a method for this
