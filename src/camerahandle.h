@@ -18,7 +18,11 @@ class CameraHandle {
     CameraHandle(types::Object3D* root, Magnum::Matrix4 projection_matrix);
 
     void reattach_to(types::Object3D* root);
-    void apply_commanded_movement(input::CommandedMovement& commanded_movement);
+    
+    void apply_commanded_movement(
+      input::CommandedMovement& commanded_movement,
+      bool yaw_relative_to_horizon = true
+    );
 };
 
 

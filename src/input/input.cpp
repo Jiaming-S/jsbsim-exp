@@ -73,6 +73,9 @@ CommandedMovement GlobalInputHandler::get_commanded_movement(
   if (_keys_down[Sdl2Application::Key::Down]) cmd.pitch -= rotation_speed;
   if (_keys_down[Sdl2Application::Key::Up])   cmd.pitch += rotation_speed;
 
+  if (_keys_down[Sdl2Application::Key::Q]) cmd.roll += rotation_speed;
+  if (_keys_down[Sdl2Application::Key::E]) cmd.roll -= rotation_speed;
+
   if (_mouse_held) {
     Magnum::Vector2 mouse_delta = Magnum::Vector2(_mouse_cur_position - _mouse_prev_position) * mouse_sensitivity;
     cmd.yaw   -= Magnum::Deg(mouse_delta.x());

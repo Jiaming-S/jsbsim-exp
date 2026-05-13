@@ -15,6 +15,7 @@ namespace input {
 
 struct CommandedMovement {
   Magnum::Vector3 translation;
+  Magnum::Deg roll;
   Magnum::Deg yaw;
   Magnum::Deg pitch;
 };

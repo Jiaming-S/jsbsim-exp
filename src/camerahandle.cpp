@@ -13,10 +13,20 @@ void CameraHandle::reattach_to(types::Object3D* root) {
   _revolut->setTransformation(Magnum::Matrix4{});
 }
 
-void CameraHandle::apply_commanded_movement(input::CommandedMovement& commanded_movement) {
-  Magnum::Matrix4 yaw_mat = Magnum::Matrix4::rotation(commanded_movement.yaw, Magnum::Vector3::yAxis());
-  _revolut->setTransformation(yaw_mat * _revolut->transformation());
+void CameraHandle::apply_commanded_movement(
+  input::CommandedMovement& commanded_movement,
+  bool yaw_relative_to_horizon
+) {
+  if (yaw_relative_to_horizon) {
+    Magnum::Matrix4 yaw_mat = Magnum::Matrix4::rotation(commanded_movement.yaw, Magnum::Vector3::yAxis());
+    _revolut->setTransformation(yaw_mat * _revolut->transformation());
+  }
+  else {
+    _revolut->rotateLocal(commanded_movement.yaw,   Magnum::Vector3::yAxis());
+  }
+
   _revolut->rotateLocal(commanded_movement.pitch, Magnum::Vector3::xAxis());
+  _revolut->rotateLocal(commanded_movement.roll,  Magnum::Vector3::zAxis());
 
   Magnum::Vector3 right = _revolut->transformation().right();
   Magnum::Vector3 up    = _revolut->transformation().up();
