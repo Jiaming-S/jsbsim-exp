@@ -65,6 +65,14 @@ AircraftHandle& AircraftHandle::link(Magnum::Shaders::PhongGL& shader, Magnum::S
   return *this;
 }
 
+void AircraftHandle::apply_commanded_movement(input::CommandedMovement commanded_movement) {
+  std::shared_ptr<JSBSim::FGFCS> fcs = _fdmexec->GetFCS();
+  fcs->SetDrCmd( commanded_movement.yaw);
+  fcs->SetDeCmd(-commanded_movement.pitch);
+  fcs->SetDaCmd(-commanded_movement.roll);
+  fcs->SetThrottleCmd(0, -commanded_movement.z);
+}
+
 void AircraftHandle::update_sim() {
   _fdmexec->Run();
 }
@@ -72,9 +80,9 @@ void AircraftHandle::update_sim() {
 void AircraftHandle::update_vis() {
   types::AircraftStateInfo state = this->to_aircraft_state();
   _visual_root_object->resetTransformation()
-    .rotateY(-state.yaw)
-    .rotateX( state.pitch)
     .rotateZ(-state.roll)
+    .rotateX( state.pitch)
+    .rotateY(-state.yaw)
     .translate(utils::as_magnum_RUB(state.north, state.east, state.down));
 }
 

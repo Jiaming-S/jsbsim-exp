@@ -11,6 +11,7 @@
 
 #include <memory>
 
+#include "input/input.h"
 #include "model/model.h"
 #include "model/textureddrawable.h"
 #include "utils/utils.h"
@@ -42,6 +43,8 @@ class AircraftHandle {
     AircraftHandle& link(Magnum::Shaders::PhongGL& shader, Magnum::SceneGraph::DrawableGroup3D& drawables);
 
     types::AircraftStateInfo to_aircraft_state();
+
+    void apply_commanded_movement(input::CommandedMovement commanded_movement);
 
     void update_sim();
     void update_vis();

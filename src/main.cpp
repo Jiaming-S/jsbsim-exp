@@ -95,6 +95,7 @@ class JSBSimVisualizer: public Magnum::Platform::Application {
 
     // JSBSim
     std::vector<AircraftHandle> _aircraft;
+    size_t _active_aircraft_index = 0; // todo: alternative datatype
 };
 
 JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
@@ -227,7 +228,13 @@ void JSBSimVisualizer::drawEvent() {
 
   // Capture and apply user keyboard and mouse input
   input::CommandedMovement commanded_movement = _input_handler.get_commanded_movement();
-  _cam->apply_commanded_movement(commanded_movement);
+  if (_sim_context->control_type == types::SimContext::CAMERA) {
+    _cam->apply_commanded_movement(commanded_movement);
+  }
+
+  if (_sim_context->control_type == types::SimContext::MODEL)  {
+    _aircraft[_active_aircraft_index].apply_commanded_movement(commanded_movement);
+  }
 
   // Do camera draw
   // TODO: make a method for this
@@ -241,7 +248,7 @@ void JSBSimVisualizer::drawEvent() {
 
   // Draw ImGui
   gui::gui_aircraft_debug(_aircraft);
-  gui::gui_camera_selection(_aircraft, *_cam, _scene);
+  gui::gui_camera_selection(_aircraft, *_cam, _scene, *_sim_context, _active_aircraft_index);
   gui::gui_input_and_control(_sim_context, commanded_movement);
   gui::gui_hud(_sim_context, commanded_movement);
   _imgui.updateApplicationCursor(*this);

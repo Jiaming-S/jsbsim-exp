@@ -14,16 +14,18 @@ using namespace Magnum::Platform;
 namespace input {
 
 struct CommandedMovement {
+  // All values strictly between -1.0f and 1.0f
   Magnum::Vector3 translation{0.0f};
   Magnum::Float roll{0.0f};
   Magnum::Float yaw{0.0f};
   Magnum::Float pitch{0.0f};
-  Magnum::Vector2 mouse_delta{0.0f};
 
   Magnum::Float& x;
   Magnum::Float& y;
   Magnum::Float& z;
-
+  
+  // Delta in number of pixels
+  Magnum::Vector2 mouse_delta{0.0f};
 
   CommandedMovement()
    : x{translation.x()}, y{translation.y()}, z{translation.z()} {}

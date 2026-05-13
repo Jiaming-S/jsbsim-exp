@@ -95,7 +95,9 @@ void gui_aircraft_debug(std::vector<AircraftHandle>& aircraft) {
 void gui_camera_selection(
   std::vector<AircraftHandle>& aircraft,
   CameraHandle& cam,
-  types::Scene3D& scene
+  types::Scene3D& scene,
+  types::SimContext& sim_context,
+  size_t& _active_aircraft_index
 ) {
   ImGui::SetNextWindowSize(ImVec2(200, 400), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowPos(ImVec2(230, 25), ImGuiCond_FirstUseEver);
@@ -112,6 +114,8 @@ void gui_camera_selection(
     ImGui::PushID(-1);
     if (ImGui::Button("Reset")) {
       cam.reattach_to(&scene);
+      sim_context.control_type = types::SimContext::CAMERA;
+      _active_aircraft_index = 0;
     }
     ImGui::PopID();
 
@@ -124,7 +128,11 @@ void gui_camera_selection(
       ImGui::TableNextColumn();
       
       ImGui::PushID(i);
-      if (ImGui::Button("Bind Camera")) cam.reattach_to(ac._visual_root_object);
+      if (ImGui::Button("Bind Camera")) {
+        cam.reattach_to(ac._visual_root_object);
+        sim_context.control_type = types::SimContext::MODEL;
+        _active_aircraft_index = i;
+      }
       ImGui::PopID();
     }
 
