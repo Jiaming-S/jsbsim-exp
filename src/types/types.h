@@ -75,6 +75,7 @@ struct SimContext {
   SimContext::State state;
   SimContext::CameraType camera_type;
   SimContext::ControlType control_type;
+  size_t _active_aircraft_index;
 };
 
 }

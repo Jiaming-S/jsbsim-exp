@@ -67,10 +67,25 @@ AircraftHandle& AircraftHandle::link(Magnum::Shaders::PhongGL& shader, Magnum::S
 
 void AircraftHandle::apply_commanded_movement(input::CommandedMovement commanded_movement) {
   std::shared_ptr<JSBSim::FGFCS> fcs = _fdmexec->GetFCS();
+
+  // Yaw/Pitch/Roll
   fcs->SetDrCmd( commanded_movement.yaw);
   fcs->SetDeCmd(-commanded_movement.pitch);
   fcs->SetDaCmd(-commanded_movement.roll);
-  fcs->SetThrottleCmd(0, -commanded_movement.z);
+  
+  // Steering
+  fcs->SetDsCmd(-commanded_movement.yaw);
+
+  // Engine (positive throttle)
+  float throttle = commanded_movement.z < 0 ? -commanded_movement.z : 0;
+  fcs->SetThrottleCmd(0, throttle);
+  
+  // Braking (negative throttle)
+  float braking = commanded_movement.z > 0 ? commanded_movement.z : 0;
+  fcs->SetDsbCmd(braking);
+  fcs->SetCBrake(braking);
+  fcs->SetLBrake(braking);
+  fcs->SetRBrake(braking);
 }
 
 void AircraftHandle::update_sim() {
