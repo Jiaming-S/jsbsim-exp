@@ -50,9 +50,9 @@ struct AircraftStateInfo {
 
 enum AircraftKeyPoints {
   NOSE,
-  LANDING_GEAR_BOTTOM,
   WINGTIP_L,
   WINGTIP_R,
+  ENGINE_NOZZLE,
 };
 
 struct SimContext {
@@ -82,7 +82,7 @@ struct SimContext {
   SimContext::CameraType camera_type;
   SimContext::ControlType control_type;
   SimContext::CameraPosition camera_pos;
-  size_t _active_aircraft_index;
+  int active_aircraft_index;
 };
 
 }

@@ -69,6 +69,27 @@ std::string to_type_string(types::AircraftType& t) {
   }
 }
 
+Magnum::Vector3 to_keypoint_coords(types::AircraftKeyPoints keypoint) {
+  Magnum::Vector3 coords;
+  switch (keypoint) {
+    case types::AircraftKeyPoints::NOSE:
+      coords = {0.0f, 26.5f, 0.0f};
+      break;
+    case types::AircraftKeyPoints::WINGTIP_L:
+      coords = {-15.5f, -8.25f, 0.0f};
+      break;
+    case types::AircraftKeyPoints::WINGTIP_R:
+      coords = {15.5f, -8.25f, 0.0f};
+      break;
+    case types::AircraftKeyPoints::ENGINE_NOZZLE:
+      coords = {0.0f, -18.5f, 0.0f};
+      break;
+  }
+
+  Magnum::Matrix4 root_correction = Magnum::Matrix4::rotationY(Magnum::Deg(90.0f));
+  return root_correction.transformPoint(coords);
+}
+
 Magnum::Vector3 as_magnum_RUB(float x, float y, float z) {
   return Magnum::Vector3{y, -z, -x};
 }

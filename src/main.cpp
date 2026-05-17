@@ -139,6 +139,8 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   _sim_context->control_type = types::SimContext::ControlType::CAMERA;
   // Start of camera in spectator cam (not fixed to an object)
   _sim_context->camera_pos = types::SimContext::CameraPosition::SPECTATOR;
+  // Start not controlling object
+  _sim_context->active_aircraft_index = -1;
 
   // Load and ingest GLTF models
   std::vector<std::pair<std::string, std::string>> models_to_import = {
@@ -234,7 +236,9 @@ void JSBSimVisualizer::drawEvent() {
   }
 
   if (_sim_context->control_type == types::SimContext::MODEL)  {
-    _aircraft[_sim_context->_active_aircraft_index].apply_commanded_movement(commanded_movement);
+    if (_sim_context->active_aircraft_index > 0) {
+      _aircraft[_sim_context->active_aircraft_index].apply_commanded_movement(commanded_movement);
+    }
   }
 
   // Do camera draw
@@ -248,7 +252,7 @@ void JSBSimVisualizer::drawEvent() {
   Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::DepthTest);
 
   // Draw ImGui
-  gui::gui_aircraft_debug(_aircraft);
+  gui::gui_aircraft_debug(_aircraft, *_sim_context);
   gui::gui_camera_selection(_aircraft, *_cam, _scene, *_sim_context);
   gui::gui_input_and_control(_sim_context, commanded_movement);
   gui::gui_hud(_sim_context, commanded_movement);

@@ -14,10 +14,11 @@ namespace gui {
 void gui_aircraft_debug_collapse(
   AircraftHandle& ac,
   std::string header_name,
-  ImGuiTreeNodeFlags header_flags = ImGuiTreeNodeFlags_DefaultOpen,
+  bool active,
   ImGuiTableFlags table_flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders
 ) {
-  if (ImGui::CollapsingHeader(header_name.c_str(), header_flags)) {
+  if (active) ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+  if (ImGui::CollapsingHeader(header_name.c_str())) {
     types::AircraftStateInfo state = ac.to_aircraft_state();
     if (ImGui::BeginTable("Aircraft Info", 2, table_flags)) {
       ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed);
@@ -78,14 +79,21 @@ void gui_aircraft_debug_collapse(
   }
 }
 
-void gui_aircraft_debug(std::vector<AircraftHandle>& aircraft) {
+void gui_aircraft_debug(
+  std::vector<AircraftHandle>& aircraft,
+  types::SimContext& sim_context
+) {
   ImGui::SetNextWindowSize(ImVec2(200, 1000), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowPos(ImVec2(25, 25), ImGuiCond_FirstUseEver);
   ImGui::Begin("Debug");
 
   for (size_t i = 0; i < aircraft.size(); i++) {
-    auto& ac = aircraft[i];
-    gui_aircraft_debug_collapse(ac, std::to_string(i) + ": " + ac._aircraft_type_string);
+    auto& cur_aircraft = aircraft[i];
+    gui_aircraft_debug_collapse(
+      cur_aircraft,
+      std::to_string(i) + ": " + cur_aircraft._aircraft_type_string,
+      (i == sim_context.active_aircraft_index)
+    );
   }
 
   ImGui::End();
@@ -112,9 +120,10 @@ void gui_camera_selection(
     
     ImGui::PushID(-1);
     if (ImGui::Button("Reset")) {
+      // TODO: make this call a method of main app, less rigid coupling
       cam.reattach_to(&scene);
       sim_context.control_type = types::SimContext::CAMERA;
-      sim_context._active_aircraft_index = 0;
+      sim_context.active_aircraft_index = -1;
     }
     ImGui::PopID();
 
@@ -128,10 +137,17 @@ void gui_camera_selection(
       
       ImGui::PushID(i);
       if (ImGui::Button("Bind Camera")) {
+        // TODO: make this call a method of main app, less rigid coupling
         cam.reattach_to(ac._visual_root_object);
         sim_context.control_type = types::SimContext::MODEL;
-        sim_context._active_aircraft_index = i;
+        sim_context.active_aircraft_index = i;
       }
+      
+      // Highlight in red if active
+      if (i == sim_context.active_aircraft_index) {
+        ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, IM_COL32(100, 0, 0, 255));
+      }
+
       ImGui::PopID();
     }
 

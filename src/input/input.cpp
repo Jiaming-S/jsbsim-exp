@@ -36,6 +36,16 @@ void GlobalInputHandler::mutate_sim_state(std::shared_ptr<types::SimContext> sim
       sim_context->state = types::SimContext::State::NORMAL;
     }
   }
+
+  // Pressing C toggles FREECAM
+  if (_keys_down[Sdl2Application::Key::C]) {
+    if (sim_context->control_type == types::SimContext::ControlType::MODEL) {
+      sim_context->control_type = types::SimContext::ControlType::CAMERA;
+    }
+    else {
+      sim_context->control_type = types::SimContext::ControlType::MODEL;
+    }
+  }
 }
 
 CommandedMovement GlobalInputHandler::get_commanded_movement() {
