@@ -137,6 +137,8 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   _sim_context->camera_type = types::SimContext::CameraType::FREE;
   // Input controls camera (not the JSBSim flight model) 
   _sim_context->control_type = types::SimContext::ControlType::CAMERA;
+  // Start of camera in spectator cam (not fixed to an object)
+  _sim_context->camera_pos = types::SimContext::CameraPosition::SPECTATOR;
 
   // Load and ingest GLTF models
   std::vector<std::pair<std::string, std::string>> models_to_import = {
@@ -228,7 +230,7 @@ void JSBSimVisualizer::drawEvent() {
   // Capture and apply user keyboard and mouse input
   input::CommandedMovement commanded_movement = _input_handler.get_commanded_movement();
   if (_sim_context->control_type == types::SimContext::CAMERA) {
-    _cam->apply_commanded_movement(commanded_movement);
+    _cam->apply_commanded_movement(commanded_movement, *_sim_context);
   }
 
   if (_sim_context->control_type == types::SimContext::MODEL)  {

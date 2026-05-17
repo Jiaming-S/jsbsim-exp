@@ -15,9 +15,9 @@ void CameraHandle::reattach_to(types::Object3D* root) {
 
 void CameraHandle::apply_commanded_movement(
   input::CommandedMovement& commanded_movement,
-  bool yaw_relative_to_horizon
+  types::SimContext& sim_context
 ) {
-  if (yaw_relative_to_horizon) {
+  if (sim_context.camera_type == types::SimContext::CameraType::FREE) {
     Magnum::Matrix4 yaw_mat = Magnum::Matrix4::rotation(Magnum::Deg(commanded_movement.yaw), Magnum::Vector3::yAxis());
     _revolut->setTransformation(yaw_mat * _revolut->transformation());
   }

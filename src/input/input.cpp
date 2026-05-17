@@ -22,6 +22,8 @@ void GlobalInputHandler::handle_pointer_move_event(Sdl2Application::PointerMoveE
   _mouse_cur_position = event.position();
 }
 
+// TODO: move this all to a SimStateHandle owned by main app, not part of input
+//   Input should be more loosely connected to sim state
 void GlobalInputHandler::mutate_sim_state(std::shared_ptr<types::SimContext> sim_context) {
   if (_keys_down[Sdl2Application::Key::P]) {
     // Pressing P while NORMAL or CUSTOM will force to PAUSED

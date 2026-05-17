@@ -21,7 +21,7 @@ class CameraHandle {
     
     void apply_commanded_movement(
       input::CommandedMovement& commanded_movement,
-      bool yaw_relative_to_horizon = true
+      types::SimContext& sim_context
     );
 };
 
