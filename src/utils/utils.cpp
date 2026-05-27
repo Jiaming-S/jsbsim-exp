@@ -9,7 +9,7 @@
 namespace utils {
 
 void populate_tmp_jsbsim_dir(
-  Corrade::Utility::Resource& _rs,
+  Corrade::Utility::Resource& rs,
   types::AircraftType aircraft_type
 ) {
   std::string tmp_dir = (*Corrade::Utility::Path::temporaryDirectory()) + "/jsbsim-flightmodels/";
@@ -23,14 +23,14 @@ void populate_tmp_jsbsim_dir(
       Magnum::Utility::Path::make(tmp_dir + "aircraft/f16/");
 
       // Fightmodel
-      Magnum::Utility::Path::write(tmp_dir + "aircraft/f16/f16.xml",     _rs.getString("assets/f16/flightmodel/f16.xml"));
-      Magnum::Utility::Path::write(tmp_dir + "aircraft/f16/reset00.xml", _rs.getString("assets/f16/flightmodel/reset00.xml"));
+      Magnum::Utility::Path::write(tmp_dir + "aircraft/f16/f16.xml",     rs.getString("assets/f16/flightmodel/f16.xml"));
+      Magnum::Utility::Path::write(tmp_dir + "aircraft/f16/reset00.xml", rs.getString("assets/f16/flightmodel/reset00.xml"));
       // Systems
-      Magnum::Utility::Path::write(tmp_dir + "systems/hook.xml", _rs.getString("assets/f16/flightmodel/hook.xml"));
-      Magnum::Utility::Path::write(tmp_dir + "systems/pushback.xml", _rs.getString("assets/f16/flightmodel/pushback.xml"));
+      Magnum::Utility::Path::write(tmp_dir + "systems/hook.xml", rs.getString("assets/f16/flightmodel/hook.xml"));
+      Magnum::Utility::Path::write(tmp_dir + "systems/pushback.xml", rs.getString("assets/f16/flightmodel/pushback.xml"));
       // Engine
-      Magnum::Utility::Path::write(tmp_dir + "engine/F100-PW-229.xml", _rs.getString("assets/f16/flightmodel/F100-PW-229.xml"));
-      Magnum::Utility::Path::write(tmp_dir + "engine/direct.xml", _rs.getString("assets/f16/flightmodel/direct.xml"));
+      Magnum::Utility::Path::write(tmp_dir + "engine/F100-PW-229.xml", rs.getString("assets/f16/flightmodel/F100-PW-229.xml"));
+      Magnum::Utility::Path::write(tmp_dir + "engine/direct.xml", rs.getString("assets/f16/flightmodel/direct.xml"));
       break;
     default: break;
   }

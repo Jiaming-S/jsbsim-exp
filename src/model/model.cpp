@@ -40,7 +40,11 @@ void _traverse_scene_graph(
   }
 }
 
-void ModelRepository::ingest_asset_glb(Corrade::Utility::Resource& rs, std::string asset_name, std::string asset_filepath) {
+void ModelRepository::ingest_asset_glb(
+  Corrade::Utility::Resource& rs,
+  std::string asset_name,
+  std::string asset_filepath
+) {
   Corrade::PluginManager::Manager<Magnum::Trade::AbstractImporter> manager;
   Corrade::Containers::Pointer<Magnum::Trade::AbstractImporter> importer = manager.loadAndInstantiate("TinyGltfImporter");
 

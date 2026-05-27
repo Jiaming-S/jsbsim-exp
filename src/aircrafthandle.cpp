@@ -53,7 +53,7 @@ AircraftHandle& AircraftHandle::with_model(std::shared_ptr<model::ModelMultipart
 
 AircraftHandle& AircraftHandle::link(Magnum::Shaders::PhongGL& shader, Magnum::SceneGraph::DrawableGroup3D& drawables) {
   for (auto& model_part : _rendered_objects) {
-    new model::TexturedDrawable {
+    new drawn::TexturedDrawable {
       *model_part.node,
       shader,
       *model_part.mesh,

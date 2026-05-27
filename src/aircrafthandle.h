@@ -11,9 +11,9 @@
 
 #include <memory>
 
+#include "drawn/textureddrawable.h"
 #include "input/input.h"
 #include "model/model.h"
-#include "model/textureddrawable.h"
 #include "utils/utils.h"
 #include "types/types.h"
 

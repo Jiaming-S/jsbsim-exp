@@ -109,8 +109,6 @@ add_executable(jsbsimexp
   src/camerahandle.cpp
   src/input/input.cpp
   src/model/model.cpp
-  src/model/coloreddrawable.cpp
-  src/model/textureddrawable.cpp
   src/utils/utils.cpp
   ${app_resources}
 )

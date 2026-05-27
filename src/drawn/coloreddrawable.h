@@ -7,9 +7,9 @@
 
 #include "../types/types.h"
 
-namespace model {
+namespace drawn {
 
-class ColoredDrawable : public Magnum::SceneGraph::Drawable3D {
+class ColoredDrawable: public Magnum::SceneGraph::Drawable3D {
   Magnum::Shaders::PhongGL& _shader;
   Magnum::GL::Mesh& _mesh;
 
@@ -22,7 +22,16 @@ class ColoredDrawable : public Magnum::SceneGraph::Drawable3D {
     ) : Magnum::SceneGraph::Drawable3D{object, &group}, _shader(shader), _mesh(mesh) {}
 
   private:
-    void draw(const Magnum::Matrix4& transformation_matrix, Magnum::SceneGraph::Camera3D& camera) override;
+    void draw(
+      const Magnum::Matrix4& transformation_matrix,
+      Magnum::SceneGraph::Camera3D& camera
+    ) override {
+      _shader.setLightPositions({{7.0f, 5.0f, 2.5f, 0.0f}})
+        .setTransformationMatrix(transformation_matrix)
+        .setNormalMatrix(transformation_matrix.normalMatrix())
+        .setProjectionMatrix(camera.projectionMatrix());
+      _mesh.draw(_shader);
+    }
 };
 
 };

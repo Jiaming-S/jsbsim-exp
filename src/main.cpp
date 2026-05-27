@@ -13,6 +13,7 @@
 #include <Magnum/SceneGraph/MatrixTransformation3D.h>
 #include <Magnum/SceneGraph/Object.h>
 #include <Magnum/SceneGraph/Scene.h>
+#include <Magnum/Shaders/FlatGL.h>
 #include <Magnum/Shaders/PhongGL.h>
 #include <Magnum/Trade/MeshData.h>
 #include <Magnum/Timeline.h>
@@ -39,11 +40,12 @@
 // Project
 #include "aircrafthandle.h"
 #include "camerahandle.h"
+#include "drawn/coloreddrawable.h"
+#include "drawn/environmentdrawable.h"
+#include "drawn/textureddrawable.h"
 #include "gui/gui.h"
 #include "input/input.h"
 #include "model/model.h"
-#include "model/coloreddrawable.h"
-#include "model/textureddrawable.h"
 #include "types/types.h"
 #include "utils/utils.h"
 
@@ -67,13 +69,16 @@ class JSBSimVisualizer: public Magnum::Platform::Application {
     void scrollEvent(ScrollEvent& event) override;
 
     // Magnum
-    Magnum::Shaders::PhongGL _shader;
+    Magnum::Shaders::FlatGL3D _flat_shader;
+    Magnum::Shaders::PhongGL _phong_shader;
     Magnum::SceneGraph::DrawableGroup3D _drawables;
-
-    Magnum::GL::Mesh _floor_mesh;
 
     Magnum::Timeline _timeline;
     types::Scene3D _scene;
+
+    // Environment
+    types::Object3D* _environ_root;
+    drawn::EnvironmentDrawable* _environ;
 
     // Meta
     std::shared_ptr<types::SimContext> _sim_context;
@@ -109,10 +114,13 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   // Enable depth test
   Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::DepthTest);
 
-  // Initialize Magnum shader
-  _shader = Magnum::Shaders::PhongGL {
-    Magnum::Shaders::PhongGL::Configuration{}.setFlags(Magnum::Shaders::PhongGL::Flag::DiffuseTexture)
+  // Initialize shaders
+  _flat_shader = Magnum::Shaders::FlatGL3D{};
+  _phong_shader = Magnum::Shaders::PhongGL{
+    Magnum::Shaders::PhongGL::Configuration{}
+      .setFlags(Magnum::Shaders::PhongGL::Flag::DiffuseTexture)
   };
+
 
   // Initialize ImGui
   _imgui = Magnum::ImGuiIntegration::Context(
@@ -153,14 +161,6 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     _model_repo.ingest_asset_glb(_rs, asset_name, asset_filepath);
   }
 
-  // Add floor
-  types::Object3D *floor = new types::Object3D{&_scene};
-  floor->scale(Magnum::Vector3{10000.0f, 0.01f, 10000.0f})
-    .translateLocal(Magnum::Vector3{0.0f, -0.1f, 0.0f})
-    .rotateXLocal(1.5707_radf);
-  _floor_mesh = Magnum::MeshTools::compile(Magnum::Primitives::grid3DWireframe({1000, 1000}));
-  new model::ColoredDrawable{*floor, _shader, _floor_mesh, _drawables};
-
   // Load and setup camera
   _cam = std::make_unique<CameraHandle>(
     &_scene,
@@ -195,9 +195,13 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
       .with_ic(preset)
       .with_visual_root(new types::Object3D{&_scene})
       .with_model(_model_repo.get_aircraft_model(types::AircraftType::F16))
-      .link(_shader, _drawables);
+      .link(_phong_shader, _drawables);
     _aircraft.push_back(std::move(aircraft));
   }
+
+  // Initialize Environment
+  _environ_root = new types::Object3D(&_scene);
+  _environ = new drawn::EnvironmentDrawable(*_environ_root, _flat_shader, *_cam, _drawables);
 
   // Start Magnum timeline
   _timeline.start();
@@ -245,25 +249,26 @@ void JSBSimVisualizer::drawEvent() {
   // TODO: make a method for this
   _cam->_camera->draw(_drawables);
 
-  // Push ImGui required settings
-  Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::Blending);
-  Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::ScissorTest);
-  Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::FaceCulling);
-  Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::DepthTest);
+  { // Push ImGui required settings
+    Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::Blending);
+    Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::ScissorTest);
+    Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::FaceCulling);
+    Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::DepthTest);
 
-  // Draw ImGui
-  gui::gui_aircraft_debug(_aircraft, *_sim_context);
-  gui::gui_camera_selection(_aircraft, *_cam, _scene, *_sim_context);
-  gui::gui_input_and_control(_sim_context, commanded_movement);
-  gui::gui_hud(_sim_context, commanded_movement);
-  _imgui.updateApplicationCursor(*this);
-  _imgui.drawFrame();
+    // Draw ImGui
+    gui::gui_aircraft_debug(_aircraft, *_sim_context);
+    gui::gui_camera_selection(_aircraft, *_cam, _scene, *_sim_context);
+    gui::gui_input_and_control(_sim_context, commanded_movement);
+    gui::gui_hud(_sim_context, commanded_movement);
+    _imgui.updateApplicationCursor(*this);
+    _imgui.drawFrame();
 
-  // Pop ImGui required settings
-  Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::DepthTest);
-  Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::FaceCulling);
-  Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::ScissorTest);
-  Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::Blending);
+    // Pop ImGui required settings
+    Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::ScissorTest);
+    Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::Blending);
+    Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::DepthTest);
+    Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::FaceCulling);
+  }
 
   // Next
   swapBuffers();

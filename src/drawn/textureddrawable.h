@@ -7,7 +7,7 @@
 
 #include "../types/types.h"
 
-namespace model {
+namespace drawn {
 
 class TexturedDrawable: public Magnum::SceneGraph::Drawable3D {
   Magnum::Shaders::PhongGL& _shader;
@@ -24,7 +24,16 @@ class TexturedDrawable: public Magnum::SceneGraph::Drawable3D {
     ) : Magnum::SceneGraph::Drawable3D{object, &group}, _shader(shader), _mesh(mesh), _texture(texture) {}
 
   private:
-    void draw(const Magnum::Matrix4& transformation_matrix, Magnum::SceneGraph::Camera3D& camera) override;
+    void draw(
+      const Magnum::Matrix4& transformation_matrix,
+      Magnum::SceneGraph::Camera3D& camera
+    ) override {
+      _shader.setTransformationMatrix(transformation_matrix)
+        .setProjectionMatrix(camera.projectionMatrix())
+        .setNormalMatrix(transformation_matrix.normalMatrix());
+      _shader.bindDiffuseTexture(*_texture);
+      _mesh.draw(_shader);
+    }
 };
 
 };
