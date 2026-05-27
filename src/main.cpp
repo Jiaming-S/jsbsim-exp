@@ -41,7 +41,7 @@
 #include "aircrafthandle.h"
 #include "camerahandle.h"
 #include "drawn/coloreddrawable.h"
-#include "drawn/environmentdrawable.h"
+#include "drawn/skyboxdrawable.h"
 #include "drawn/textureddrawable.h"
 #include "gui/gui.h"
 #include "input/input.h"
@@ -76,9 +76,9 @@ class JSBSimVisualizer: public Magnum::Platform::Application {
     Magnum::Timeline _timeline;
     types::Scene3D _scene;
 
-    // Environment
-    types::Object3D* _environ_root;
-    drawn::EnvironmentDrawable* _environ;
+    // Skybox
+    types::Object3D* _skybox_root;
+    drawn::SkyboxDrawable* _skybox;
 
     // Meta
     std::shared_ptr<types::SimContext> _sim_context;
@@ -199,9 +199,9 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     _aircraft.push_back(std::move(aircraft));
   }
 
-  // Initialize Environment
-  _environ_root = new types::Object3D(&_scene);
-  _environ = new drawn::EnvironmentDrawable(*_environ_root, _flat_shader, *_cam, _drawables);
+  // Initialize skybox
+  _skybox_root = new types::Object3D(&_scene);
+  _skybox = new drawn::SkyboxDrawable(*_skybox_root, _flat_shader, *_cam, _drawables);
 
   // Start Magnum timeline
   _timeline.start();

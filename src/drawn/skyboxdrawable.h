@@ -12,13 +12,13 @@
 
 namespace drawn {
 
-class EnvironmentDrawable: public Magnum::SceneGraph::Drawable3D {
+class SkyboxDrawable: public Magnum::SceneGraph::Drawable3D {
   Magnum::Shaders::FlatGL3D& _shader;
   CameraHandle& _cam;
   Magnum::GL::Mesh _mesh;
 
   public:
-    explicit EnvironmentDrawable(
+    explicit SkyboxDrawable(
       types::Object3D& object,
       Magnum::Shaders::FlatGL3D& shader,
       CameraHandle& cam,
