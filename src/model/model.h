@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "../types/types.h"
+#include "../utils/utils.h"
 
 using namespace Magnum::Math::Literals;
 
