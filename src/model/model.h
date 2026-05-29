@@ -16,13 +16,10 @@
 #include <Magnum/Trade/MaterialData.h>
 #include <Corrade/PluginManager/Manager.h>
 
-#include <functional>
-#include <iostream>
 #include <unordered_map>
 #include <vector>
 
 #include "../types/types.h"
-#include "../utils/utils.h"
 
 using namespace Magnum::Math::Literals;
 

@@ -1,7 +1,8 @@
 #pragma once
 
-#include <Magnum/GL/Mesh.h>
 #include <Magnum/GL/Buffer.h>
+#include <Magnum/GL/Mesh.h>
+#include <Magnum/GL/Renderer.h>
 #include <Magnum/Math/Color.h>
 #include <Magnum/SceneGraph/Camera.h>
 #include <Magnum/SceneGraph/Drawable.h>
@@ -26,8 +27,8 @@ class SkyboxDrawable: public Magnum::SceneGraph::Drawable3D {
     ) : Magnum::SceneGraph::Drawable3D{object, &group}, _shader(shader), _cam(cam) {
       
       // Initialize mesh for a fat plus
-      float radius = 48.0f;
-      float width = 2.0f;
+      float radius = 40.0f;
+      float width = 0.4f;
 
       // All vertices
       Magnum::Vector3 vertices[] = {
@@ -57,7 +58,7 @@ class SkyboxDrawable: public Magnum::SceneGraph::Drawable3D {
       Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::Blending);
       
       _shader.setTransformationProjectionMatrix(camera.projectionMatrix() * transformation_matrix)
-        .setColor(Magnum::Color4{{1.0f, 1.0f, 1.0f, 0.5f}});
+        .setColor(Magnum::Color4{{1.0f, 1.0f, 1.0f, 0.2f}});
       _mesh.draw(_shader);
       
       Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::Blending);

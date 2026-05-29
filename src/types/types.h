@@ -6,7 +6,6 @@
 
 #include <FGFDMExec.h>
 
-#include <memory>
 
 namespace types {
 
