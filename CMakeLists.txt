@@ -106,6 +106,7 @@ corrade_add_resource(app_resources resources.conf)
 # Build and link jsbsimexp
 add_executable(jsbsimexp 
   src/main.cpp
+  src/types/types.cpp
   src/aircrafthandle.cpp
   src/camerahandle.cpp
   src/input/input.cpp
