@@ -27,10 +27,7 @@
 
 namespace utils {
 
-extern void populate_tmp_jsbsim_dir(
-  Corrade::Utility::Resource& rs,
-  types::AircraftType aircraft_type = types::AircraftType::F16
-);
+extern void populate_tmp_jsbsim_dir(types::AircraftType aircraft_type = types::AircraftType::F16);
 
 /// @brief Loads and initializes an aircraft FGFDMExec
 /// @param aircraft_type 

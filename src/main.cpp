@@ -38,12 +38,11 @@
 // Project
 #include "aircrafthandle.h"
 #include "camerahandle.h"
-#include "drawn/coloreddrawable.h"
-#include "drawn/skyboxdrawable.h"
-#include "drawn/textureddrawable.h"
+#include "drawn/environmentdrawable.h"
 #include "gui/gui.h"
 #include "input/input.h"
 #include "model/model.h"
+#include "shaders/floorshader.h"
 #include "types/types.h"
 #include "utils/utils.h"
 
@@ -69,20 +68,20 @@ class JSBSimVisualizer: public Magnum::Platform::Application {
     // Magnum
     Magnum::Shaders::FlatGL3D _flat_shader;
     Magnum::Shaders::PhongGL _phong_shader;
+    shaders::FloorShader _floor_shader;
+
+    Magnum::SceneGraph::DrawableGroup3D _background_drawables;
     Magnum::SceneGraph::DrawableGroup3D _drawables;
 
     Magnum::Timeline _timeline;
     types::Scene3D _scene;
 
-    // Skybox
-    types::Object3D* _skybox_root;
-    drawn::SkyboxDrawable* _skybox;
+    // Environment
+    types::Object3D* _environment_root;
+    drawn::EnvironmentDrawable* _environment;
 
     // Meta
     std::shared_ptr<types::SimContext> _sim_context;
-
-    // Resource manager
-    Corrade::Utility::Resource _rs{"assets"};
 
     // 3D Model Repository
     model::ModelRepository _model_repo;
@@ -150,13 +149,13 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
 
   // Load and ingest GLTF models
   std::vector<std::pair<std::string, std::string>> models_to_import = {
-    {"f16", "assets/f16/f16.glb"},
+    {"f16", "assets/f16/model/f16.glb"},
   };
 
   for (auto& p : models_to_import) {
     std::string asset_name = p.first;
     std::string asset_filepath = p.second;
-    _model_repo.ingest_asset_glb(_rs, asset_name, asset_filepath);
+    _model_repo.ingest_asset_glb(asset_name, asset_filepath);
   }
 
   // Load and setup camera
@@ -171,7 +170,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   );
 
   // Load and populate aircraft configs
-  utils::populate_tmp_jsbsim_dir(_rs, types::AircraftType::F16);
+  utils::populate_tmp_jsbsim_dir(types::AircraftType::F16);
 
   // Load initial conditions
   std::vector<types::AircraftInitialConditionPreset> presets = {
@@ -197,9 +196,13 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     _aircraft.push_back(std::move(aircraft));
   }
 
-  // Initialize skybox
-  _skybox_root = new types::Object3D(&_scene);
-  _skybox = new drawn::SkyboxDrawable(*_skybox_root, _flat_shader, *_cam, _drawables);
+  // Initialize environment
+  _environment_root = new types::Object3D(&_scene);
+  _environment = new drawn::EnvironmentDrawable(
+    *_environment_root,
+    _floor_shader,
+    _background_drawables
+  );
 
   // Start Magnum timeline
   _timeline.start();
@@ -245,6 +248,7 @@ void JSBSimVisualizer::drawEvent() {
 
   // Do camera draw
   // TODO: make a method for this
+  _cam->_camera->draw(_background_drawables);
   _cam->_camera->draw(_drawables);
 
   { // Push ImGui required settings

@@ -8,16 +8,14 @@
 
 namespace utils {
 
-void populate_tmp_jsbsim_dir(
-  Corrade::Utility::Resource& rs,
-  types::AircraftType aircraft_type
-) {
+void populate_tmp_jsbsim_dir(types::AircraftType aircraft_type) {
   std::string tmp_dir = (*Corrade::Utility::Path::temporaryDirectory()) + "/jsbsim-flightmodels/";
   Magnum::Utility::Path::make(tmp_dir);
   Magnum::Utility::Path::make(tmp_dir + "aircraft/");
   Magnum::Utility::Path::make(tmp_dir + "systems/");
   Magnum::Utility::Path::make(tmp_dir + "engine/");
 
+  Corrade::Utility::Resource rs{"assets"};
   switch (aircraft_type) {
     case types::AircraftType::F16:
       Magnum::Utility::Path::make(tmp_dir + "aircraft/f16/");

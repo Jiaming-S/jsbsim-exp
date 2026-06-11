@@ -14,7 +14,6 @@ class CameraHandle {
     Magnum::SceneGraph::Camera3D *_camera;
     types::Object3D *_mount, *_revolut;
 
-    CameraHandle() {};
     CameraHandle(types::Object3D* root, Magnum::Matrix4 projection_matrix);
 
     void reattach_to(types::Object3D* root);

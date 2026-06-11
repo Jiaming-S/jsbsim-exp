@@ -45,7 +45,6 @@ class ModelRepository {
 
   public:
     void ingest_asset_glb(
-      Corrade::Utility::Resource& rs,
       std::string asset_name,
       std::string asset_filepath
     );

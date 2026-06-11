@@ -41,7 +41,6 @@ void _traverse_scene_graph(
 }
 
 void ModelRepository::ingest_asset_glb(
-  Corrade::Utility::Resource& rs,
   std::string asset_name,
   std::string asset_filepath
 ) {
@@ -49,6 +48,7 @@ void ModelRepository::ingest_asset_glb(
   Corrade::Containers::Pointer<Magnum::Trade::AbstractImporter> importer = manager.loadAndInstantiate("TinyGltfImporter");
 
   // Read asset from Corrade resource manager
+  Corrade::Utility::Resource rs{"assets"};
   importer->openData(rs.getRaw(asset_filepath));
 
   auto target_model = std::make_shared<ModelMultipartTextured>();
