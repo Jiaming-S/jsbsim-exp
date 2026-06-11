@@ -38,11 +38,13 @@
 // Project
 #include "aircrafthandle.h"
 #include "camerahandle.h"
+#include "drawn/atmospheredrawable.h"
 #include "drawn/environmentdrawable.h"
 #include "gui/gui.h"
 #include "input/input.h"
 #include "model/model.h"
 #include "shaders/floorshader.h"
+#include "shaders/skyshader.h"
 #include "types/types.h"
 #include "utils/utils.h"
 
@@ -68,7 +70,9 @@ class JSBSimVisualizer: public Magnum::Platform::Application {
     // Magnum
     Magnum::Shaders::FlatGL3D _flat_shader;
     Magnum::Shaders::PhongGL _phong_shader;
+    
     shaders::FloorShader _floor_shader;
+    shaders::SkyShader _sky_shader;
 
     Magnum::SceneGraph::DrawableGroup3D _background_drawables;
     Magnum::SceneGraph::DrawableGroup3D _drawables;
@@ -77,8 +81,9 @@ class JSBSimVisualizer: public Magnum::Platform::Application {
     types::Scene3D _scene;
 
     // Environment
-    types::Object3D* _environment_root;
+    types::Object3D* _scene_root;
     drawn::EnvironmentDrawable* _environment;
+    drawn::AtmosphereDrawable* _atmosphere;
 
     // Meta
     std::shared_ptr<types::SimContext> _sim_context;
@@ -197,10 +202,15 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   }
 
   // Initialize environment
-  _environment_root = new types::Object3D(&_scene);
+  _scene_root = new types::Object3D(&_scene);
   _environment = new drawn::EnvironmentDrawable(
-    *_environment_root,
+    *_scene_root,
     _floor_shader,
+    _background_drawables
+  );
+  _atmosphere = new drawn::AtmosphereDrawable(
+    *_scene_root,
+    _sky_shader,
     _background_drawables
   );
 
