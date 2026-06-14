@@ -34,7 +34,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <queue>
 
 // Project
 #include "aircrafthandle.h"

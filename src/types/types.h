@@ -48,8 +48,8 @@ struct AircraftStateInfo {
   double v_down;
 };
 
-struct AircraftTrailBreadcrumbs {
-  std::queue<AircraftStateInfo> trail;
+struct AircraftTrailBreadcrumb {
+  AircraftStateInfo breadcrumb;
   double sim_time;
 };
 

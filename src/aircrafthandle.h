@@ -10,6 +10,7 @@
 #include <models/FGPropulsion.h>
 
 #include <memory>
+#include <deque>
 
 #include "drawn/textureddrawable.h"
 #include "input/input.h"
@@ -23,7 +24,9 @@ class AircraftHandle {
     const types::AircraftType _aircraft_type;
     const std::string _aircraft_type_string;
 
-    std::unordered_map<types::AircraftKeyPoints, types::Object3D *> _keypoints_mapping;
+    // Aircraft keypoints
+    std::unordered_map<types::AircraftKeyPoints, types::Object3D *> _aircraft_keypoints_mapping;
+    std::deque<types::AircraftTrailBreadcrumb> _aircraft_trail;
 
     // JSBSim
     std::unique_ptr<JSBSim::FGFDMExec> _fdmexec;
@@ -43,10 +46,17 @@ class AircraftHandle {
     AircraftHandle& with_model(std::shared_ptr<model::ModelMultipartTextured> model);
     AircraftHandle& link(Magnum::Shaders::PhongGL& shader, Magnum::SceneGraph::DrawableGroup3D& drawables);
 
-    types::AircraftStateInfo to_aircraft_state();
-
+    /// @brief Applies JSBSim FGFCS commands defined in given `CommandedMovement`
     void apply_commanded_movement(input::CommandedMovement commanded_movement);
 
+    /// @brief Calls `_fdmexec->Run()`
     void update_sim();
+    
+    /// @brief Updates `_visual_root_object` with current position from JSBSim FGFDMExec
+    /// @note  Also inserts new position as breadcrumb into `_aircraft_trail`
     void update_vis();
+
+    /// @brief Outputs an `AircraftStateInfo` representation from the AircraftHandle's
+    ///        hooked JSBSim FGFDMExec
+    types::AircraftStateInfo to_aircraft_state();
 };

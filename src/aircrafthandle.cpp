@@ -38,7 +38,7 @@ AircraftHandle& AircraftHandle::with_keypoints(std::vector<types::AircraftKeyPoi
     Magnum::Vector3 keypoint_relative_coords = utils::to_keypoint_coords(_aircraft_type, keypoint);
     types::Object3D *keypoint_object = new types::Object3D{_visual_root_object};
     keypoint_object->translate(keypoint_relative_coords);
-    _keypoints_mapping[keypoint] = keypoint_object;
+    _aircraft_keypoints_mapping[keypoint] = keypoint_object;
   }
 
   return *this;
@@ -107,6 +107,11 @@ void AircraftHandle::update_sim() {
 
 void AircraftHandle::update_vis() {
   types::AircraftStateInfo state = this->to_aircraft_state();
+  _aircraft_trail.push_back(types::AircraftTrailBreadcrumb{
+    state,
+    _fdmexec->GetSimTime(),
+  });
+  
   _visual_root_object->resetTransformation()
     .rotateZ(-state.roll)
     .rotateX( state.pitch)
