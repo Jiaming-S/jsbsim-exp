@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Magnum/GL/Mesh.h>
+#include "Magnum/Primitives/UVSphere.h"
 #include <Magnum/SceneGraph/Object.h>
 #include <Magnum/SceneGraph/MatrixTransformation3D.h>
 #include <Magnum/ImGuiIntegration/Context.hpp>
@@ -11,6 +12,7 @@
 
 #include <memory>
 
+#include "drawn/coloreddrawable.h"
 #include "drawn/textureddrawable.h"
 #include "input/input.h"
 #include "model/model.h"
@@ -24,6 +26,7 @@ class AircraftHandle {
     const std::string _aircraft_type_string;
 
     std::unordered_map<types::AircraftKeyPoints, types::Object3D *> _keypoints_mapping;
+    std::shared_ptr<Magnum::GL::Mesh> _sphere_mesh{std::make_shared<Magnum::GL::Mesh>(Magnum::MeshTools::compile(Magnum::Primitives::uvSphereSolid(16, 32)))};
 
     // JSBSim
     std::unique_ptr<JSBSim::FGFDMExec> _fdmexec;
@@ -39,6 +42,7 @@ class AircraftHandle {
     AircraftHandle& with_fdmexec(bool quiet = true);
     AircraftHandle& with_ic(types::AircraftInitialConditionPreset preset);
     AircraftHandle& with_visual_root(types::Object3D *object);
+    AircraftHandle& with_keypoints(std::vector<types::AircraftKeyPoints> keypoints);
     AircraftHandle& with_model(std::shared_ptr<model::ModelMultipartTextured> model);
     AircraftHandle& link(Magnum::Shaders::PhongGL& shader, Magnum::SceneGraph::DrawableGroup3D& drawables);
 

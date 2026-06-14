@@ -50,7 +50,7 @@ std::unique_ptr<JSBSim::FGFDMExec> load_aircraft(
 
   // Import aircraft (default "f16")
   if (!aircraft_fdmexec->LoadModel(aircraft_type_string)) {
-    std::cerr << "Failed to load model \"" << aircraft_type_string << "\" from tmp_dir \`" << tmp_dir << "\`" << std::endl;
+    std::cerr << "Failed to load model \"" << aircraft_type_string << "\" from " << tmp_dir << "" << std::endl;
     return nullptr;
   }
 
@@ -67,25 +67,31 @@ std::string to_type_string(types::AircraftType& t) {
   }
 }
 
-Magnum::Vector3 to_keypoint_coords(types::AircraftKeyPoints keypoint) {
+Magnum::Vector3 to_keypoint_coords(
+  types::AircraftType aircraft_type,
+  types::AircraftKeyPoints keypoint
+) {
   Magnum::Vector3 coords;
-  switch (keypoint) {
-    case types::AircraftKeyPoints::NOSE:
-      coords = {0.0f, 26.5f, 0.0f};
-      break;
-    case types::AircraftKeyPoints::WINGTIP_L:
-      coords = {-15.5f, -8.25f, 0.0f};
-      break;
-    case types::AircraftKeyPoints::WINGTIP_R:
-      coords = {15.5f, -8.25f, 0.0f};
-      break;
-    case types::AircraftKeyPoints::ENGINE_NOZZLE:
-      coords = {0.0f, -18.5f, 0.0f};
+  switch (aircraft_type) {
+    case types::AircraftType::F16:
+      switch (keypoint) {
+        case types::AircraftKeyPoints::NOSE:
+          coords = {0.0f, -1.5f, -26.5f};
+          break;
+        case types::AircraftKeyPoints::WINGTIP_L:
+          coords = {-15.0f, -1.25f, 8.0f};
+          break;
+        case types::AircraftKeyPoints::WINGTIP_R:
+          coords = {15.0f, -1.25f, 8.0f};
+          break;
+        case types::AircraftKeyPoints::ENGINE_EXHAUST:
+          coords = {0.0f, -1.25f, 18.5f};
+          break;
+      }
       break;
   }
 
-  Magnum::Matrix4 root_correction = Magnum::Matrix4::rotationY(Magnum::Deg(90.0f));
-  return root_correction.transformPoint(coords);
+  return coords;
 }
 
 Magnum::Vector3 as_magnum_RUB(float x, float y, float z) {

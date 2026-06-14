@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Magnum/Magnum.h"
 #include <Magnum/GL/Mesh.h>
 #include <Magnum/SceneGraph/Object.h>
 #include <Magnum/SceneGraph/MatrixTransformation3D.h>
@@ -47,11 +48,16 @@ struct AircraftStateInfo {
   double v_down;
 };
 
+struct AircraftTrailBreadcrumbs {
+  std::queue<AircraftStateInfo> trail;
+  double sim_time;
+};
+
 enum AircraftKeyPoints {
   NOSE,
   WINGTIP_L,
   WINGTIP_R,
-  ENGINE_NOZZLE,
+  ENGINE_EXHAUST,
 };
 
 struct SimContext {

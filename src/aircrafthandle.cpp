@@ -31,6 +31,19 @@ AircraftHandle& AircraftHandle::with_visual_root(types::Object3D *object) {
   return *this;
 }
 
+AircraftHandle& AircraftHandle::with_keypoints(std::vector<types::AircraftKeyPoints> keypoints) {
+  assert(_visual_root_object);
+
+  for (auto& keypoint : keypoints) {
+    Magnum::Vector3 keypoint_relative_coords = utils::to_keypoint_coords(_aircraft_type, keypoint);
+    types::Object3D *keypoint_object = new types::Object3D{_visual_root_object};
+    keypoint_object->translate(keypoint_relative_coords);
+    _keypoints_mapping[keypoint] = keypoint_object;
+  }
+
+  return *this;
+}
+
 AircraftHandle& AircraftHandle::with_model(std::shared_ptr<model::ModelMultipartTextured> model) {
   assert(_visual_root_object);
   assert(model);
@@ -41,7 +54,7 @@ AircraftHandle& AircraftHandle::with_model(std::shared_ptr<model::ModelMultipart
     Magnum::GL::Mesh* mesh_ptr = &model->_meshes[component.mesh_idx];
     Magnum::GL::Texture2D* texture_ptr = &model->_textures[component.texture_idx];
 
-    _rendered_objects.push_back(types::Object3DRenderable {
+    _rendered_objects.push_back(types::Object3DRenderable{
       part_node,
       mesh_ptr,
       texture_ptr
@@ -53,13 +66,25 @@ AircraftHandle& AircraftHandle::with_model(std::shared_ptr<model::ModelMultipart
 
 AircraftHandle& AircraftHandle::link(Magnum::Shaders::PhongGL& shader, Magnum::SceneGraph::DrawableGroup3D& drawables) {
   for (auto& model_part : _rendered_objects) {
-    new drawn::TexturedDrawable {
+    new drawn::TexturedDrawable{
       *model_part.node,
       shader,
       *model_part.mesh,
       model_part.texture,
       drawables
     };
+  }
+
+  { // Debug keypoint visualization
+    for (auto& p : _keypoints_mapping) {
+      types::Object3D *pos = p.second;
+      new drawn::ColoredDrawable{
+        *pos,
+        shader,
+        *_sphere_mesh,
+        drawables
+      };
+    }
   }
 
   return *this;

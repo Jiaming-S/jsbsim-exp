@@ -43,6 +43,12 @@ extern std::unique_ptr<JSBSim::FGFDMExec> load_aircraft(
 /// Convert aircraft type to corresponding type_string
 extern std::string to_type_string(types::AircraftType& t);
 
+/// Convert keypoint to coordinate relative to model
+extern Magnum::Vector3 to_keypoint_coords(
+  types::AircraftType aircraft_type,
+  types::AircraftKeyPoints keypoint
+);
+
 /// Right Up Back
 extern Magnum::Vector3 as_magnum_RUB(float x, float y, float z);
 

@@ -34,6 +34,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <queue>
 
 // Project
 #include "aircrafthandle.h"
@@ -196,6 +197,12 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
       .with_fdmexec()
       .with_ic(preset)
       .with_visual_root(new types::Object3D{&_scene})
+      .with_keypoints({
+        types::AircraftKeyPoints::WINGTIP_L,
+        types::AircraftKeyPoints::WINGTIP_R,
+        types::AircraftKeyPoints::ENGINE_EXHAUST,
+        types::AircraftKeyPoints::NOSE,
+      })
       .with_model(_model_repo.get_aircraft_model(types::AircraftType::F16))
       .link(_phong_shader, _drawables);
     _aircraft.push_back(std::move(aircraft));
