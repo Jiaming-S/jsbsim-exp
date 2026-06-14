@@ -75,18 +75,6 @@ AircraftHandle& AircraftHandle::link(Magnum::Shaders::PhongGL& shader, Magnum::S
     };
   }
 
-  { // Debug keypoint visualization
-    for (auto& p : _keypoints_mapping) {
-      types::Object3D *pos = p.second;
-      new drawn::ColoredDrawable{
-        *pos,
-        shader,
-        *_sphere_mesh,
-        drawables
-      };
-    }
-  }
-
   return *this;
 }
 
