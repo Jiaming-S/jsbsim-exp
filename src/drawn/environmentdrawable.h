@@ -36,20 +36,24 @@ class EnvironmentDrawable: public Magnum::SceneGraph::Drawable3D {
       { // Push Environment required settings
         Magnum::GL::Renderer::setDepthMask(GL_FALSE);
         Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::DepthTest);
+        Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::Blending);
       }
       
       Magnum::Matrix4 camera_from_root_pos = camera.object().absoluteTransformationMatrix();
       _shader.setProjectionMatrix(camera.projectionMatrix())
         .setCameraWorldPos(camera_from_root_pos.translation())
         .setViewMatrix(camera_from_root_pos.inverted())
-        .setGridSpacing(100.0f);
+        .setGridSpacing(100.0f)
+        .setSnapInterval(100.0f);
       _mesh.draw(_shader);
 
       { // Pop Environment required settings
+        Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::Blending);
         Magnum::GL::Renderer::setDepthMask(GL_TRUE);
         Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::DepthTest);
       }
     }
+
 };
 
 };

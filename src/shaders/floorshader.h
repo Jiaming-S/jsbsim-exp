@@ -17,6 +17,7 @@ class FloorShader: public Magnum::GL::AbstractShaderProgram {
   Magnum::Int _camera_pos;
   Magnum::Int _view_matrix;
   Magnum::Int _grid_spacing;
+  Magnum::Int _snap_interval;
 
   // Layout
   //  - Slot 0: Position
@@ -50,6 +51,7 @@ class FloorShader: public Magnum::GL::AbstractShaderProgram {
         _view_matrix = uniformLocation("uViewMatrix");
         _camera_pos = uniformLocation("uCameraWorldPos");
         _grid_spacing = uniformLocation("uGridSpacing");
+        _snap_interval = uniformLocation("uSnapInterval");
       }
     }
 
@@ -67,6 +69,10 @@ class FloorShader: public Magnum::GL::AbstractShaderProgram {
     }
     FloorShader& setGridSpacing(float spacing) {
       setUniform(_grid_spacing, spacing);
+      return *this;
+    }
+    FloorShader& setSnapInterval(float interval) {
+      setUniform(_snap_interval, interval);
       return *this;
     }
 };

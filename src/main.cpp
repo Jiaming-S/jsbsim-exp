@@ -203,14 +203,14 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
 
   // Initialize environment
   _scene_root = new types::Object3D(&_scene);
-  _environment = new drawn::EnvironmentDrawable(
-    *_scene_root,
-    _floor_shader,
-    _background_drawables
-  );
   _atmosphere = new drawn::AtmosphereDrawable(
     *_scene_root,
     _sky_shader,
+    _background_drawables
+  );
+  _environment = new drawn::EnvironmentDrawable(
+    *_scene_root,
+    _floor_shader,
     _background_drawables
   );
 
