@@ -1,4 +1,5 @@
 #include "aircrafthandle.h"
+#include "drawn/traildrawable.h"
 
 
 AircraftHandle& AircraftHandle::with_fdmexec(bool quiet) {
@@ -64,7 +65,10 @@ AircraftHandle& AircraftHandle::with_model(std::shared_ptr<model::ModelMultipart
   return *this;
 }
 
-AircraftHandle& AircraftHandle::link(Magnum::Shaders::PhongGL& shader, Magnum::SceneGraph::DrawableGroup3D& drawables) {
+AircraftHandle& AircraftHandle::link(
+  Magnum::Shaders::PhongGL& shader,
+  Magnum::SceneGraph::DrawableGroup3D& drawables
+) {
   for (auto& model_part : _rendered_objects) {
     new drawn::TexturedDrawable{
       *model_part.node,
@@ -74,6 +78,31 @@ AircraftHandle& AircraftHandle::link(Magnum::Shaders::PhongGL& shader, Magnum::S
       drawables
     };
   }
+
+  return *this;
+}
+
+AircraftHandle& AircraftHandle::link_trails(
+  types::Object3D& object,
+  Magnum::SceneGraph::DrawableGroup3D& drawables
+) {
+  new drawn::TrailDrawable{
+    object,
+    drawables,
+    _aircraft_trail,
+    _aircraft_type,
+    types::AircraftKeyPoints::WINGTIP_L,
+    {1.0f, 1.0f, 1.0f}
+  };
+
+  new drawn::TrailDrawable{
+    object,
+    drawables,
+    _aircraft_trail,
+    _aircraft_type,
+    types::AircraftKeyPoints::WINGTIP_R,
+    {1.0f, 1.0f, 1.0f}
+  };
 
   return *this;
 }
@@ -107,7 +136,8 @@ void AircraftHandle::update_sim() {
 
 void AircraftHandle::update_vis() {
   types::AircraftStateInfo state = this->to_aircraft_state();
-  _aircraft_trail.push_back(types::AircraftTrailBreadcrumb{
+  if (_aircraft_trail->size() > _aircraft_trail_size_limit) _aircraft_trail->pop_front();
+  _aircraft_trail->push_back(types::AircraftTrailBreadcrumb{
     state,
     _fdmexec->GetSimTime(),
   });

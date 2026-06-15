@@ -203,7 +203,8 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
         types::AircraftKeyPoints::NOSE,
       })
       .with_model(_model_repo.get_aircraft_model(types::AircraftType::F16))
-      .link(_phong_shader, _drawables);
+      .link(_phong_shader, _drawables)
+      .link_trails(_scene, _drawables);
     _aircraft.push_back(std::move(aircraft));
   }
 
