@@ -45,6 +45,7 @@
 #include "model/model.h"
 #include "shaders/floorshader.h"
 #include "shaders/skyshader.h"
+#include "shaders/shadowshader.h"
 #include "types/types.h"
 #include "utils/utils.h"
 
@@ -73,6 +74,7 @@ class JSBSimVisualizer: public Magnum::Platform::Application {
     
     shaders::FloorShader _floor_shader;
     shaders::SkyShader _sky_shader;
+    shaders::ShadowShader _shadow_shader;
 
     Magnum::SceneGraph::DrawableGroup3D _background_drawables;
     Magnum::SceneGraph::DrawableGroup3D _drawables;
@@ -173,6 +175,9 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
       INFINITY
     )
   );
+  
+  _cam->_mount->translate(_cam->_camera->projectionMatrix().up() * 10);
+  _cam->_mount->translate(_cam->_camera->projectionMatrix().backward() * 10);
 
   // Load and populate aircraft configs
   utils::populate_tmp_jsbsim_dir(types::AircraftType::F16);
@@ -204,7 +209,8 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
       })
       .with_model(_model_repo.get_aircraft_model(types::AircraftType::F16))
       .link(_phong_shader, _drawables)
-      .link_trails(_scene, _drawables);
+      .link_trails(_scene, _drawables)
+      .link_shadow(_shadow_shader, _drawables);
     _aircraft.push_back(std::move(aircraft));
   }
 

@@ -15,6 +15,7 @@
 
 #include "drawn/textureddrawable.h"
 #include "drawn/traildrawable.h"
+#include "drawn/shadowdrawable.h"
 #include "input/input.h"
 #include "model/model.h"
 #include "utils/utils.h"
@@ -50,6 +51,7 @@ class AircraftHandle {
     AircraftHandle& with_model(std::shared_ptr<model::ModelMultipartTextured> model);
     AircraftHandle& link(Magnum::Shaders::PhongGL& shader, Magnum::SceneGraph::DrawableGroup3D& drawables);
     AircraftHandle& link_trails(types::Object3D& object, Magnum::SceneGraph::DrawableGroup3D& drawables);
+    AircraftHandle& link_shadow(shaders::ShadowShader& shader, Magnum::SceneGraph::DrawableGroup3D& drawables);
 
     /// @brief Applies JSBSim FGFCS commands defined in given `CommandedMovement`
     void apply_commanded_movement(input::CommandedMovement commanded_movement);

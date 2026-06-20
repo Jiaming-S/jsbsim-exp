@@ -107,6 +107,16 @@ AircraftHandle& AircraftHandle::link_trails(
   return *this;
 }
 
+AircraftHandle& AircraftHandle::link_shadow(
+  shaders::ShadowShader& shader,
+  Magnum::SceneGraph::DrawableGroup3D& drawables
+) {
+  assert(_visual_root_object);
+  new drawn::ShadowDrawable{*_visual_root_object, shader, drawables};
+  return *this;
+}
+
+
 void AircraftHandle::apply_commanded_movement(input::CommandedMovement commanded_movement) {
   std::shared_ptr<JSBSim::FGFCS> fcs = _fdmexec->GetFCS();
 
