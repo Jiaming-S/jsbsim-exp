@@ -4,14 +4,15 @@
 #include <magic_enum.hpp>
 
 #include "../aircrafthandle.h"
-#include "../utils/utils.h"
+#include "../camerahandle.h"
+#include "Magnum/Magnum.h"
 
 using namespace Magnum::Math::Literals;
 
 
 namespace gui {
 
-void gui_aircraft_debug_collapse(
+inline void gui_aircraft_debug_collapse(
   AircraftHandle& ac,
   std::string header_name,
   bool active,
@@ -27,59 +28,59 @@ void gui_aircraft_debug_collapse(
       ImGui::TableNextColumn();
       ImGui::Text("Yaw");
       ImGui::TableNextColumn();
-      ImGui::Text("%lf deg", Magnum::Float(state.yaw) / M_PI * 180.0);
+      ImGui::Text("%.2lf deg", Magnum::Float(state.yaw) / M_PI * 180.0);
 
       ImGui::TableNextColumn();
       ImGui::Text("Roll");
       ImGui::TableNextColumn();
-      ImGui::Text("%lf deg", Magnum::Float(state.roll) / M_PI * 180.0);
+      ImGui::Text("%.2lf deg", Magnum::Float(state.roll) / M_PI * 180.0);
 
       ImGui::TableNextColumn();
       ImGui::Text("Pitch");
       ImGui::TableNextColumn();
-      ImGui::Text("%lf deg", Magnum::Float(state.pitch) / M_PI * 180.0);
+      ImGui::Text("%.2lf deg", Magnum::Float(state.pitch) / M_PI * 180.0);
 
       ImGui::TableNextColumn();
       ImGui::Text("Alt");
       ImGui::TableNextColumn();
-      ImGui::Text("%lf ft", state.alt);
+      ImGui::Text("%.2lf ft", state.alt);
 
       ImGui::TableNextColumn();
       ImGui::Text("North");
       ImGui::TableNextColumn();
-      ImGui::Text("%lf ft", state.north);
+      ImGui::Text("%.2lf ft", state.north);
 
       ImGui::TableNextColumn();
       ImGui::Text("East");
       ImGui::TableNextColumn();
-      ImGui::Text("%lf ft", state.east);
+      ImGui::Text("%.2lf ft", state.east);
 
       ImGui::TableNextColumn();
       ImGui::Text("Down");
       ImGui::TableNextColumn();
-      ImGui::Text("%lf ft", state.down);
+      ImGui::Text("%.2lf ft", state.down);
 
       ImGui::TableNextColumn();
       ImGui::Text("Velocity North");
       ImGui::TableNextColumn();
-      ImGui::Text("%lf ft/s", state.v_north);
+      ImGui::Text("%.2lf ft/s", state.v_north);
       
       ImGui::TableNextColumn();
       ImGui::Text("Velocity East");
       ImGui::TableNextColumn();
-      ImGui::Text("%lf ft/s", state.v_east);
+      ImGui::Text("%.2lf ft/s", state.v_east);
       
       ImGui::TableNextColumn();
       ImGui::Text("Velocity Down");
       ImGui::TableNextColumn();
-      ImGui::Text("%lf ft/s", state.v_down);
+      ImGui::Text("%.2lf ft/s", state.v_down);
 
       ImGui::EndTable();
     }
   }
 }
 
-void gui_aircraft_debug(
+inline void gui_aircraft_debug(
   std::vector<AircraftHandle>& aircraft,
   types::SimContext& sim_context
 ) {
@@ -100,10 +101,10 @@ void gui_aircraft_debug(
 }
 
 
-void gui_camera_selection(
+inline void gui_camera_selection(
   std::vector<AircraftHandle>& aircraft,
   CameraHandle& cam,
-  types::Scene3D& scene,
+  types::Object3D *scene_root,
   types::SimContext& sim_context
 ) {
   ImGui::SetNextWindowSize(ImVec2(200, 400), ImGuiCond_FirstUseEver);
@@ -115,13 +116,20 @@ void gui_camera_selection(
     ImGui::TableSetupColumn("Button");
 
     ImGui::TableNextColumn();
-    ImGui::Text("Reset Camera");
+    ImGui::Text("Detach Camera");
     ImGui::TableNextColumn();
     
     ImGui::PushID(-1);
-    if (ImGui::Button("Reset")) {
+    if (ImGui::Button("Detach")) {
       // TODO: make this call a method of main app, less rigid coupling
-      cam.reattach_to(&scene);
+      Magnum::Matrix4 prev_world_position = cam._mount->absoluteTransformation();
+      Magnum::Matrix4 prev_orientation = cam._revolut->transformation();
+
+      cam.reattach_to(scene_root);
+
+      cam._mount->translate(prev_world_position.translation());
+      cam._revolut->transform(prev_orientation);
+
       sim_context.control_type = types::SimContext::CAMERA;
       sim_context.active_aircraft_index = -1;
     }
@@ -139,6 +147,9 @@ void gui_camera_selection(
       if (ImGui::Button("Bind Camera")) {
         // TODO: make this call a method of main app, less rigid coupling
         cam.reattach_to(ac._visual_root_object);
+        cam._mount->translate(cam._camera->projectionMatrix().up() * 10);
+        cam._mount->translate(cam._camera->projectionMatrix().backward() * -50);
+
         sim_context.control_type = types::SimContext::MODEL;
         sim_context.active_aircraft_index = i;
       }
@@ -157,7 +168,7 @@ void gui_camera_selection(
   ImGui::End();
 }
 
-void gui_directional_radar_plot(
+inline void gui_directional_radar_plot(
   std::string label,
   Magnum::Deg angle,
   float magnitude,
@@ -195,7 +206,7 @@ void gui_directional_radar_plot(
   ImGui::Dummy(size);
 }
 
-void gui_input_and_control(
+inline void gui_input_and_control(
   std::shared_ptr<types::SimContext> sim_context,
   input::CommandedMovement& commanded_movement,
   ImGuiTableFlags table_flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders
@@ -310,7 +321,7 @@ void gui_input_and_control(
   ImGui::End();
 }
 
-void gui_hud(
+inline void gui_hud(
   std::shared_ptr<types::SimContext> sim_context,
   input::CommandedMovement& commanded_movement,
   float crosshair_len = 5.0f
