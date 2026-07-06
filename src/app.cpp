@@ -1,4 +1,6 @@
 #include "app.h"
+#include "blackboard/jsbsimexpblackboard.h"
+#include "types/types.h"
 
 JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   : Magnum::Platform::Application{
@@ -7,7 +9,9 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
         .setTitle("Visualizer")
         .addWindowFlags(Magnum::Platform::Sdl2Application::Configuration::WindowFlag::Resizable)
         .addWindowFlags(Magnum::Platform::Sdl2Application::Configuration::WindowFlag::Maximized)
-    }
+    },
+    _blackboard{make_jsbsimexp_blackboard()},
+    _input_component(_blackboard)
 {
   // Enable depth test
   Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::DepthTest);
@@ -33,20 +37,6 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   // Enable ImGui blend equations for text
   Magnum::GL::Renderer::setBlendEquation(Magnum::GL::Renderer::BlendEquation::Add, Magnum::GL::Renderer::BlendEquation::Add);
   Magnum::GL::Renderer::setBlendFunction(Magnum::GL::Renderer::BlendFunction::SourceAlpha, Magnum::GL::Renderer::BlendFunction::OneMinusSourceAlpha);
-
-  // Initialize simulation app context
-  _sim_context = std::make_shared<types::SimContext>();
-  
-  // Use standard 1x speed 
-  _sim_context->state = types::SimContext::State::NORMAL;
-  // Free camera (bound to &scene) 
-  _sim_context->camera_type = types::SimContext::CameraType::FREE;
-  // Input controls camera (not the JSBSim flight model) 
-  _sim_context->control_type = types::SimContext::ControlType::CAMERA;
-  // Start of camera in spectator cam (not fixed to an object)
-  _sim_context->camera_pos = types::SimContext::CameraPosition::SPECTATOR;
-  // Start not controlling object
-  _sim_context->active_aircraft_index = -1;
 
   // Load and ingest GLTF models
   std::vector<std::pair<std::string, std::string>> models_to_import = {
@@ -132,7 +122,10 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
 void JSBSimVisualizer::tickEvent() {
   for (auto& cur : _aircraft) {
     // Tick Controller
-    if (_sim_context->state != types::SimContext::State::PAUSED) cur.update_sim();
+    if (_blackboard->sim_state_blackboard->sim_physics_state != types::eSimPhysicsState::PAUSED) {
+      cur.update_sim();
+    }
+    
     // Update Visual Model
     cur.update_vis();
   }

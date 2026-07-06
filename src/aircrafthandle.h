@@ -16,7 +16,6 @@
 #include "drawn/textureddrawable.h"
 #include "drawn/traildrawable.h"
 #include "drawn/shadowdrawable.h"
-#include "input/input.h"
 #include "model/model.h"
 #include "utils/utils.h"
 #include "types/types.h"

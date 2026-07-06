@@ -40,10 +40,11 @@
 // Project
 #include "aircrafthandle.h"
 #include "camerahandle.h"
+#include "blackboard/jsbsimexpblackboard.h"
+#include "components/inputcomponent.h"
 #include "drawn/atmospheredrawable.h"
 #include "drawn/environmentdrawable.h"
 #include "gui/gui.h"
-#include "input/input.h"
 #include "model/model.h"
 #include "shaders/floorshader.h"
 #include "shaders/skyshader.h"
@@ -69,7 +70,13 @@ class JSBSimVisualizer : public Magnum::Platform::Application {
     void pointerReleaseEvent(PointerEvent& event) override;
     void pointerMoveEvent(PointerMoveEvent& event) override;
     void scrollEvent(ScrollEvent& event) override;
+
     
+    // Blackboard Table
+    std::shared_ptr<JSBSimExpBlackboard> _blackboard;
+
+    // Blackboard Components
+    InputComponent _input_component;
 
     // Magnum
     Magnum::Shaders::FlatGL3D _flat_shader;
@@ -90,14 +97,8 @@ class JSBSimVisualizer : public Magnum::Platform::Application {
     drawn::EnvironmentDrawable* _environment;
     drawn::AtmosphereDrawable* _atmosphere;
 
-    // Meta
-    std::shared_ptr<types::SimContext> _sim_context;
-
     // 3D Model Repository
     model::ModelRepository _model_repo;
-
-    // Input
-    input::GlobalInputHandler _input_handler;
 
     // ImGui
     Magnum::ImGuiIntegration::Context _imgui{Magnum::NoCreate};

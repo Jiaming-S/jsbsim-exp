@@ -110,7 +110,6 @@ add_executable(jsbsimexp
   src/types/types.cpp
   src/aircrafthandle.cpp
   src/camerahandle.cpp
-  src/input/input.cpp
   src/model/model.cpp
   src/utils/utils.cpp
   ${app_resources}

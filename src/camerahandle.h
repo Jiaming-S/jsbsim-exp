@@ -3,7 +3,6 @@
 #include <Magnum/SceneGraph/Camera.h>
 #include <Magnum/Platform/Sdl2Application.h>
 
-#include "input/input.h"
 #include "types/types.h"
 
 using namespace Magnum::Math::Literals;

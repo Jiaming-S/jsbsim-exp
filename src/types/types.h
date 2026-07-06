@@ -60,34 +60,32 @@ enum AircraftKeyPoints {
   ENGINE_EXHAUST,
 };
 
-struct SimContext {
-  enum State {
-    NORMAL,
-    PAUSED,
-    CUSTOM,
-  };
 
-  enum CameraType {
-    FREE,
-    LOCKED,
-  };
+// Blackboard Types
 
-  enum CameraPosition {
-    SPECTATOR,
-    THIRDPERSON,
-    COCKPIT,
-  };
+// Info on our physics simulation type
+enum eSimPhysicsState {
+  NORMAL,
+  PAUSED,
+  CUSTOM,
+};
 
-  enum ControlType {
-    CAMERA,
-    MODEL,
-  };
-  
-  SimContext::State state;
-  SimContext::CameraType camera_type;
-  SimContext::ControlType control_type;
-  SimContext::CameraPosition camera_pos;
-  int active_aircraft_index;
+// Info on whether we are controlling the camera or model
+enum eSimControlType {
+  CAMERA,
+  MODEL,
+};
+
+// Info on whether we are orientation-locked or free floating about camera root
+enum eCameraType {
+  LOCKED,
+  FREE,
+};
+
+// Info on whether there is an active aircraft
+enum eAircraftActive {
+  NO_ACTIVE,
+  HAS_ACTIVE,
 };
 
 }
