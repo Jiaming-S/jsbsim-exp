@@ -16,11 +16,6 @@ class CameraHandle {
     CameraHandle(types::Object3D* root, Magnum::Matrix4 projection_matrix);
 
     void reattach_to(types::Object3D* root);
-    
-    void apply_commanded_movement(
-      input::CommandedMovement& commanded_movement,
-      types::SimContext& sim_context
-    );
 };
 
 

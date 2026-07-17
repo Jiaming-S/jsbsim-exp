@@ -16,6 +16,8 @@ class SimStateBlackboard : public Blackboard {
     types::eSimControlType sim_control_type{types::eSimControlType::CAMERA};
     
     types::eCameraType camera_type{types::eCameraType::FREE};
+    
+    types::eAircraftActive has_active_aircraft{types::eAircraftActive::NO_ACTIVE};
 
     // Locals
 

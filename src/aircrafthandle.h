@@ -51,18 +51,8 @@ class AircraftHandle {
     AircraftHandle& link(Magnum::Shaders::PhongGL& shader, Magnum::SceneGraph::DrawableGroup3D& drawables);
     AircraftHandle& link_trails(types::Object3D& object, Magnum::SceneGraph::DrawableGroup3D& drawables);
     AircraftHandle& link_shadow(shaders::ShadowShader& shader, Magnum::SceneGraph::DrawableGroup3D& drawables);
-
-    /// @brief Applies JSBSim FGFCS commands defined in given `CommandedMovement`
-    void apply_commanded_movement(input::CommandedMovement commanded_movement);
-
-    /// @brief Calls `_fdmexec->Run()`
-    void update_sim();
     
-    /// @brief Updates `_visual_root_object` with current position from JSBSim FGFDMExec
-    /// @note  Also inserts new position as breadcrumb into `_aircraft_trail`
-    void update_vis();
-
     /// @brief Outputs an `AircraftStateInfo` representation from the AircraftHandle's
     ///        hooked JSBSim FGFDMExec
-    types::AircraftStateInfo to_aircraft_state();
+    types::AircraftStateInfo as_aircraft_state();
 };

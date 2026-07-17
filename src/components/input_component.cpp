@@ -1,5 +1,8 @@
-#include "inputcomponent.h"
-#include "Magnum/Platform/Sdl2Application.h"
+#include "input_component.h"
+
+void InputComponent::init() {}
+
+void InputComponent::quit() {}
 
 void InputComponent::handle_dispatch() {
   using Magnum::Platform::Sdl2Application;
@@ -37,6 +40,12 @@ void InputComponent::handle_dispatch() {
     }
   }
 
+  // Reset
+  blackboard->input_blackboard->commanded_translation = {0.0, 0.0, 0.0};
+  blackboard->input_blackboard->commanded_pitch = 0.0;
+  blackboard->input_blackboard->commanded_yaw = 0.0;
+  blackboard->input_blackboard->commanded_roll = 0.0;
+  blackboard->input_blackboard->mouse_delta = {0.0, 0.0};
 
   // Commanded Movement conversion (translation)
   // Translation forward/backward
@@ -80,7 +89,6 @@ void InputComponent::handle_dispatch() {
 
   // Commanded Movement conversion (rotation)
   if (blackboard->sim_state_blackboard->sim_control_type == types::eSimControlType::MODEL) {
-    
     blackboard->input_blackboard->mouse_delta = Magnum::Vector2(
       blackboard->input_blackboard->mouse_position -
       blackboard->input_blackboard->prev_mouse_position

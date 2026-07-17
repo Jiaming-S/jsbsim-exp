@@ -116,50 +116,7 @@ AircraftHandle& AircraftHandle::link_shadow(
   return *this;
 }
 
-
-void AircraftHandle::apply_commanded_movement(input::CommandedMovement commanded_movement) {
-  std::shared_ptr<JSBSim::FGFCS> fcs = _fdmexec->GetFCS();
-
-  // Yaw/Pitch/Roll
-  fcs->SetDrCmd( commanded_movement.yaw);
-  fcs->SetDeCmd(-commanded_movement.pitch);
-  fcs->SetDaCmd(-commanded_movement.roll);
-  
-  // Steering
-  fcs->SetDsCmd(-commanded_movement.yaw);
-
-  // Engine (positive throttle)
-  float throttle = commanded_movement.z < 0 ? -commanded_movement.z : 0;
-  fcs->SetThrottleCmd(0, throttle);
-  
-  // Braking (negative throttle)
-  float braking = commanded_movement.z > 0 ? commanded_movement.z : 0;
-  fcs->SetDsbCmd(braking);
-  fcs->SetCBrake(braking);
-  fcs->SetLBrake(braking);
-  fcs->SetRBrake(braking);
-}
-
-void AircraftHandle::update_sim() {
-  _fdmexec->Run();
-}
-
-void AircraftHandle::update_vis() {
-  types::AircraftStateInfo state = this->to_aircraft_state();
-  if (_aircraft_trail->size() > _aircraft_trail_size_limit) _aircraft_trail->pop_front();
-  _aircraft_trail->push_back(types::AircraftTrailBreadcrumb{
-    state,
-    _fdmexec->GetSimTime(),
-  });
-  
-  _visual_root_object->resetTransformation()
-    .rotateZ(-state.roll)
-    .rotateX( state.pitch)
-    .rotateY(-state.yaw)
-    .translate(utils::as_magnum_RUB(state.north, state.east, state.down));
-}
-
-types::AircraftStateInfo AircraftHandle::to_aircraft_state() {
+types::AircraftStateInfo AircraftHandle::as_aircraft_state() {
   std::shared_ptr<JSBSim::FGAircraft>  cur_aircraft  = _fdmexec->GetAircraft();
   std::shared_ptr<JSBSim::FGPropagate> cur_propagate = _fdmexec->GetPropagate();
 

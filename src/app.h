@@ -34,23 +34,27 @@
 
 // Standard library
 #include <memory>
-#include <string>
 #include <vector>
 
 // Project
+#include "blackboard/jsbsimexpblackboard.h"
+
+#include "components/aircraft_movement_component.h"
+#include "components/camera_movement_component.h"
+#include "components/input_component.h"
+#include "components/sim_tick_component.h"
+#include "components/vis_tick_component.h"
+
 #include "aircrafthandle.h"
 #include "camerahandle.h"
-#include "blackboard/jsbsimexpblackboard.h"
-#include "components/inputcomponent.h"
 #include "drawn/atmospheredrawable.h"
 #include "drawn/environmentdrawable.h"
-#include "gui/gui.h"
+// #include "gui/gui.h"
 #include "model/model.h"
 #include "shaders/floorshader.h"
 #include "shaders/skyshader.h"
 #include "shaders/shadowshader.h"
 #include "types/types.h"
-#include "utils/utils.h"
 
 // Literal operators
 using namespace Magnum::Math::Literals;
@@ -76,7 +80,11 @@ class JSBSimVisualizer : public Magnum::Platform::Application {
     std::shared_ptr<JSBSimExpBlackboard> _blackboard;
 
     // Blackboard Components
+    AircraftMovementComponent _aircraft_movement_component;
+    CameraMovementComponent _camera_movement_component;
     InputComponent _input_component;
+    SimTickComponent _sim_tick_component;
+    VisTickComponent _vis_tick_component;
 
     // Magnum
     Magnum::Shaders::FlatGL3D _flat_shader;
@@ -102,10 +110,4 @@ class JSBSimVisualizer : public Magnum::Platform::Application {
 
     // ImGui
     Magnum::ImGuiIntegration::Context _imgui{Magnum::NoCreate};
-
-    // Camera
-    std::unique_ptr<CameraHandle> _cam;
-
-    // JSBSim
-    std::vector<AircraftHandle> _aircraft;
 };
