@@ -6,7 +6,7 @@ void SimTickComponent::quit() {}
 
 void SimTickComponent::handle_dispatch() {
   // Tick all aircraft FDMExec's
-  for (auto &ac : blackboard->aircraft_blackboard_vec->aircraft) {
+  for (auto &ac : blackboard->aircraft_blackboard->aircraft) {
     ac._fdmexec->Run();
   }
 }

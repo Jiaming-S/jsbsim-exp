@@ -39,8 +39,9 @@
 // Project
 #include "blackboard/jsbsimexpblackboard.h"
 
-#include "components/aircraft_movement_component.h"
-#include "components/camera_movement_component.h"
+#include "components/aircraft_control_component.h"
+#include "components/camera_control_component.h"
+#include "components/gui_component.h"
 #include "components/input_component.h"
 #include "components/sim_tick_component.h"
 #include "components/vis_tick_component.h"
@@ -80,8 +81,9 @@ class JSBSimVisualizer : public Magnum::Platform::Application {
     std::shared_ptr<JSBSimExpBlackboard> _blackboard;
 
     // Blackboard Components
-    AircraftMovementComponent _aircraft_movement_component;
-    CameraMovementComponent _camera_movement_component;
+    AircraftControlComponent _aircraft_movement_component;
+    CameraControlComponent _camera_movement_component;
+    GuiComponent _gui_component;
     InputComponent _input_component;
     SimTickComponent _sim_tick_component;
     VisTickComponent _vis_tick_component;
@@ -101,7 +103,6 @@ class JSBSimVisualizer : public Magnum::Platform::Application {
     types::Scene3D _scene;
 
     // Environment
-    types::Object3D* _scene_root;
     drawn::EnvironmentDrawable* _environment;
     drawn::AtmosphereDrawable* _atmosphere;
 

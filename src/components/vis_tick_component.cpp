@@ -6,7 +6,7 @@ void VisTickComponent::quit() {}
 
 void VisTickComponent::handle_dispatch() {
   // Tick all aircraft root objects
-  for (auto& ac : blackboard->aircraft_blackboard_vec->aircraft) {
+  for (auto& ac : blackboard->aircraft_blackboard->aircraft) {
     types::AircraftStateInfo state = ac.as_aircraft_state();
     if (ac._aircraft_trail->size() > ac._aircraft_trail_size_limit) ac._aircraft_trail->pop_front();
     ac._aircraft_trail->push_back(types::AircraftTrailBreadcrumb{

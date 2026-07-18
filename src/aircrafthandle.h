@@ -54,5 +54,5 @@ class AircraftHandle {
     
     /// @brief Outputs an `AircraftStateInfo` representation from the AircraftHandle's
     ///        hooked JSBSim FGFDMExec
-    types::AircraftStateInfo as_aircraft_state();
+    types::AircraftStateInfo as_aircraft_state() const;
 };

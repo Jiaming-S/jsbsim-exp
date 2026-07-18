@@ -116,7 +116,7 @@ AircraftHandle& AircraftHandle::link_shadow(
   return *this;
 }
 
-types::AircraftStateInfo AircraftHandle::as_aircraft_state() {
+types::AircraftStateInfo AircraftHandle::as_aircraft_state() const {
   std::shared_ptr<JSBSim::FGAircraft>  cur_aircraft  = _fdmexec->GetAircraft();
   std::shared_ptr<JSBSim::FGPropagate> cur_propagate = _fdmexec->GetPropagate();
 

@@ -112,8 +112,9 @@ add_executable(jsbsimexp
   src/camerahandle.cpp
   src/model/model.cpp
   src/utils/utils.cpp
-  src/components/aircraft_movement_component.cpp
-  src/components/camera_movement_component.cpp
+  src/components/aircraft_control_component.cpp
+  src/components/camera_control_component.cpp
+  src/components/gui_component.cpp
   src/components/input_component.cpp
   src/components/sim_tick_component.cpp
   src/components/vis_tick_component.cpp

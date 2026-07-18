@@ -1,5 +1,4 @@
 #include "app.h"
-#include "camerahandle.h"
 
 JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   : Magnum::Platform::Application{
@@ -13,6 +12,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     _blackboard{make_jsbsimexp_blackboard()},
     // Initialize all components hooked onto blackboard
     _aircraft_movement_component{_blackboard},
+    _gui_component{_blackboard},
     _camera_movement_component{_blackboard},
     _input_component{_blackboard},
     _sim_tick_component{_blackboard},
@@ -58,14 +58,14 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   CameraHandle cam = CameraHandle{
     &_scene,
     Magnum::Matrix4::perspectiveProjection(
-      90.0_degf,
+      120.0_degf,
       Magnum::Vector2{windowSize()}.aspectRatio(),
       0.01f,
       INFINITY
     )
   };
   
-  _blackboard->camera_blackboard_vec->cameras.push_back(cam);
+  _blackboard->camera_blackboard->cameras.push_back(cam);
   cam._mount->translate(cam._camera->projectionMatrix().up() * 10);
   cam._mount->translate(cam._camera->projectionMatrix().backward() * 10);
 
@@ -101,18 +101,18 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
       .link(_phong_shader, _drawables)
       .link_trails(_scene, _drawables)
       .link_shadow(_shadow_shader, _drawables);
-    _blackboard->aircraft_blackboard_vec->aircraft.push_back(std::move(aircraft));
+    _blackboard->aircraft_blackboard->aircraft.push_back(std::move(aircraft));
   }
 
   // Initialize environment
-  _scene_root = new types::Object3D(&_scene);
+  _blackboard->magnum_blackboard->scene_root = new types::Object3D(&_scene);
   _atmosphere = new drawn::AtmosphereDrawable(
-    *_scene_root,
+    *_blackboard->magnum_blackboard->scene_root,
     _sky_shader,
     _background_drawables
   );
   _environment = new drawn::EnvironmentDrawable(
-    *_scene_root,
+    *_blackboard->magnum_blackboard->scene_root,
     _floor_shader,
     _background_drawables
   );
@@ -153,41 +153,27 @@ void JSBSimVisualizer::drawEvent() {
   _aircraft_movement_component.handle_dispatch();
   _camera_movement_component.handle_dispatch();
 
-  // input::CommandedMovement commanded_movement = _input_handler.get_commanded_movement();
-  // if (_sim_context->control_type == types::SimContext::CAMERA) {
-  //   _cam->apply_commanded_movement(commanded_movement, *_sim_context);
-  // }
-
-  // if (_sim_context->control_type == types::SimContext::MODEL)  {
-  //   if (_sim_context->active_aircraft_index > 0) {
-  //     _aircraft[_sim_context->active_aircraft_index].apply_commanded_movement(commanded_movement);
-  //   }
-  // }
-
   // Do camera draw
   // TODO: make a method for this
-  _blackboard->camera_blackboard_vec->cameras[0]._camera->draw(_background_drawables);
-  _blackboard->camera_blackboard_vec->cameras[0]._camera->draw(_drawables);
+  _blackboard->camera_blackboard->cameras[0]._camera->draw(_background_drawables);
+  _blackboard->camera_blackboard->cameras[0]._camera->draw(_drawables);
 
-  // {
-  //   Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::Blending);
-  //   Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::ScissorTest);
-  //   Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::FaceCulling);
-  //   Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::DepthTest);
+  {
+    Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::Blending);
+    Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::ScissorTest);
+    Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::FaceCulling);
+    Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::DepthTest);
 
-  //   // Draw ImGui
-  //   gui::gui_aircraft_debug(_aircraft, *_sim_context);
-  //   gui::gui_camera_selection(_aircraft, *_cam, _scene_root, *_sim_context);
-  //   gui::gui_input_and_control(_sim_context, commanded_movement);
-  //   gui::gui_hud(_sim_context, commanded_movement);
-  //   _imgui.updateApplicationCursor(*this);
-  //   _imgui.drawFrame();
+    // Draw ImGui
+    _gui_component.handle_dispatch();
+    _imgui.updateApplicationCursor(*this);
+    _imgui.drawFrame();
 
-  //   Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::ScissorTest);
-  //   Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::Blending);
-  //   Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::DepthTest);
-  //   Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::FaceCulling);
-  // }
+    Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::ScissorTest);
+    Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::Blending);
+    Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::DepthTest);
+    Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::FaceCulling);
+  }
 
   // Next
   swapBuffers();
@@ -196,13 +182,13 @@ void JSBSimVisualizer::drawEvent() {
 
 void JSBSimVisualizer::keyPressEvent(KeyEvent& event) {
   if (_imgui.handleKeyPressEvent(event)) return;
-  _blackboard->input_blackboard->keys_down[event.key()] = true;
+  _blackboard->keyboard_input_blackboard->keys_down[event.key()] = true;
   event.setAccepted();
 }
 
 void JSBSimVisualizer::keyReleaseEvent(KeyEvent& event) {
   if (_imgui.handleKeyReleaseEvent(event)) return;
-  _blackboard->input_blackboard->keys_down[event.key()] = false;
+  _blackboard->keyboard_input_blackboard->keys_down[event.key()] = false;
   event.setAccepted();
 }
 
@@ -210,7 +196,7 @@ void JSBSimVisualizer::pointerPressEvent(PointerEvent& event) {
   if (_imgui.handlePointerPressEvent(event)) return;
   
   if (event.pointer() == Sdl2Application::Pointer::MouseLeft) {
-    _blackboard->input_blackboard->mouse_held = true;
+    _blackboard->keyboard_input_blackboard->mouse_held = true;
     event.setAccepted();
   }
 }
@@ -219,14 +205,14 @@ void JSBSimVisualizer::pointerReleaseEvent(PointerEvent& event) {
   if (_imgui.handlePointerReleaseEvent(event)) return;
 
   if (event.pointer() == Sdl2Application::Pointer::MouseLeft) {
-    _blackboard->input_blackboard->mouse_held = false;
+    _blackboard->keyboard_input_blackboard->mouse_held = false;
     event.setAccepted();
   }
 }
 
 void JSBSimVisualizer::pointerMoveEvent(PointerMoveEvent& event) {
   if (_imgui.handlePointerMoveEvent(event)) return;
-  _blackboard->input_blackboard->mouse_position = event.position();
+  _blackboard->keyboard_input_blackboard->mouse_position = event.position();
   event.setAccepted();
 }
 
