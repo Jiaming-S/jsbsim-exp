@@ -19,6 +19,8 @@ class SimStateBlackboard : public Blackboard {
     
     types::eAircraftActive has_active_aircraft{types::eAircraftActive::NO_ACTIVE};
 
+    types::eCursorHidden cursor_hidden{types::eCursorHidden::HIDDEN_AND_LOCKED};
+
     // Locals
 
 };

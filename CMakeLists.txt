@@ -115,7 +115,9 @@ add_executable(jsbsimexp
   src/components/aircraft_control_component.cpp
   src/components/camera_control_component.cpp
   src/components/gui_component.cpp
-  src/components/input_component.cpp
+  src/components/keyboard_input_component.cpp
+  src/components/mouse_cursor_hide_component.cpp
+  src/components/mouse_input_component.cpp
   src/components/sim_tick_component.cpp
   src/components/vis_tick_component.cpp
   ${app_resources}

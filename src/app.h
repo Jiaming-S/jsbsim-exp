@@ -42,7 +42,9 @@
 #include "components/aircraft_control_component.h"
 #include "components/camera_control_component.h"
 #include "components/gui_component.h"
-#include "components/input_component.h"
+#include "components/keyboard_input_component.h"
+#include "components/mouse_cursor_hide_component.h"
+#include "components/mouse_input_component.h"
 #include "components/sim_tick_component.h"
 #include "components/vis_tick_component.h"
 
@@ -50,7 +52,7 @@
 #include "camerahandle.h"
 #include "drawn/atmospheredrawable.h"
 #include "drawn/environmentdrawable.h"
-// #include "gui/gui.h"
+#include "gui/gui.h"
 #include "model/model.h"
 #include "shaders/floorshader.h"
 #include "shaders/skyshader.h"
@@ -84,7 +86,9 @@ class JSBSimVisualizer : public Magnum::Platform::Application {
     AircraftControlComponent _aircraft_movement_component;
     CameraControlComponent _camera_movement_component;
     GuiComponent _gui_component;
-    InputComponent _input_component;
+    KeyboardInputComponent _keyboard_input_component;
+    MouseCursorHideComponent _mouse_cursor_hide_component;
+    MouseInputComponent _mouse_input_component;
     SimTickComponent _sim_tick_component;
     VisTickComponent _vis_tick_component;
 

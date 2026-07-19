@@ -1,12 +1,14 @@
 #include "app.h"
+#include "types/types.h"
 
 JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   : Magnum::Platform::Application{
       arguments,
       Configuration{}
         .setTitle("Visualizer")
-        .addWindowFlags(Magnum::Platform::Sdl2Application::Configuration::WindowFlag::Resizable)
-        .addWindowFlags(Magnum::Platform::Sdl2Application::Configuration::WindowFlag::Maximized)
+        .addWindowFlags(Magnum::Platform::Sdl2Application::Configuration::WindowFlag::FullscreenDesktop)
+        // .addWindowFlags(Magnum::Platform::Sdl2Application::Configuration::WindowFlag::Resizable)
+        // .addWindowFlags(Magnum::Platform::Sdl2Application::Configuration::WindowFlag::Maximized)
     },
     // Initialize smart pointer to blackboard
     _blackboard{make_jsbsimexp_blackboard()},
@@ -14,7 +16,9 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     _aircraft_movement_component{_blackboard},
     _gui_component{_blackboard},
     _camera_movement_component{_blackboard},
-    _input_component{_blackboard},
+    _keyboard_input_component{_blackboard},
+    _mouse_cursor_hide_component{_blackboard},
+    _mouse_input_component{_blackboard},
     _sim_tick_component{_blackboard},
     _vis_tick_component{_blackboard}
 {
@@ -38,6 +42,8 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
 
   // Disable ImGui imgui.ini file
   ImGui::GetIO().IniFilename = nullptr;
+  // Disable ImGui fighting Magnum for cursor control
+  ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 
   // Enable ImGui blend equations for text
   Magnum::GL::Renderer::setBlendEquation(Magnum::GL::Renderer::BlendEquation::Add, Magnum::GL::Renderer::BlendEquation::Add);
@@ -148,8 +154,10 @@ void JSBSimVisualizer::drawEvent() {
   if (!ImGui::GetIO().WantTextInput &&  isTextInputActive()) stopTextInput();
 
   // Capture and apply user keyboard and mouse input
-  _input_component.handle_dispatch();
+  _keyboard_input_component.handle_dispatch();
+  _mouse_input_component.handle_dispatch();
 
+  // Apply keyboard and mouse input on aircraft and camera
   _aircraft_movement_component.handle_dispatch();
   _camera_movement_component.handle_dispatch();
 
@@ -178,17 +186,24 @@ void JSBSimVisualizer::drawEvent() {
   // Next
   swapBuffers();
   redraw();
+
+  // Hide or unhide cursor
+  _mouse_cursor_hide_component.handle_dispatch();
+
+  // TODO: Move this logic to cursor_hide_component...
+  if (_blackboard->sim_state_blackboard->cursor_hidden == types::eCursorHidden::HIDDEN_AND_LOCKED) setCursor(Cursor::HiddenLocked);
+  if (_blackboard->sim_state_blackboard->cursor_hidden == types::eCursorHidden::VISIBLE) setCursor(Cursor::Arrow);
 }
 
 void JSBSimVisualizer::keyPressEvent(KeyEvent& event) {
   if (_imgui.handleKeyPressEvent(event)) return;
-  _blackboard->keyboard_input_blackboard->keys_down[event.key()] = true;
+  _blackboard->keyboard_input_blackboard->keys_down.insert(event.key());
   event.setAccepted();
 }
 
 void JSBSimVisualizer::keyReleaseEvent(KeyEvent& event) {
   if (_imgui.handleKeyReleaseEvent(event)) return;
-  _blackboard->keyboard_input_blackboard->keys_down[event.key()] = false;
+  _blackboard->keyboard_input_blackboard->keys_down.erase(event.key());
   event.setAccepted();
 }
 
@@ -213,6 +228,7 @@ void JSBSimVisualizer::pointerReleaseEvent(PointerEvent& event) {
 void JSBSimVisualizer::pointerMoveEvent(PointerMoveEvent& event) {
   if (_imgui.handlePointerMoveEvent(event)) return;
   _blackboard->keyboard_input_blackboard->mouse_position = event.position();
+  _blackboard->keyboard_input_blackboard->mouse_delta = event.relativePosition();
   event.setAccepted();
 }
 

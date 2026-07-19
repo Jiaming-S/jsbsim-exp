@@ -88,4 +88,9 @@ enum eAircraftActive {
   HAS_ACTIVE,
 };
 
+enum eCursorHidden {
+  HIDDEN_AND_LOCKED,
+  VISIBLE,
+};
+
 }
