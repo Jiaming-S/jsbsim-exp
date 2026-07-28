@@ -6,8 +6,8 @@
 
 class MouseCursorHideComponent : public Component {
   public:
-    explicit MouseCursorHideComponent(std::shared_ptr<JSBSimExpBlackboard> bb) 
-      : Component(std::move(bb)) {}
+    explicit MouseCursorHideComponent(std::shared_ptr<JSBSimExpBlackboard> bb, Sdl2Application *app) 
+      : Component(std::move(bb), app) {}
     void init() override;
     void handle_dispatch() override;
     void quit() override;

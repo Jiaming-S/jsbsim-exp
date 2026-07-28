@@ -4,8 +4,8 @@
 
 class VisTickComponent : public Component {
   public:
-    explicit VisTickComponent(std::shared_ptr<JSBSimExpBlackboard> bb) 
-      : Component(std::move(bb)) {}
+    explicit VisTickComponent(std::shared_ptr<JSBSimExpBlackboard> bb, Sdl2Application *app) 
+      : Component(std::move(bb), app) {}
     void init() override;
     void handle_dispatch() override;
     void quit() override;

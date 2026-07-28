@@ -13,14 +13,14 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     // Initialize smart pointer to blackboard
     _blackboard{make_jsbsimexp_blackboard()},
     // Initialize all components hooked onto blackboard
-    _aircraft_movement_component{_blackboard},
-    _gui_component{_blackboard},
-    _camera_movement_component{_blackboard},
-    _keyboard_input_component{_blackboard},
-    _mouse_cursor_hide_component{_blackboard},
-    _mouse_input_component{_blackboard},
-    _sim_tick_component{_blackboard},
-    _vis_tick_component{_blackboard}
+    _aircraft_movement_component{_blackboard, this},
+    _gui_component{_blackboard, this},
+    _camera_movement_component{_blackboard, this},
+    _keyboard_input_component{_blackboard, this},
+    _mouse_cursor_hide_component{_blackboard, this},
+    _mouse_input_component{_blackboard, this},
+    _sim_tick_component{_blackboard, this},
+    _vis_tick_component{_blackboard, this}
 {
   // Enable depth test
   Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::DepthTest);
