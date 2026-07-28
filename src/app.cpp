@@ -6,9 +6,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
       arguments,
       Configuration{}
         .setTitle("Visualizer")
-        // .addWindowFlags(Magnum::Platform::Sdl2Application::Configuration::WindowFlag::FullscreenDesktop)
-        .addWindowFlags(Magnum::Platform::Sdl2Application::Configuration::WindowFlag::Resizable)
-        .addWindowFlags(Magnum::Platform::Sdl2Application::Configuration::WindowFlag::Maximized)
+        .addWindowFlags(Magnum::Platform::Sdl2Application::Configuration::WindowFlag::FullscreenDesktop)
     },
     // Initialize smart pointer to blackboard
     _blackboard{make_jsbsimexp_blackboard()},
@@ -222,7 +220,9 @@ void JSBSimVisualizer::pointerReleaseEvent(PointerEvent& event) {
 }
 
 void JSBSimVisualizer::pointerMoveEvent(PointerMoveEvent& event) {
-  if (_imgui.handlePointerMoveEvent(event)) return;
+  if (_blackboard->sim_state_blackboard->cursor_hidden == types::eCursorHidden::VISIBLE) {
+    if (_imgui.handlePointerMoveEvent(event)) return;
+  }
   _blackboard->keyboard_input_blackboard->mouse_position = event.position();
   _blackboard->keyboard_input_blackboard->mouse_delta = event.relativePosition();
   event.setAccepted();

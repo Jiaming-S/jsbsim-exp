@@ -107,6 +107,7 @@ inline void gui_camera_selection(
   CameraHandle &cam = blackboard->camera_blackboard->cameras[active_camera_index];
   
   const size_t active_aircraft_index = blackboard->aircraft_blackboard->active_aircraft_index;
+  const bool has_active_aircraft = blackboard->sim_state_blackboard->has_active_aircraft;
   const std::vector<AircraftHandle> &aircraft = blackboard->aircraft_blackboard->aircraft;
 
   types::Object3D *scene_root = blackboard->magnum_blackboard->scene_root;
@@ -157,7 +158,7 @@ inline void gui_camera_selection(
       }
       
       // Highlight in red if active
-      if (i == active_aircraft_index) {
+      if (i == active_aircraft_index && has_active_aircraft) {
         ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, IM_COL32(100, 0, 0, 255));
       }
 

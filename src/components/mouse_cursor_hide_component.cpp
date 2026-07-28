@@ -8,7 +8,7 @@ void MouseCursorHideComponent::handle_dispatch() {
   const types::eCursorHidden cursor_hidden = blackboard->sim_state_blackboard->cursor_hidden;
 
   if (cursor_hidden == types::eCursorHidden::HIDDEN_AND_LOCKED) {
-    ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoMouseCursorChange;
+    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
     app->setCursor(Sdl2Application::Cursor::HiddenLocked);
   }
 
@@ -16,6 +16,4 @@ void MouseCursorHideComponent::handle_dispatch() {
     ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoMouseCursorChange;
     app->setCursor(Sdl2Application::Cursor::Arrow);
   }
-
-
 }
