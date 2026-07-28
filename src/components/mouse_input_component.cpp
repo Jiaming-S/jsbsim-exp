@@ -26,4 +26,5 @@ void MouseInputComponent::handle_dispatch() {
 
   // Update blackboard prev values
   blackboard->keyboard_input_blackboard->prev_mouse_position = blackboard->keyboard_input_blackboard->mouse_position;
+  blackboard->keyboard_input_blackboard->mouse_delta = {0.0f, 0.0f};
 }
