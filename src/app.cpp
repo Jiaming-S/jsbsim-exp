@@ -156,10 +156,6 @@ void JSBSimVisualizer::drawEvent() {
   // Hide or unhide cursor
   _mouse_cursor_hide_component.handle_dispatch();
 
-  // TODO: Move this logic to cursor_hide_component...
-  if (_blackboard->sim_state_blackboard->cursor_hidden == types::eCursorHidden::HIDDEN_AND_LOCKED) setCursor(Cursor::HiddenLocked);
-  if (_blackboard->sim_state_blackboard->cursor_hidden == types::eCursorHidden::VISIBLE) setCursor(Cursor::Arrow);
-
   // Apply keyboard and mouse input on aircraft and camera
   _aircraft_movement_component.handle_dispatch();
   _camera_movement_component.handle_dispatch();
