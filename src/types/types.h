@@ -21,6 +21,7 @@ struct Object3DRenderable {
 
 enum AircraftType {
   F16,
+  F16_NO_PID,
 };
 
 enum AircraftInitialConditionPreset {

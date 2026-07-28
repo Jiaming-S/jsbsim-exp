@@ -17,7 +17,7 @@ void populate_tmp_jsbsim_dir(types::AircraftType aircraft_type) {
 
   Corrade::Utility::Resource rs{"assets"};
   switch (aircraft_type) {
-    case types::AircraftType::F16:
+    case types::AircraftType::F16: {
       Magnum::Utility::Path::make(tmp_dir + "aircraft/f16/");
 
       // Fightmodel
@@ -30,7 +30,22 @@ void populate_tmp_jsbsim_dir(types::AircraftType aircraft_type) {
       Magnum::Utility::Path::write(tmp_dir + "engine/F100-PW-229.xml", rs.getString("assets/f16/flightmodel/F100-PW-229.xml"));
       Magnum::Utility::Path::write(tmp_dir + "engine/direct.xml", rs.getString("assets/f16/flightmodel/direct.xml"));
       break;
-    default: break;
+    }
+    
+    case types::AircraftType::F16_NO_PID: {
+      Magnum::Utility::Path::make(tmp_dir + "aircraft/f16_no_pid/");
+
+      // Fightmodel
+      Magnum::Utility::Path::write(tmp_dir + "aircraft/f16_no_pid/f16_no_pid.xml",     rs.getString("assets/f16_no_pid/flightmodel/f16_no_pid.xml"));
+      Magnum::Utility::Path::write(tmp_dir + "aircraft/f16_no_pid/reset00.xml", rs.getString("assets/f16_no_pid/flightmodel/reset00.xml"));
+      // Systems
+      Magnum::Utility::Path::write(tmp_dir + "systems/hook.xml", rs.getString("assets/f16_no_pid/flightmodel/hook.xml"));
+      Magnum::Utility::Path::write(tmp_dir + "systems/pushback.xml", rs.getString("assets/f16_no_pid/flightmodel/pushback.xml"));
+      // Engine
+      Magnum::Utility::Path::write(tmp_dir + "engine/F100-PW-229.xml", rs.getString("assets/f16_no_pid/flightmodel/F100-PW-229.xml"));
+      Magnum::Utility::Path::write(tmp_dir + "engine/direct.xml", rs.getString("assets/f16_no_pid/flightmodel/direct.xml"));
+      break;
+    }
   }
 }
 
@@ -48,12 +63,8 @@ std::unique_ptr<JSBSim::FGFDMExec> load_aircraft(
   aircraft_fdmexec->SetEnginePath(SGPath(tmp_dir + "engine/"));
   aircraft_fdmexec->SetSystemsPath(SGPath(tmp_dir + "systems/"));
 
-  // Import aircraft (default "f16")
-  if (!aircraft_fdmexec->LoadModel(aircraft_type_string)) {
-    std::cerr << "Failed to load model \"" << aircraft_type_string << "\" from " << tmp_dir << "" << std::endl;
-    return nullptr;
-  }
-
+  // Import aircraft (using type string name)
+  aircraft_fdmexec->LoadModel(aircraft_type_string);
   POP_JSBSIM_DEBUG_LEVEL
   
   // Return unique_ptr
@@ -63,6 +74,7 @@ std::unique_ptr<JSBSim::FGFDMExec> load_aircraft(
 std::string to_type_string(types::AircraftType& t) {
   switch (t) {
     case types::AircraftType::F16: return "f16";
+    case types::AircraftType::F16_NO_PID: return "f16_no_pid";
     default: return NULL;
   }
 }
@@ -74,6 +86,7 @@ Magnum::Vector3 to_keypoint_coords(
   Magnum::Vector3 coords;
   switch (aircraft_type) {
     case types::AircraftType::F16:
+    case types::AircraftType::F16_NO_PID:
       switch (keypoint) {
         case types::AircraftKeyPoints::NOSE:
           coords = {0.0f, -1.5f, -26.5f};

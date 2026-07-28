@@ -2,6 +2,7 @@
 
 #include "Magnum/Magnum.h"
 #include <Magnum/ImGuiIntegration/Context.hpp>
+#include <cmath>
 #include <magic_enum.hpp>
 #include <memory>
 #include <vector>
@@ -73,19 +74,24 @@ inline void gui_aircraft_debug(
         ImGui::Text("%.2lf ft", state.down);
 
         ImGui::TableNextColumn();
-        ImGui::Text("Velocity North");
+        ImGui::Text("Vel North");
         ImGui::TableNextColumn();
         ImGui::Text("%.2lf ft/s", state.v_north);
         
         ImGui::TableNextColumn();
-        ImGui::Text("Velocity East");
+        ImGui::Text("Vel East");
         ImGui::TableNextColumn();
         ImGui::Text("%.2lf ft/s", state.v_east);
         
         ImGui::TableNextColumn();
-        ImGui::Text("Velocity Down");
+        ImGui::Text("Vel Down");
         ImGui::TableNextColumn();
         ImGui::Text("%.2lf ft/s", state.v_down);
+
+        ImGui::TableNextColumn();
+        ImGui::Text("Ground Spd");
+        ImGui::TableNextColumn();
+        ImGui::Text("%.2lf ft/s", std::sqrt(pow(state.v_north, 2) + pow(state.v_east, 2)));
 
         ImGui::EndTable();
       }

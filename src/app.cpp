@@ -71,6 +71,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
 
   // Load and populate aircraft configs
   utils::populate_tmp_jsbsim_dir(types::AircraftType::F16);
+  utils::populate_tmp_jsbsim_dir(types::AircraftType::F16_NO_PID);
 
   // Load initial conditions
   std::vector<types::AircraftInitialConditionPreset> presets = {
@@ -78,7 +79,6 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     types::AircraftInitialConditionPreset::DEFAULT_OPPONENT,
     types::AircraftInitialConditionPreset::ON_GROUND,
     types::AircraftInitialConditionPreset::TAKEOFF_ROLL,
-    types::AircraftInitialConditionPreset::TAKEOFF_ROLL_ROTATION,
     types::AircraftInitialConditionPreset::LEFT_SPIRAL,
     types::AircraftInitialConditionPreset::RIGHT_SPIRAL,
     types::AircraftInitialConditionPreset::LEFT_TAXI,
@@ -102,6 +102,25 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
       .link_trails(_scene, _drawables)
       .link_shadow(_shadow_shader, _drawables);
     _blackboard->aircraft_blackboard->aircraft.push_back(std::move(aircraft));
+  }
+
+  { // Add an F16 with all PID's turned off
+    AircraftHandle funny_aircraft = AircraftHandle{types::AircraftType::F16_NO_PID};
+    funny_aircraft
+      .with_fdmexec()
+      .with_ic(types::AircraftInitialConditionPreset::TAKEOFF_ROLL_ROTATION)
+      .with_visual_root(new types::Object3D{&_scene})
+      .with_keypoints({
+        types::AircraftKeyPoints::WINGTIP_L,
+        types::AircraftKeyPoints::WINGTIP_R,
+        types::AircraftKeyPoints::ENGINE_EXHAUST,
+        types::AircraftKeyPoints::NOSE,
+      })
+      .with_model(_model_repo.get_aircraft_model(types::AircraftType::F16))
+      .link(_phong_shader, _drawables)
+      .link_trails(_scene, _drawables)
+      .link_shadow(_shadow_shader, _drawables);
+    _blackboard->aircraft_blackboard->aircraft.push_back(std::move(funny_aircraft));
   }
 
   // Initialize environment

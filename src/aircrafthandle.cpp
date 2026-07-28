@@ -1,5 +1,6 @@
 #include "aircrafthandle.h"
 #include "drawn/traildrawable.h"
+#include "initialization/FGTrim.h"
 
 
 AircraftHandle& AircraftHandle::with_fdmexec(bool quiet) {
