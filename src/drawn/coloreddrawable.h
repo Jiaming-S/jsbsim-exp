@@ -26,10 +26,18 @@ class ColoredDrawable: public Magnum::SceneGraph::Drawable3D {
       const Magnum::Matrix4& transformation_matrix,
       Magnum::SceneGraph::Camera3D& camera
     ) override {
-      _shader.setLightPositions({{7.0f, 5.0f, 2.5f, 0.0f}})
-        .setTransformationMatrix(transformation_matrix)
+      // Transform world-space sun direction to camera space (view space)
+      Magnum::Matrix4 view_matrix = camera.object().absoluteTransformationMatrix().inverted();
+      Magnum::Vector4 light_dir_camera = view_matrix * Magnum::Vector4{0.3f, 0.5f, -0.6f, 0.0f};
+
+      _shader.setTransformationMatrix(transformation_matrix)
         .setNormalMatrix(transformation_matrix.normalMatrix())
-        .setProjectionMatrix(camera.projectionMatrix());
+        .setProjectionMatrix(camera.projectionMatrix())
+        .setLightPositions({light_dir_camera})
+        .setAmbientColor(Magnum::Color4{0.35f, 0.35f, 0.35f, 1.0f})
+        .setSpecularColor(Magnum::Color4{0.4f, 0.4f, 0.4f, 1.0f})
+        .setShininess(60.0f);
+
       _mesh.draw(_shader);
     }
 };

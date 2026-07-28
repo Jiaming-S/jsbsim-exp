@@ -10,10 +10,9 @@ void main() {
     vec2 center = vec2(0.5, 0.5);
     float dist = length(vTextureCoords - center);
     
-    // Smooth boundary for a soft circular shadow
-    // Inside 0.43, it is fully solid (1.0).
-    // Outside 0.50, it is fully transparent (0.0).
-    float mask = smoothstep(0.50, 0.43, dist);
+    // Dynamic soft boundary: shadow gets blurrier as it fades (uOpacity decreases)
+    float innerRadius = 0.40 * uOpacity;
+    float mask = smoothstep(0.50, innerRadius, dist);
     
     fragmentColor = vec4(uColor.rgb, uColor.a * mask * uOpacity);
 }
