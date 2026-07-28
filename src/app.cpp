@@ -6,9 +6,9 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
       arguments,
       Configuration{}
         .setTitle("Visualizer")
-        .addWindowFlags(Magnum::Platform::Sdl2Application::Configuration::WindowFlag::FullscreenDesktop)
-        // .addWindowFlags(Magnum::Platform::Sdl2Application::Configuration::WindowFlag::Resizable)
-        // .addWindowFlags(Magnum::Platform::Sdl2Application::Configuration::WindowFlag::Maximized)
+        // .addWindowFlags(Magnum::Platform::Sdl2Application::Configuration::WindowFlag::FullscreenDesktop)
+        .addWindowFlags(Magnum::Platform::Sdl2Application::Configuration::WindowFlag::Resizable)
+        .addWindowFlags(Magnum::Platform::Sdl2Application::Configuration::WindowFlag::Maximized)
     },
     // Initialize smart pointer to blackboard
     _blackboard{make_jsbsimexp_blackboard()},
@@ -44,10 +44,6 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   ImGui::GetIO().IniFilename = nullptr;
   // Disable ImGui fighting Magnum for cursor control
   ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
-
-  // Enable ImGui blend equations for text
-  Magnum::GL::Renderer::setBlendEquation(Magnum::GL::Renderer::BlendEquation::Add, Magnum::GL::Renderer::BlendEquation::Add);
-  Magnum::GL::Renderer::setBlendFunction(Magnum::GL::Renderer::BlendFunction::SourceAlpha, Magnum::GL::Renderer::BlendFunction::OneMinusSourceAlpha);
 
   // Load and ingest GLTF models
   std::vector<std::pair<std::string, std::string>> models_to_import = {
@@ -157,6 +153,13 @@ void JSBSimVisualizer::drawEvent() {
   _keyboard_input_component.handle_dispatch();
   _mouse_input_component.handle_dispatch();
 
+  // Hide or unhide cursor
+  _mouse_cursor_hide_component.handle_dispatch();
+
+  // TODO: Move this logic to cursor_hide_component...
+  if (_blackboard->sim_state_blackboard->cursor_hidden == types::eCursorHidden::HIDDEN_AND_LOCKED) setCursor(Cursor::HiddenLocked);
+  if (_blackboard->sim_state_blackboard->cursor_hidden == types::eCursorHidden::VISIBLE) setCursor(Cursor::Arrow);
+
   // Apply keyboard and mouse input on aircraft and camera
   _aircraft_movement_component.handle_dispatch();
   _camera_movement_component.handle_dispatch();
@@ -171,10 +174,14 @@ void JSBSimVisualizer::drawEvent() {
     Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::ScissorTest);
     Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::FaceCulling);
     Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::DepthTest);
+    Magnum::GL::Renderer::setBlendEquation(Magnum::GL::Renderer::BlendEquation::Add, Magnum::GL::Renderer::BlendEquation::Add);
+    Magnum::GL::Renderer::setBlendFunction(Magnum::GL::Renderer::BlendFunction::SourceAlpha, Magnum::GL::Renderer::BlendFunction::OneMinusSourceAlpha);
 
-    // Draw ImGui
+    // Draw imgui guis
     _gui_component.handle_dispatch();
-    _imgui.updateApplicationCursor(*this);
+    if (_blackboard->sim_state_blackboard->cursor_hidden == types::eCursorHidden::VISIBLE) {
+      _imgui.updateApplicationCursor(*this);
+    }
     _imgui.drawFrame();
 
     Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::ScissorTest);
@@ -186,13 +193,6 @@ void JSBSimVisualizer::drawEvent() {
   // Next
   swapBuffers();
   redraw();
-
-  // Hide or unhide cursor
-  _mouse_cursor_hide_component.handle_dispatch();
-
-  // TODO: Move this logic to cursor_hide_component...
-  if (_blackboard->sim_state_blackboard->cursor_hidden == types::eCursorHidden::HIDDEN_AND_LOCKED) setCursor(Cursor::HiddenLocked);
-  if (_blackboard->sim_state_blackboard->cursor_hidden == types::eCursorHidden::VISIBLE) setCursor(Cursor::Arrow);
 }
 
 void JSBSimVisualizer::keyPressEvent(KeyEvent& event) {
@@ -238,5 +238,19 @@ void JSBSimVisualizer::scrollEvent(ScrollEvent& event) {
     event.setAccepted();
     return;
   }
+}
+
+void JSBSimVisualizer::viewportEvent(ViewportEvent& event) {
+  Magnum::GL::defaultFramebuffer.setViewport({{}, event.framebufferSize()});
+  _imgui.relayout(
+    Magnum::Vector2{
+      event.windowSize()} / event.dpiScaling(),
+      event.windowSize(), 
+      event.framebufferSize()
+    );
+}
+
+void JSBSimVisualizer::textInputEvent(TextInputEvent& event) {
+  if (_imgui.handleTextInputEvent(event)) return;
 }
 

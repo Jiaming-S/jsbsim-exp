@@ -71,7 +71,7 @@ FetchContent_MakeAvailable(magnum_fetch)
 FetchContent_Declare(
   imgui_fetch
   GIT_REPOSITORY https://github.com/ocornut/imgui.git
-  GIT_TAG        master
+  GIT_TAG        8936b58fe26e8c3da834b8f60b06511d537b4c63
 )
 
 FetchContent_MakeAvailable(imgui_fetch)
@@ -81,7 +81,7 @@ set(IMGUI_DIR "${imgui_fetch_SOURCE_DIR}" CACHE PATH "Path to ImGui" FORCE)
 FetchContent_Declare(
   magnum_integration_fetch
   GIT_REPOSITORY https://github.com/mosra/magnum-integration.git
-  GIT_TAG        master
+  GIT_TAG        af4754a1cf736901626fdd8d7b8fd739f7a02112
 )
 
 set(MAGNUM_WITH_IMGUIINTEGRATION ON CACHE BOOL "Enable ImGui integration wtih Magnum" FORCE)

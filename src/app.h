@@ -67,18 +67,7 @@ class JSBSimVisualizer : public Magnum::Platform::Application {
   public:
     explicit JSBSimVisualizer(const Arguments& arguments);
 
-  private:
-    // Overrides
-    void tickEvent() override;
-    void drawEvent() override;
-    void keyPressEvent(KeyEvent& event) override;
-    void keyReleaseEvent(KeyEvent& event) override;
-    void pointerPressEvent(PointerEvent& event) override;
-    void pointerReleaseEvent(PointerEvent& event) override;
-    void pointerMoveEvent(PointerMoveEvent& event) override;
-    void scrollEvent(ScrollEvent& event) override;
-
-    
+  private:    
     // Blackboard Table
     std::shared_ptr<JSBSimExpBlackboard> _blackboard;
 
@@ -115,4 +104,16 @@ class JSBSimVisualizer : public Magnum::Platform::Application {
 
     // ImGui
     Magnum::ImGuiIntegration::Context _imgui{Magnum::NoCreate};
+
+    // Overridden Methods
+    void tickEvent() override;
+    void drawEvent() override;
+    void keyPressEvent(KeyEvent& event) override;
+    void keyReleaseEvent(KeyEvent& event) override;
+    void pointerPressEvent(PointerEvent& event) override;
+    void pointerReleaseEvent(PointerEvent& event) override;
+    void pointerMoveEvent(PointerMoveEvent& event) override;
+    void scrollEvent(ScrollEvent& event) override;
+    void viewportEvent(ViewportEvent& event) override;
+    void textInputEvent(TextInputEvent& event) override;
 };
