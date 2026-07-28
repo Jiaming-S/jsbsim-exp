@@ -1,4 +1,5 @@
 #include "keyboard_input_component.h"
+#include "Magnum/Platform/Sdl2Application.h"
 
 void KeyboardInputComponent::init() {}
 
@@ -50,6 +51,14 @@ void KeyboardInputComponent::handle_dispatch() {
   }
   else {
     blackboard->sim_state_blackboard->cursor_hidden = types::eCursorHidden::HIDDEN_AND_LOCKED;
+  }
+
+  // Camera speed hold
+  if (keys_down.count(Sdl2Application::Key::LeftShift)) {
+    blackboard->camera_blackboard->camera_speed = 5.0f;
+  }
+  else {
+    blackboard->camera_blackboard->camera_speed = 1.0f;
   }
 
   // Reset

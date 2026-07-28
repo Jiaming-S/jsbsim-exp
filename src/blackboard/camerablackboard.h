@@ -12,6 +12,7 @@ class CameraBlackboard : public Blackboard {
 
     // Inputs
     uint32_t active_camera_index = 0;
+    float camera_speed = 1.0;
 
     // Outputs
     std::vector<CameraHandle> cameras;
