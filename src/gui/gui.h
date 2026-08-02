@@ -2,7 +2,6 @@
 
 #include "Magnum/Magnum.h"
 #include <Magnum/ImGuiIntegration/Context.hpp>
-#include <cmath>
 #include <magic_enum.hpp>
 #include <memory>
 #include <vector>

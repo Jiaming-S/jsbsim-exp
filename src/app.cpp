@@ -1,5 +1,4 @@
 #include "app.h"
-#include "types/types.h"
 
 JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   : Magnum::Platform::Application{
@@ -126,6 +125,9 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
 
   // Initialize environment
   _blackboard->magnum_blackboard->scene_root = new types::Object3D(&_scene);
+  _blackboard->magnum_blackboard->imgui = &_imgui;
+
+
   _atmosphere = new drawn::AtmosphereDrawable(
     *_blackboard->magnum_blackboard->scene_root,
     _sky_shader,
@@ -184,26 +186,8 @@ void JSBSimVisualizer::drawEvent() {
   _blackboard->camera_blackboard->cameras[0]._camera->draw(_background_drawables);
   _blackboard->camera_blackboard->cameras[0]._camera->draw(_drawables);
 
-  {
-    Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::Blending);
-    Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::ScissorTest);
-    Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::FaceCulling);
-    Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::DepthTest);
-    Magnum::GL::Renderer::setBlendEquation(Magnum::GL::Renderer::BlendEquation::Add, Magnum::GL::Renderer::BlendEquation::Add);
-    Magnum::GL::Renderer::setBlendFunction(Magnum::GL::Renderer::BlendFunction::SourceAlpha, Magnum::GL::Renderer::BlendFunction::OneMinusSourceAlpha);
-
-    // Draw imgui guis
-    _gui_component.handle_dispatch();
-    if (_blackboard->sim_state_blackboard->cursor_hidden == types::eCursorHidden::VISIBLE) {
-      _imgui.updateApplicationCursor(*this);
-    }
-    _imgui.drawFrame();
-
-    Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::ScissorTest);
-    Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::Blending);
-    Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::DepthTest);
-    Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::FaceCulling);
-  }
+  // Draw imgui guis
+  _gui_component.handle_dispatch();
 
   // Next
   swapBuffers();
