@@ -39,6 +39,9 @@ class AircraftHandle {
     types::Object3D *_visual_root_object;
     std::vector<types::Object3DRenderable> _rendered_objects;
 
+    // State info
+    types::AircraftStateInfo _state_info{};
+
     explicit AircraftHandle(types::AircraftType aircraft_type)
       : _aircraft_type{aircraft_type}, _aircraft_type_string{utils::to_type_string(aircraft_type)},
         _aircraft_trail{std::make_shared<std::deque<types::AircraftTrailBreadcrumb>>()} {}
@@ -51,8 +54,4 @@ class AircraftHandle {
     AircraftHandle& link(Magnum::Shaders::PhongGL& shader, Magnum::SceneGraph::DrawableGroup3D& drawables);
     AircraftHandle& link_trails(types::Object3D& object, Magnum::SceneGraph::DrawableGroup3D& drawables);
     AircraftHandle& link_shadow(shaders::ShadowShader& shader, Magnum::SceneGraph::DrawableGroup3D& drawables);
-    
-    /// @brief Outputs an `AircraftStateInfo` representation from the AircraftHandle's
-    ///        hooked JSBSim FGFDMExec
-    types::AircraftStateInfo as_aircraft_state() const;
 };

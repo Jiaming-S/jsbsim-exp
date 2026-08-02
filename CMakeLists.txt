@@ -113,6 +113,7 @@ add_executable(jsbsimexp
   src/model/model.cpp
   src/utils/utils.cpp
   src/components/aircraft_control_component.cpp
+  src/components/aircraft_state_info_component.cpp
   src/components/camera_control_component.cpp
   src/components/gui_component.cpp
   src/components/keyboard_input_component.cpp

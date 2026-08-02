@@ -37,16 +37,22 @@ enum AircraftInitialConditionPreset {
 };
 
 struct AircraftStateInfo {
-  Magnum::Rad pitch;
-  Magnum::Rad roll;
-  Magnum::Rad yaw;
-  double alt;
-  double north;
-  double east;
-  double down;
-  double v_north;
-  double v_east;
-  double v_down;
+  Magnum::Rad pitch{0.0};
+  Magnum::Rad roll{0.0};
+  Magnum::Rad yaw{0.0};
+  Magnum::Deg pitch_deg{0.0};
+  Magnum::Deg roll_deg{0.0};
+  Magnum::Deg yaw_deg{0.0};
+  Magnum::Rad alpha;
+  Magnum::Deg alpha_deg;
+  double alt = 0.0;
+  double north = 0.0;
+  double east = 0.0;
+  double down = 0.0;
+  double v_north = 0.0;
+  double v_east = 0.0;
+  double v_down = 0.0;
+  double s_ground = 0.0;
 };
 
 struct AircraftTrailBreadcrumb {

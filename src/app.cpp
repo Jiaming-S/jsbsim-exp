@@ -11,7 +11,8 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     // Initialize smart pointer to blackboard
     _blackboard{make_jsbsimexp_blackboard()},
     // Initialize all components hooked onto blackboard
-    _aircraft_movement_component{_blackboard, this},
+    _aircraft_control_component{_blackboard, this},
+    _aircraft_state_info_component{_blackboard, this},
     _gui_component{_blackboard, this},
     _camera_movement_component{_blackboard, this},
     _keyboard_input_component{_blackboard, this},
@@ -150,6 +151,7 @@ void JSBSimVisualizer::tickEvent() {
     _sim_tick_component.handle_dispatch();
   }
 
+  _aircraft_state_info_component.handle_dispatch();
   _vis_tick_component.handle_dispatch();
 }
 
@@ -174,7 +176,7 @@ void JSBSimVisualizer::drawEvent() {
   _mouse_cursor_hide_component.handle_dispatch();
 
   // Apply keyboard and mouse input on aircraft and camera
-  _aircraft_movement_component.handle_dispatch();
+  _aircraft_control_component.handle_dispatch();
   _camera_movement_component.handle_dispatch();
 
   // Do camera draw
