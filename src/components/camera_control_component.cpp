@@ -48,10 +48,10 @@ void CameraControlComponent::handle_dispatch() {
   const Magnum::Vector3 up_direction    = active_camera._revolut->transformation().up();
   const Magnum::Vector3 back_direction  = active_camera._revolut->transformation().backward();
 
-  const float camera_speed = blackboard->camera_blackboard->camera_speed;
-  const float commanded_right = camera_speed * blackboard->keyboard_input_blackboard->commanded_translation.x();
-  const float commanded_up = camera_speed * blackboard->keyboard_input_blackboard->commanded_translation.y();
-  const float commanded_back = camera_speed * blackboard->keyboard_input_blackboard->commanded_translation.z();
+  const float camera_translation_speed = blackboard->camera_blackboard->camera_translation_speed;
+  const float commanded_right = camera_translation_speed * blackboard->keyboard_input_blackboard->commanded_translation.x();
+  const float commanded_up = camera_translation_speed * blackboard->keyboard_input_blackboard->commanded_translation.y();
+  const float commanded_back = camera_translation_speed * blackboard->keyboard_input_blackboard->commanded_translation.z();
 
   active_camera._mount->translate(
     (right_direction * commanded_right) +

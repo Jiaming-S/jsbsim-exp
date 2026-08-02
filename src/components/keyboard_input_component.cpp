@@ -13,8 +13,8 @@ void KeyboardInputComponent::handle_dispatch() {
   const types::eSimControlType sim_control_type = blackboard->sim_state_blackboard->sim_control_type;
   const types::eSimControlType sim_control_type_default = blackboard->sim_state_blackboard->sim_control_type_default;
   const types::eCursorHidden cursor_hidden = blackboard->sim_state_blackboard->cursor_hidden;
-  const float camera_speed = blackboard->sim_state_blackboard->camera_speed;
-  const float camera_speed_accelerated = blackboard->sim_state_blackboard->camera_speed_accelerated;
+  const float camera_translation_speed_default = blackboard->camera_blackboard->camera_translation_speed_default;
+  const float camera_translation_speed_accelerated = blackboard->camera_blackboard->camera_translation_speed_accelerated;
 
   // Pausing Toggle
   if (keys_down.count(Sdl2Application::Key::P)) {
@@ -52,10 +52,10 @@ void KeyboardInputComponent::handle_dispatch() {
 
   // Camera speed hold
   if (keys_down.count(Sdl2Application::Key::LeftShift)) {
-    blackboard->camera_blackboard->camera_speed = camera_speed_accelerated;
+    blackboard->camera_blackboard->camera_translation_speed = camera_translation_speed_accelerated;
   }
   else {
-    blackboard->camera_blackboard->camera_speed = camera_speed;
+    blackboard->camera_blackboard->camera_translation_speed = camera_translation_speed_default;
   }
 
   // Reset

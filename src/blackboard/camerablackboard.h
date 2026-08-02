@@ -11,8 +11,10 @@ class CameraBlackboard : public Blackboard {
     CameraBlackboard() {}
 
     // Inputs
+    const float camera_translation_speed_default = 4.0;
+    const float camera_translation_speed_accelerated = 20.0f;
+    float camera_translation_speed = 1.0;
     uint32_t active_camera_index = 0;
-    float camera_speed = 1.0;
 
     // Outputs
     std::vector<CameraHandle> cameras;
