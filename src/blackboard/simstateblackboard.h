@@ -10,10 +10,13 @@ class SimStateBlackboard : public Blackboard {
     SimStateBlackboard() {}
 
     // Inputs
+    float camera_speed = 1.0f;
+    float camera_speed_accelerated = 5.0f;
 
     // Outputs
     types::eSimPhysicsState sim_physics_state{types::eSimPhysicsState::NORMAL};
     types::eSimControlType sim_control_type{types::eSimControlType::CAMERA};
+    types::eSimControlType sim_control_type_default{types::eSimControlType::CAMERA};
     
     types::eCameraType camera_type{types::eCameraType::FREE};
     

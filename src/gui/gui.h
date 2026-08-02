@@ -138,8 +138,8 @@ inline void gui_camera_selection(
       cam._mount->translate(prev_world_position.translation());
       cam._revolut->transform(prev_orientation);
 
-      blackboard->sim_state_blackboard->sim_control_type = types::eSimControlType::CAMERA;
       blackboard->sim_state_blackboard->has_active_aircraft = types::eAircraftActive::NO_ACTIVE;
+      blackboard->sim_state_blackboard->sim_control_type_default = types::eSimControlType::CAMERA;
     }
     ImGui::PopID();
 
@@ -158,7 +158,7 @@ inline void gui_camera_selection(
         cam._mount->translate(cam._camera->projectionMatrix().up() * 10);
         cam._mount->translate(cam._camera->projectionMatrix().backward() * -50);
 
-        blackboard->sim_state_blackboard->sim_control_type = types::eSimControlType::MODEL;
+        blackboard->sim_state_blackboard->sim_control_type_default = types::eSimControlType::MODEL;
         blackboard->sim_state_blackboard->has_active_aircraft = types::eAircraftActive::HAS_ACTIVE;
         blackboard->aircraft_blackboard->active_aircraft_index = i;
       }
