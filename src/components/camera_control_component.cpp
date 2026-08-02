@@ -13,19 +13,36 @@ void CameraControlComponent::handle_dispatch() {
   const double commanded_pitch = blackboard->keyboard_input_blackboard->commanded_pitch;
   const double commanded_roll = blackboard->keyboard_input_blackboard->commanded_roll;
 
+  const types::eCameraType camera_type = blackboard->sim_state_blackboard->camera_type;
+
   const size_t active_camera_index = blackboard->camera_blackboard->active_camera_index;
   const CameraHandle &active_camera = blackboard->camera_blackboard->cameras[active_camera_index];
 
-  if (blackboard->sim_state_blackboard->camera_type == types::eCameraType::FREE) {
+  // In freecam mode
+  if (camera_type == types::eCameraType::FREE) {
+    // Yawing around revolut always aligned with horizon
     Magnum::Matrix4 yaw_mat = Magnum::Matrix4::rotation(Magnum::Deg(commanded_yaw), Magnum::Vector3::yAxis());
     active_camera._revolut->setTransformation(yaw_mat * active_camera._revolut->transformation());
-  }
-  else if (blackboard->sim_state_blackboard->camera_type == types::eCameraType::LOCKED) {
-    active_camera._revolut->rotateLocal(Magnum::Deg(commanded_yaw), Magnum::Vector3::yAxis());
+
+    // Pitch around revolut
+    active_camera._revolut->rotateLocal(Magnum::Deg(commanded_pitch), Magnum::Vector3::xAxis());
+
+    // Roll around revolut
+    active_camera._revolut->rotateLocal(Magnum::Deg(commanded_roll),  Magnum::Vector3::zAxis());
   }
 
-  active_camera._revolut->rotateLocal(Magnum::Deg(commanded_pitch), Magnum::Vector3::xAxis());
-  active_camera._revolut->rotateLocal(Magnum::Deg(commanded_roll),  Magnum::Vector3::zAxis());
+  // In locked (vehicle) cam mode
+  else if (camera_type == types::eCameraType::LOCKED) {
+    // Yaw around root
+    active_camera._mount->rotateLocal(Magnum::Deg(commanded_yaw), Magnum::Vector3::yAxis());
+
+    // Pitch around root
+    active_camera._mount->rotateLocal(Magnum::Deg(commanded_pitch), Magnum::Vector3::xAxis());
+
+    // Roll around revolut
+    active_camera._revolut->rotateLocal(Magnum::Deg(commanded_roll), Magnum::Vector3::zAxis());
+  }
+
 
   const Magnum::Vector3 right_direction = active_camera._revolut->transformation().right();
   const Magnum::Vector3 up_direction    = active_camera._revolut->transformation().up();

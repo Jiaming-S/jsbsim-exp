@@ -12,7 +12,7 @@ class KeyboardInputBlackboard : public Blackboard {
     // Inputs
     std::unordered_set<Magnum::Platform::Sdl2Application::Key> keys_down;
     bool mouse_held = false;
-    float mouse_sensitivity = 2.5f;
+    float mouse_sensitivity = 0.1f;
     Magnum::Vector2 mouse_position{0.0f, 0.0f};
 
     // Outputs

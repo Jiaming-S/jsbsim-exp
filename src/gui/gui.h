@@ -134,14 +134,18 @@ inline void gui_camera_selection(
     // Detach from aircraft, and stay at current world position
     ImGui::PushID(-1);
     if (ImGui::Button("Detach")) {
-      Magnum::Matrix4 prev_world_position = cam._mount->absoluteTransformation();
+      // Get world position and orientation of _revolut
+      Magnum::Matrix4 prev_world_position = cam._revolut->absoluteTransformation();
       Magnum::Matrix4 prev_orientation = cam._revolut->transformation();
 
+      // Attach _mount to scene root
       cam.reattach_to(scene_root);
 
+      // Apply previous position and rotation
       cam._mount->translate(prev_world_position.translation());
       cam._revolut->transform(prev_orientation);
 
+      // Update relevant sim states
       blackboard->sim_state_blackboard->has_active_aircraft = types::eAircraftActive::NO_ACTIVE;
       blackboard->sim_state_blackboard->sim_control_type_default = types::eSimControlType::CAMERA;
     }
@@ -158,10 +162,14 @@ inline void gui_camera_selection(
       
       ImGui::PushID(i);
       if (ImGui::Button("Bind Camera")) {
+        // Attach _mount to aircraft root
         cam.reattach_to(ac._visual_root_object);
-        cam._mount->translate(cam._camera->projectionMatrix().up() * 10);
-        cam._mount->translate(cam._camera->projectionMatrix().backward() * -50);
 
+        // Move _revolut back and up a certain amount
+        cam._revolut->translate(cam._camera->projectionMatrix().up() * 10);
+        cam._revolut->translate(cam._camera->projectionMatrix().backward() * -50);
+
+        // Update relevant sim states
         blackboard->sim_state_blackboard->sim_control_type_default = types::eSimControlType::MODEL;
         blackboard->sim_state_blackboard->has_active_aircraft = types::eAircraftActive::HAS_ACTIVE;
         blackboard->aircraft_blackboard->active_aircraft_index = i;

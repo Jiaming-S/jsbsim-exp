@@ -181,7 +181,7 @@ void JSBSimVisualizer::drawEvent() {
   _aircraft_control_component.handle_dispatch();
   _camera_movement_component.handle_dispatch();
 
-  // Do camera draw
+  // Draw camera
   // TODO: make a method for this
   _blackboard->camera_blackboard->cameras[0]._camera->draw(_background_drawables);
   _blackboard->camera_blackboard->cameras[0]._camera->draw(_drawables);
