@@ -115,6 +115,7 @@ add_executable(jsbsimexp
   src/components/aircraft_control_component.cpp
   src/components/aircraft_state_info_component.cpp
   src/components/camera_control_component.cpp
+  src/components/foreign_input_component.cpp
   src/components/gui_component.cpp
   src/components/keyboard_input_component.cpp
   src/components/mouse_cursor_hide_component.cpp

@@ -5,9 +5,9 @@
 
 #include "blackboard.h"
 
-class KeyboardInputBlackboard : public Blackboard {
+class InputBlackboard : public Blackboard {
   public:
-    KeyboardInputBlackboard() {}
+    InputBlackboard() {}
 
     // Inputs
     std::unordered_set<Magnum::Platform::Sdl2Application::Key> keys_down;

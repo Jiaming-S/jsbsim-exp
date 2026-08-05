@@ -4,7 +4,7 @@
 
 #include "aircraftblackboard.h"
 #include "camerablackboard.h"
-#include "keyboardinputblackboard.h"
+#include "inputblackboard.h"
 #include "magnumblackboard.h"
 #include "simstateblackboard.h"
 
@@ -13,13 +13,13 @@ class JSBSimExpBlackboard : public Blackboard {
     JSBSimExpBlackboard() :
       aircraft_blackboard{std::make_unique<AircraftBlackboard>()},  
       camera_blackboard{std::make_unique<CameraBlackboard>()},
-      keyboard_input_blackboard{std::make_unique<KeyboardInputBlackboard>()},
+      input_blackboard{std::make_unique<InputBlackboard>()},
       magnum_blackboard{std::make_unique<MagnumBlackboard>()},
       sim_state_blackboard{std::make_unique<SimStateBlackboard>()} {}
 
     std::unique_ptr<AircraftBlackboard> aircraft_blackboard;
     std::unique_ptr<CameraBlackboard> camera_blackboard;
-    std::unique_ptr<KeyboardInputBlackboard> keyboard_input_blackboard;
+    std::unique_ptr<InputBlackboard> input_blackboard;
     std::unique_ptr<MagnumBlackboard> magnum_blackboard;
     std::unique_ptr<SimStateBlackboard> sim_state_blackboard;
 };

@@ -18,15 +18,15 @@ void AircraftControlComponent::handle_dispatch() {
   std::shared_ptr<JSBSim::FGFCS> fcs = active_aircraft._fdmexec->GetFCS();
 
   // Yaw/Pitch/Roll
-  fcs->SetDrCmd( blackboard->keyboard_input_blackboard->commanded_yaw);
-  fcs->SetDeCmd(-blackboard->keyboard_input_blackboard->commanded_pitch);
-  fcs->SetDaCmd(-blackboard->keyboard_input_blackboard->commanded_roll);
+  fcs->SetDrCmd( blackboard->input_blackboard->commanded_yaw);
+  fcs->SetDeCmd(-blackboard->input_blackboard->commanded_pitch);
+  fcs->SetDaCmd(-blackboard->input_blackboard->commanded_roll);
   
   // Steering
-  fcs->SetDsCmd(-blackboard->keyboard_input_blackboard->commanded_yaw);
+  fcs->SetDsCmd(-blackboard->input_blackboard->commanded_yaw);
 
   // Engine (positive throttle, retained)
-  double throttle_command = -blackboard->keyboard_input_blackboard->commanded_translation.z();
+  double throttle_command = -blackboard->input_blackboard->commanded_translation.z();
   double prev_throttle_pos = fcs->GetThrottlePos(0);
   double next_throttle_pos = prev_throttle_pos + throttle_command * 0.1;
   fcs->SetThrottleCmd(0, next_throttle_pos);

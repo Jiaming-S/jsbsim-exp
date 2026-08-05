@@ -13,6 +13,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     _aircraft_control_component{_blackboard, this},
     _aircraft_state_info_component{_blackboard, this},
     _gui_component{_blackboard, this},
+    _foreign_input_component{_blackboard, this},
     _camera_movement_component{_blackboard, this},
     _keyboard_input_component{_blackboard, this},
     _mouse_cursor_hide_component{_blackboard, this},
@@ -177,7 +178,10 @@ void JSBSimVisualizer::drawEvent() {
   // Hide or unhide cursor
   _mouse_cursor_hide_component.handle_dispatch();
 
-  // Apply keyboard and mouse input on aircraft and camera
+  // Check if an external process has provided input
+  _foreign_input_component.handle_dispatch();
+
+  // Apply input on aircraft and camera
   _aircraft_control_component.handle_dispatch();
   _camera_movement_component.handle_dispatch();
 
@@ -196,13 +200,13 @@ void JSBSimVisualizer::drawEvent() {
 
 void JSBSimVisualizer::keyPressEvent(KeyEvent& event) {
   if (_imgui.handleKeyPressEvent(event)) return;
-  _blackboard->keyboard_input_blackboard->keys_down.insert(event.key());
+  _blackboard->input_blackboard->keys_down.insert(event.key());
   event.setAccepted();
 }
 
 void JSBSimVisualizer::keyReleaseEvent(KeyEvent& event) {
   if (_imgui.handleKeyReleaseEvent(event)) return;
-  _blackboard->keyboard_input_blackboard->keys_down.erase(event.key());
+  _blackboard->input_blackboard->keys_down.erase(event.key());
   event.setAccepted();
 }
 
@@ -210,7 +214,7 @@ void JSBSimVisualizer::pointerPressEvent(PointerEvent& event) {
   if (_imgui.handlePointerPressEvent(event)) return;
   
   if (event.pointer() == Sdl2Application::Pointer::MouseLeft) {
-    _blackboard->keyboard_input_blackboard->mouse_held = true;
+    _blackboard->input_blackboard->mouse_held = true;
     event.setAccepted();
   }
 }
@@ -219,7 +223,7 @@ void JSBSimVisualizer::pointerReleaseEvent(PointerEvent& event) {
   if (_imgui.handlePointerReleaseEvent(event)) return;
 
   if (event.pointer() == Sdl2Application::Pointer::MouseLeft) {
-    _blackboard->keyboard_input_blackboard->mouse_held = false;
+    _blackboard->input_blackboard->mouse_held = false;
     event.setAccepted();
   }
 }
@@ -228,8 +232,8 @@ void JSBSimVisualizer::pointerMoveEvent(PointerMoveEvent& event) {
   if (_blackboard->sim_state_blackboard->cursor_hidden == types::eCursorHidden::VISIBLE) {
     if (_imgui.handlePointerMoveEvent(event)) return;
   }
-  _blackboard->keyboard_input_blackboard->mouse_position = event.position();
-  _blackboard->keyboard_input_blackboard->mouse_delta = event.relativePosition();
+  _blackboard->input_blackboard->mouse_position = event.position();
+  _blackboard->input_blackboard->mouse_delta = event.relativePosition();
   event.setAccepted();
 }
 
