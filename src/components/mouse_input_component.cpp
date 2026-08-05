@@ -17,8 +17,8 @@ void MouseInputComponent::handle_dispatch() {
     const Magnum::Float roll_movement = mouse_delta.x() * mouse_sensitivity;
     const Magnum::Float pitch_movement = mouse_delta.y() * mouse_sensitivity;
 
-    blackboard->input_blackboard->commanded_roll -= roll_movement;
-    blackboard->input_blackboard->commanded_pitch -= pitch_movement;
+    blackboard->input_blackboard->commanded_aircraft_roll -= roll_movement;
+    blackboard->input_blackboard->commanded_aircraft_pitch -= pitch_movement;
   }
 
   else if (sim_control_type == types::eSimControlType::CAMERA &&
@@ -26,8 +26,8 @@ void MouseInputComponent::handle_dispatch() {
     const Magnum::Float yaw_movement = mouse_delta.x() * mouse_sensitivity;
     const Magnum::Float pitch_movement = mouse_delta.y() * mouse_sensitivity;
 
-    blackboard->input_blackboard->commanded_yaw -= yaw_movement;
-    blackboard->input_blackboard->commanded_pitch -= pitch_movement;
+    blackboard->input_blackboard->commanded_camera_yaw -= yaw_movement;
+    blackboard->input_blackboard->commanded_camera_pitch -= pitch_movement;
   }
 
   // Update blackboard prev values

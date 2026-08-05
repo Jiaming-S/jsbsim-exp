@@ -9,9 +9,9 @@ void CameraControlComponent::handle_dispatch() {
     return;
   }
 
-  const double commanded_yaw = blackboard->input_blackboard->commanded_yaw;
-  const double commanded_pitch = blackboard->input_blackboard->commanded_pitch;
-  const double commanded_roll = blackboard->input_blackboard->commanded_roll;
+  const double commanded_yaw = blackboard->input_blackboard->commanded_camera_yaw;
+  const double commanded_pitch = blackboard->input_blackboard->commanded_camera_pitch;
+  const double commanded_roll = blackboard->input_blackboard->commanded_camera_roll;
 
   const types::eCameraType camera_type = blackboard->sim_state_blackboard->camera_type;
 
@@ -49,9 +49,9 @@ void CameraControlComponent::handle_dispatch() {
   const Magnum::Vector3 back_direction  = active_camera._revolut->transformation().backward();
 
   const float camera_translation_speed = blackboard->camera_blackboard->camera_translation_speed;
-  const float commanded_right = camera_translation_speed * blackboard->input_blackboard->commanded_translation.x();
-  const float commanded_up = camera_translation_speed * blackboard->input_blackboard->commanded_translation.y();
-  const float commanded_back = camera_translation_speed * blackboard->input_blackboard->commanded_translation.z();
+  const float commanded_right = camera_translation_speed * blackboard->input_blackboard->commanded_camera_translation.x();
+  const float commanded_up = camera_translation_speed * blackboard->input_blackboard->commanded_camera_translation.y();
+  const float commanded_back = camera_translation_speed * blackboard->input_blackboard->commanded_camera_translation.z();
 
   active_camera._mount->translate(
     (right_direction * commanded_right) +

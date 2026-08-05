@@ -16,10 +16,16 @@ class InputBlackboard : public Blackboard {
     Magnum::Vector2 mouse_position{0.0f, 0.0f};
 
     // Outputs
-    Magnum::Vector3 commanded_translation{0.0f, 0.0f, 0.0f};
-    Magnum::Float commanded_roll{0.0f};
-    Magnum::Float commanded_yaw{0.0f};
-    Magnum::Float commanded_pitch{0.0f};
+    Magnum::Float commanded_aircraft_throttle{0.0f};
+    Magnum::Float commanded_aircraft_braking{0.0f};
+    Magnum::Float commanded_aircraft_roll{0.0f};
+    Magnum::Float commanded_aircraft_yaw{0.0f};
+    Magnum::Float commanded_aircraft_pitch{0.0f};
+    
+    Magnum::Vector3 commanded_camera_translation{0.0f, 0.0f, 0.0f};
+    Magnum::Float commanded_camera_roll{0.0f};
+    Magnum::Float commanded_camera_yaw{0.0f};
+    Magnum::Float commanded_camera_pitch{0.0f};
 
     // Local    
     std::unordered_set<Magnum::Platform::Sdl2Application::Key> prev_keys_down;

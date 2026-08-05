@@ -18,22 +18,23 @@ void AircraftControlComponent::handle_dispatch() {
   std::shared_ptr<JSBSim::FGFCS> fcs = active_aircraft._fdmexec->GetFCS();
 
   // Yaw/Pitch/Roll
-  fcs->SetDrCmd( blackboard->input_blackboard->commanded_yaw);
-  fcs->SetDeCmd(-blackboard->input_blackboard->commanded_pitch);
-  fcs->SetDaCmd(-blackboard->input_blackboard->commanded_roll);
+  fcs->SetDrCmd( blackboard->input_blackboard->commanded_aircraft_yaw);
+  fcs->SetDeCmd(-blackboard->input_blackboard->commanded_aircraft_pitch);
+  fcs->SetDaCmd(-blackboard->input_blackboard->commanded_aircraft_roll);
   
   // Steering
-  fcs->SetDsCmd(-blackboard->input_blackboard->commanded_yaw);
+  fcs->SetDsCmd(-blackboard->input_blackboard->commanded_aircraft_yaw);
 
-  // Engine (positive throttle, retained)
-  double throttle_command = -blackboard->input_blackboard->commanded_translation.z();
-  double prev_throttle_pos = fcs->GetThrottlePos(0);
-  double next_throttle_pos = prev_throttle_pos + throttle_command * 0.1;
-  fcs->SetThrottleCmd(0, next_throttle_pos);
+  // Throttle (persistent)
+  const double cur_throttle_command = blackboard->input_blackboard->commanded_aircraft_throttle;
+  const double prev_throttle_command = fcs->GetThrottleCmd(0);
+  double next_throttle_command = prev_throttle_command + cur_throttle_command;
+  if (next_throttle_command < 0.0) next_throttle_command = 0.0;
+  fcs->SetThrottleCmd(0, next_throttle_command);
   
-  // Braking (negative throttle, momentary)
-  float braking = -throttle_command;
-  if (braking > 0.0) braking = 0.0;
+  // Braking
+  float braking = blackboard->input_blackboard->commanded_aircraft_braking;
+  if (braking < 0.0) braking = 0.0;
   fcs->SetDsbCmd(braking);
   fcs->SetCBrake(braking);
   fcs->SetLBrake(braking);
