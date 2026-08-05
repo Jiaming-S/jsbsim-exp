@@ -36,23 +36,34 @@ enum AircraftInitialConditionPreset {
   RIGHT_TAXI,
 };
 
+// Note: JSBSim uses ft/fps, km/kph is just for gui
 struct AircraftStateInfo {
-  Magnum::Rad pitch{0.0};
-  Magnum::Rad roll{0.0};
-  Magnum::Rad yaw{0.0};
+  Magnum::Rad pitch_rad{0.0};
+  Magnum::Rad roll_rad{0.0};
+  Magnum::Rad yaw_rad{0.0};
   Magnum::Deg pitch_deg{0.0};
   Magnum::Deg roll_deg{0.0};
   Magnum::Deg yaw_deg{0.0};
-  Magnum::Rad alpha;
+  Magnum::Rad alpha_rad;
   Magnum::Deg alpha_deg;
-  double alt = 0.0;
-  double north = 0.0;
-  double east = 0.0;
-  double down = 0.0;
-  double v_north = 0.0;
-  double v_east = 0.0;
-  double v_down = 0.0;
-  double s_ground = 0.0;
+  double alt_ft = 0.0;
+  double north_ft = 0.0;
+  double east_ft = 0.0;
+  double down_ft = 0.0;
+  double alt_km = 0.0;
+  double north_km = 0.0;
+  double east_km = 0.0;
+  double down_km = 0.0;
+  double north_spd_fps = 0.0;
+  double east_spd_fps = 0.0;
+  double down_spd_fps = 0.0;
+  double ground_spd_fps = 0.0;
+  double indicated_spd_fps = 0.0;
+  double north_spd_kph = 0.0;
+  double east_spd_kph = 0.0;
+  double down_spd_kph = 0.0;
+  double ground_spd_kph = 0.0;
+  double indicated_spd_kph = 0.0;
 };
 
 struct AircraftTrailBreadcrumb {

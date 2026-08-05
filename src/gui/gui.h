@@ -43,14 +43,14 @@ inline void gui_aircraft_debug(
         ImGui::Text("%.2f deg", (float) state.yaw_deg);
 
         ImGui::TableNextColumn();
-        ImGui::Text("Roll");
-        ImGui::TableNextColumn();
-        ImGui::Text("%.2f deg", (float) state.roll_deg);
-
-        ImGui::TableNextColumn();
         ImGui::Text("Pitch");
         ImGui::TableNextColumn();
         ImGui::Text("%.2f deg", (float) state.pitch_deg);
+
+        ImGui::TableNextColumn();
+        ImGui::Text("Roll");
+        ImGui::TableNextColumn();
+        ImGui::Text("%.2f deg", (float) state.roll_deg);
 
         ImGui::TableNextColumn();
         ImGui::Text("AOA");
@@ -60,42 +60,47 @@ inline void gui_aircraft_debug(
         ImGui::TableNextColumn();
         ImGui::Text("Alt");
         ImGui::TableNextColumn();
-        ImGui::Text("%.2lf ft", state.alt);
+        ImGui::Text("%.2lf km", state.alt_km);
 
         ImGui::TableNextColumn();
         ImGui::Text("North");
         ImGui::TableNextColumn();
-        ImGui::Text("%.2lf ft", state.north);
+        ImGui::Text("%.2lf km", state.north_km);
 
         ImGui::TableNextColumn();
         ImGui::Text("East");
         ImGui::TableNextColumn();
-        ImGui::Text("%.2lf ft", state.east);
+        ImGui::Text("%.2lf km", state.east_km);
 
         ImGui::TableNextColumn();
         ImGui::Text("Down");
         ImGui::TableNextColumn();
-        ImGui::Text("%.2lf ft", state.down);
+        ImGui::Text("%.2lf km", state.down_km);
 
         ImGui::TableNextColumn();
         ImGui::Text("Vel North");
         ImGui::TableNextColumn();
-        ImGui::Text("%.2lf ft/s", state.v_north);
+        ImGui::Text("%.2lf kph", state.north_spd_kph);
         
         ImGui::TableNextColumn();
         ImGui::Text("Vel East");
         ImGui::TableNextColumn();
-        ImGui::Text("%.2lf ft/s", state.v_east);
+        ImGui::Text("%.2lf kph", state.east_spd_kph);
         
         ImGui::TableNextColumn();
         ImGui::Text("Vel Down");
         ImGui::TableNextColumn();
-        ImGui::Text("%.2lf ft/s", state.v_down);
+        ImGui::Text("%.2lf kph", state.down_spd_kph);
 
         ImGui::TableNextColumn();
         ImGui::Text("Ground Spd");
         ImGui::TableNextColumn();
-        ImGui::Text("%.2lf ft/s", state.s_ground);
+        ImGui::Text("%.2lf kph", state.ground_spd_kph);
+
+        ImGui::TableNextColumn();
+        ImGui::Text("Indicated Spd");
+        ImGui::TableNextColumn();
+        ImGui::Text("%.2lf kph", state.indicated_spd_kph);
 
         ImGui::EndTable();
       }

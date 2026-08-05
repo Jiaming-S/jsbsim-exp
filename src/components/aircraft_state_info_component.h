@@ -2,8 +2,9 @@
 
 #include "component.h"
 
-#include "models/FGAerodynamics.h"
-#include "models/FGPropagate.h"
+#include <Magnum/Magnum.h>
+#include <models/FGAerodynamics.h>
+#include <models/FGPropagate.h>
 
 class AircraftStateInfoComponent : public Component {
   public:

@@ -77,10 +77,10 @@ class TrailDrawable: public Magnum::SceneGraph::Drawable3D {
         types::AircraftStateInfo& pos = (*_trail)[i].breadcrumb;
         
         // Magnum world-space transformation matrix for cur pos `AircraftStateInfo`
-        Magnum::Matrix4 cur_transform_mat = Magnum::Matrix4::translation(utils::as_magnum_RUB(pos.north, pos.east, pos.down))
-          * Magnum::Matrix4::rotationY(-pos.yaw)
-          * Magnum::Matrix4::rotationX( pos.pitch)
-          * Magnum::Matrix4::rotationZ(-pos.roll);
+        Magnum::Matrix4 cur_transform_mat = Magnum::Matrix4::translation(utils::as_magnum_RUB(pos.north_ft, pos.east_ft, pos.down_ft))
+          * Magnum::Matrix4::rotationY(-pos.yaw_rad)
+          * Magnum::Matrix4::rotationX( pos.pitch_rad)
+          * Magnum::Matrix4::rotationZ(-pos.roll_rad);
         
         // cur righthand delta x
         Magnum::Vector3 cur_righthand = cur_transform_mat.right() * _ribbon_width;
