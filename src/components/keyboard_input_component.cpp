@@ -5,10 +5,19 @@ void KeyboardInputComponent::init() {}
 
 void KeyboardInputComponent::quit() {}
 
+bool is_edge(
+  const Sdl2Application::Key key,
+  const std::unordered_set<Sdl2Application::Key> keys_down,
+  const std::unordered_set<Sdl2Application::Key> prev_keys_down
+) {
+  return (keys_down.count(key) && !prev_keys_down.count(key));
+}
+
 void KeyboardInputComponent::handle_dispatch() {
   using Magnum::Platform::Sdl2Application;
   
   const std::unordered_set<Sdl2Application::Key> keys_down = blackboard->input_blackboard->keys_down;
+  const std::unordered_set<Sdl2Application::Key> prev_keys_down = blackboard->input_blackboard->prev_keys_down;
   const types::eSimPhysicsState sim_physics_state = blackboard->sim_state_blackboard->sim_physics_state;
   const types::eSimControlType sim_control_type = blackboard->sim_state_blackboard->sim_control_type;
   const types::eSimControlType sim_control_type_default = blackboard->sim_state_blackboard->sim_control_type_default;
@@ -17,7 +26,7 @@ void KeyboardInputComponent::handle_dispatch() {
   const float camera_translation_speed_accelerated = blackboard->camera_blackboard->camera_translation_speed_accelerated;
 
   // Pausing Toggle
-  if (keys_down.count(Sdl2Application::Key::P)) {
+  if (is_edge(Sdl2Application::Key::P, keys_down, prev_keys_down)) {
     switch (sim_physics_state) {
       case types::eSimPhysicsState::NORMAL: {
         blackboard->sim_state_blackboard->sim_physics_state = types::eSimPhysicsState::PAUSED;
