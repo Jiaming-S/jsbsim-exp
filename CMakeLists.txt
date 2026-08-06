@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(jsbsimexp VERSION 1.0 LANGUAGES C CXX)
 
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
@@ -33,6 +34,47 @@ set(BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(jsbsim_fetch)
+
+# Fetch ZeroMQ
+FetchContent_Declare(
+  zeromq_fetch
+  GIT_REPOSITORY https://github.com/zeromq/libzmq.git
+  GIT_TAG        v4.3.5
+)
+
+# Disable libzmq features we don't need
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(ENABLE_DRAFTS OFF CACHE BOOL "" FORCE)
+set(WITH_PERF_TOOL OFF CACHE BOOL "" FORCE)
+
+FetchContent_MakeAvailable(zeromq_fetch)
+
+# Fetch ZeroMQ C++ Bindings (cppzmq)
+FetchContent_Declare(
+  cppzmq_fetch
+  GIT_REPOSITORY https://github.com/zeromq/cppzmq.git
+  GIT_TAG        v4.11.0
+)
+
+# Disable cppzmq tests
+set(CPPZMQ_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+
+FetchContent_MakeAvailable(cppzmq_fetch)
+
+# Fetch msgpack
+FetchContent_Declare(
+  msgpack_fetch
+  GIT_REPOSITORY https://github.com/msgpack/msgpack-c.git
+  GIT_TAG        cpp-8.0.0
+)
+
+# Disable msgpack-cxx features we don't need
+set(MSGPACK_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(MSGPACK_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(MSGPACK_USE_BOOST OFF CACHE BOOL "" FORCE)
+
+FetchContent_MakeAvailable(msgpack_fetch)
 
 # Fetch Corrade
 FetchContent_Declare(
@@ -130,6 +172,8 @@ target_include_directories(jsbsimexp PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/types)
 target_link_libraries(jsbsimexp PRIVATE 
   magic_enum::magic_enum
   libJSBSim 
+  cppzmq
+  msgpack-cxx
   Magnum::Magnum 
   Magnum::Sdl2Application 
   Magnum::GL
