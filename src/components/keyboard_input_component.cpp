@@ -13,6 +13,13 @@ bool is_edge(
   return (keys_down.count(key) && !prev_keys_down.count(key));
 }
 
+bool is_held(
+  const Sdl2Application::Key key,
+  const std::unordered_set<Sdl2Application::Key> keys_down
+) {
+  return keys_down.count(key);
+}
+
 void KeyboardInputComponent::handle_dispatch() {
   using Magnum::Platform::Sdl2Application;
   
@@ -44,7 +51,7 @@ void KeyboardInputComponent::handle_dispatch() {
   }
 
   // Freecam hold
-  if (keys_down.count(Sdl2Application::Key::C)) {
+  if (is_held(Sdl2Application::Key::C, keys_down)) {
     blackboard->sim_state_blackboard->sim_control_type = types::eSimControlType::CAMERA;
   }
   else {
@@ -52,7 +59,7 @@ void KeyboardInputComponent::handle_dispatch() {
   }
 
   // Cursor visibility hold
-  if (keys_down.count(Sdl2Application::Key::LeftAlt)) {
+  if (is_held(Sdl2Application::Key::LeftAlt, keys_down)) {
     blackboard->sim_state_blackboard->cursor_hidden = types::eCursorHidden::VISIBLE;
   }
   else {
@@ -60,7 +67,7 @@ void KeyboardInputComponent::handle_dispatch() {
   }
 
   // Camera speed hold
-  if (keys_down.count(Sdl2Application::Key::LeftShift)) {
+  if (is_held(Sdl2Application::Key::LeftShift, keys_down)) {
     blackboard->camera_blackboard->camera_translation_speed = camera_translation_speed_accelerated;
   }
   else {
