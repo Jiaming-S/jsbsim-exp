@@ -10,12 +10,19 @@ using namespace Magnum::Platform;
 
 class CameraHandle {
   public:
-    Magnum::SceneGraph::Camera3D *_camera;
     types::Object3D *_mount, *_revolut;
+    Magnum::SceneGraph::Camera3D *_camera;
 
-    CameraHandle(types::Object3D* root, Magnum::Matrix4 projection_matrix);
+    explicit CameraHandle(types::Object3D* root) :
+      _mount{new types::Object3D{root}},
+      _revolut{new types::Object3D{_mount}},
+      _camera{new Magnum::SceneGraph::Camera3D{*_revolut}} {}
 
-    void reattach_to(types::Object3D* root);
+    CameraHandle& with_projection_matrix(Magnum::Matrix4 projection_matrix);
+    CameraHandle& with_default_offset(types::eSimControlType camera_type);
+    
+    CameraHandle& attach_to(types::Object3D* root);
+    CameraHandle& detach_to_scene_root(types::Object3D* scene_root);
 };
 
 

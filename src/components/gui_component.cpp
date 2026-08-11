@@ -13,7 +13,7 @@ void GuiComponent::handle_dispatch() {
   Magnum::GL::Renderer::setBlendFunction(Magnum::GL::Renderer::BlendFunction::SourceAlpha, Magnum::GL::Renderer::BlendFunction::OneMinusSourceAlpha);
 
   const bool cursor_hidden = blackboard->sim_state_blackboard->cursor_hidden;
-  Magnum::ImGuiIntegration::Context *imgui = blackboard->magnum_blackboard->imgui;
+  Magnum::ImGuiIntegration::Context *imgui_ctx = blackboard->magnum_blackboard->imgui_ctx;
 
   gui::gui_aircraft_debug(blackboard);
   gui::gui_camera_selection(blackboard);
@@ -21,9 +21,9 @@ void GuiComponent::handle_dispatch() {
   // gui::gui_hud(_sim_context, commanded_movement);
 
   if (cursor_hidden == types::eCursorHidden::VISIBLE) {
-    imgui->updateApplicationCursor(*app);
+    imgui_ctx->updateApplicationCursor(*app);
   }
-  imgui->drawFrame();
+  imgui_ctx->drawFrame();
 
   Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::ScissorTest);
   Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::Blending);

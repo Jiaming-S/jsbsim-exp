@@ -107,7 +107,7 @@ class JSBSimVisualizer : public Magnum::Platform::Application {
     model::ModelRepository _model_repo;
 
     // ImGui
-    Magnum::ImGuiIntegration::Context _imgui{Magnum::NoCreate};
+    Magnum::ImGuiIntegration::Context _imgui_ctx{Magnum::NoCreate};
 
     // Overridden Methods
     void tickEvent() override;

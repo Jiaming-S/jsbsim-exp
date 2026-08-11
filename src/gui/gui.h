@@ -119,7 +119,7 @@ inline void gui_camera_selection(
   ImGui::Begin("Camera Selection");
 
   const size_t active_camera_index = blackboard->camera_blackboard->active_camera_index;
-  CameraHandle &cam = blackboard->camera_blackboard->cameras[active_camera_index];
+  CameraHandle &camera_handle = blackboard->camera_blackboard->cameras[active_camera_index];
   
   const size_t active_aircraft_index = blackboard->aircraft_blackboard->active_aircraft_index;
   const bool has_active_aircraft = blackboard->sim_state_blackboard->has_active_aircraft;
@@ -139,16 +139,8 @@ inline void gui_camera_selection(
     // Detach from aircraft, and stay at current world position
     ImGui::PushID(-1);
     if (ImGui::Button("Detach")) {
-      // Get world position and orientation of _revolut
-      Magnum::Matrix4 prev_world_position = cam._revolut->absoluteTransformation();
-      Magnum::Matrix4 prev_orientation = cam._revolut->transformation();
-
-      // Attach _mount to scene root
-      cam.reattach_to(scene_root);
-
-      // Apply previous position and rotation
-      cam._mount->translate(prev_world_position.translation());
-      cam._revolut->transform(prev_orientation);
+      // Detach _mount from aircraft root and back to scene root
+      camera_handle.detach_to_scene_root(scene_root);
 
       // Update relevant sim states
       blackboard->sim_state_blackboard->has_active_aircraft = types::eAircraftActive::NO_ACTIVE;
@@ -168,11 +160,9 @@ inline void gui_camera_selection(
       ImGui::PushID(i);
       if (ImGui::Button("Bind Camera")) {
         // Attach _mount to aircraft root
-        cam.reattach_to(ac._visual_root_object);
-
-        // Move _revolut back and up a certain amount
-        cam._revolut->translate(cam._camera->projectionMatrix().up() * 10);
-        cam._revolut->translate(cam._camera->projectionMatrix().backward() * -50);
+        camera_handle
+          .attach_to(ac._visual_root_object)
+          .with_default_offset(types::eSimControlType::MODEL);
 
         // Update relevant sim states
         blackboard->sim_state_blackboard->sim_control_type_default = types::eSimControlType::MODEL;

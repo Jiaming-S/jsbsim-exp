@@ -1,4 +1,5 @@
 #include "app.h"
+#include "types/types.h"
 
 JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   : Magnum::Platform::Application{
@@ -33,7 +34,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
 
 
   // Initialize ImGui
-  _imgui = Magnum::ImGuiIntegration::Context(
+  _imgui_ctx = Magnum::ImGuiIntegration::Context(
     Magnum::Vector2{windowSize()} / dpiScaling(),
     windowSize(),
     framebufferSize()
@@ -56,19 +57,19 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   }
 
   // Load and setup camera
-  CameraHandle cam = CameraHandle{
-    &_scene,
-    Magnum::Matrix4::perspectiveProjection(
-      120.0_degf,
-      Magnum::Vector2{windowSize()}.aspectRatio(),
-      0.01f,
-      INFINITY
-    )
-  };
+  CameraHandle camera_handle = CameraHandle{&_scene};
+  Magnum::Matrix4 default_projection = Magnum::Matrix4::perspectiveProjection(
+    _blackboard->camera_blackboard->default_camera_fov,
+    Magnum::Vector2{windowSize()}.aspectRatio(),
+    _blackboard->camera_blackboard->default_camera_near_dist,
+    _blackboard->camera_blackboard->default_camera_far_dist
+  );
+
+  camera_handle
+    .with_projection_matrix(default_projection)
+    .with_default_offset(types::eSimControlType::CAMERA);
   
-  _blackboard->camera_blackboard->cameras.push_back(cam);
-  cam._mount->translate(cam._camera->projectionMatrix().up() * 10);
-  cam._mount->translate(cam._camera->projectionMatrix().backward() * 10);
+  _blackboard->camera_blackboard->cameras.push_back(camera_handle);
 
   // Load and populate aircraft configs
   utils::populate_tmp_jsbsim_dir(types::AircraftType::F16);
@@ -126,7 +127,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
 
   // Initialize environment
   _blackboard->magnum_blackboard->scene_root = new types::Object3D(&_scene);
-  _blackboard->magnum_blackboard->imgui = &_imgui;
+  _blackboard->magnum_blackboard->imgui_ctx = &_imgui_ctx;
 
 
   _atmosphere = new drawn::AtmosphereDrawable(
@@ -165,7 +166,7 @@ void JSBSimVisualizer::drawEvent() {
   
   // Next frame
   _timeline.nextFrame();
-  _imgui.newFrame();
+  _imgui_ctx.newFrame();
 
   // ImGui settings
   if ( ImGui::GetIO().WantTextInput && !isTextInputActive()) startTextInput();
@@ -199,19 +200,19 @@ void JSBSimVisualizer::drawEvent() {
 }
 
 void JSBSimVisualizer::keyPressEvent(KeyEvent& event) {
-  if (_imgui.handleKeyPressEvent(event)) return;
+  if (_imgui_ctx.handleKeyPressEvent(event)) return;
   _blackboard->input_blackboard->keys_down.insert(event.key());
   event.setAccepted();
 }
 
 void JSBSimVisualizer::keyReleaseEvent(KeyEvent& event) {
-  if (_imgui.handleKeyReleaseEvent(event)) return;
+  if (_imgui_ctx.handleKeyReleaseEvent(event)) return;
   _blackboard->input_blackboard->keys_down.erase(event.key());
   event.setAccepted();
 }
 
 void JSBSimVisualizer::pointerPressEvent(PointerEvent& event) {
-  if (_imgui.handlePointerPressEvent(event)) return;
+  if (_imgui_ctx.handlePointerPressEvent(event)) return;
   
   if (event.pointer() == Sdl2Application::Pointer::MouseLeft) {
     _blackboard->input_blackboard->mouse_held = true;
@@ -220,7 +221,7 @@ void JSBSimVisualizer::pointerPressEvent(PointerEvent& event) {
 }
 
 void JSBSimVisualizer::pointerReleaseEvent(PointerEvent& event) {
-  if (_imgui.handlePointerReleaseEvent(event)) return;
+  if (_imgui_ctx.handlePointerReleaseEvent(event)) return;
 
   if (event.pointer() == Sdl2Application::Pointer::MouseLeft) {
     _blackboard->input_blackboard->mouse_held = false;
@@ -230,7 +231,7 @@ void JSBSimVisualizer::pointerReleaseEvent(PointerEvent& event) {
 
 void JSBSimVisualizer::pointerMoveEvent(PointerMoveEvent& event) {
   if (_blackboard->sim_state_blackboard->cursor_hidden == types::eCursorHidden::VISIBLE) {
-    if (_imgui.handlePointerMoveEvent(event)) return;
+    if (_imgui_ctx.handlePointerMoveEvent(event)) return;
   }
   _blackboard->input_blackboard->mouse_position = event.position();
   _blackboard->input_blackboard->mouse_delta = event.relativePosition();
@@ -239,7 +240,7 @@ void JSBSimVisualizer::pointerMoveEvent(PointerMoveEvent& event) {
 
 void JSBSimVisualizer::scrollEvent(ScrollEvent& event) {
   // Don't scroll if we are scrolling an ImGui window
-  if (_imgui.handleScrollEvent(event)) {
+  if (_imgui_ctx.handleScrollEvent(event)) {
     event.setAccepted();
     return;
   }
@@ -247,7 +248,7 @@ void JSBSimVisualizer::scrollEvent(ScrollEvent& event) {
 
 void JSBSimVisualizer::viewportEvent(ViewportEvent& event) {
   Magnum::GL::defaultFramebuffer.setViewport({{}, event.framebufferSize()});
-  _imgui.relayout(
+  _imgui_ctx.relayout(
     Magnum::Vector2{
       event.windowSize()} / event.dpiScaling(),
       event.windowSize(), 
@@ -256,6 +257,6 @@ void JSBSimVisualizer::viewportEvent(ViewportEvent& event) {
 }
 
 void JSBSimVisualizer::textInputEvent(TextInputEvent& event) {
-  if (_imgui.handleTextInputEvent(event)) return;
+  if (_imgui_ctx.handleTextInputEvent(event)) return;
 }
 

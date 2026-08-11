@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Magnum/Platform/Sdl2Application.h>
+#include <Magnum/SceneGraph/Drawable.h>
 #include "Magnum/ImGuiIntegration/Context.h"
 
 #include "blackboard.h"
@@ -16,7 +17,9 @@ class MagnumBlackboard : public Blackboard {
 
     // Outputs
     types::Object3D *scene_root;
-    Magnum::ImGuiIntegration::Context *imgui;
+    Magnum::ImGuiIntegration::Context *imgui_ctx;
+    Magnum::SceneGraph::DrawableGroup3D _background_drawables;
+    Magnum::SceneGraph::DrawableGroup3D _drawables;
 
     // Local
 
