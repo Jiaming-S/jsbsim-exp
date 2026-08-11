@@ -140,7 +140,7 @@ inline void gui_camera_selection(
     ImGui::PushID(-1);
     if (ImGui::Button("Detach")) {
       // Detach _mount from aircraft root and back to scene root
-      camera_handle.detach_to_scene_root(scene_root);
+      camera_handle.attach_to_scene_root(scene_root);
 
       // Update relevant sim states
       blackboard->sim_state_blackboard->has_active_aircraft = types::eAircraftActive::NO_ACTIVE;

@@ -7,10 +7,10 @@ CameraHandle& CameraHandle::attach_to(types::Object3D* root) {
   return *this;
 }
 
-CameraHandle& CameraHandle::detach_to_scene_root(types::Object3D* scene_root) {
+CameraHandle& CameraHandle::attach_to_scene_root(types::Object3D* scene_root) {
   // Get world position and orientation of _revolut
-  Magnum::Matrix4 prev_world_position = _revolut->absoluteTransformation();
-  Magnum::Matrix4 prev_orientation = _revolut->transformation();
+  const Magnum::Matrix4 prev_world_position = _revolut->absoluteTransformation();
+  const Magnum::Matrix4 prev_orientation = _revolut->transformation();
 
   // Attach _mount to scene root
   this->attach_to(scene_root);

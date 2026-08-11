@@ -22,7 +22,7 @@ class CameraHandle {
     CameraHandle& with_default_offset(types::eSimControlType camera_type);
     
     CameraHandle& attach_to(types::Object3D* root);
-    CameraHandle& detach_to_scene_root(types::Object3D* scene_root);
+    CameraHandle& attach_to_scene_root(types::Object3D* scene_root);
 };
 
 

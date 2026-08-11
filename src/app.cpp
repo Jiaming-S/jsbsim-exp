@@ -56,20 +56,21 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     _model_repo.ingest_asset_glb(asset_name, asset_filepath);
   }
 
-  // Load and setup camera
-  CameraHandle camera_handle = CameraHandle{&_scene};
-  Magnum::Matrix4 default_projection = Magnum::Matrix4::perspectiveProjection(
-    _blackboard->camera_blackboard->default_camera_fov,
-    Magnum::Vector2{windowSize()}.aspectRatio(),
-    _blackboard->camera_blackboard->default_camera_near_dist,
-    _blackboard->camera_blackboard->default_camera_far_dist
-  );
+  { // Load and setup camera
+    CameraHandle camera_handle = CameraHandle{&_scene};
+    Magnum::Matrix4 default_projection = Magnum::Matrix4::perspectiveProjection(
+      _blackboard->camera_blackboard->default_camera_fov,
+      Magnum::Vector2{windowSize()}.aspectRatio(),
+      _blackboard->camera_blackboard->default_camera_near_dist,
+      _blackboard->camera_blackboard->default_camera_far_dist
+    );
 
-  camera_handle
-    .with_projection_matrix(default_projection)
-    .with_default_offset(types::eSimControlType::CAMERA);
-  
-  _blackboard->camera_blackboard->cameras.push_back(camera_handle);
+    camera_handle
+      .with_projection_matrix(default_projection)
+      .with_default_offset(types::eSimControlType::CAMERA);
+    
+    _blackboard->camera_blackboard->cameras.push_back(camera_handle);
+  }
 
   // Load and populate aircraft configs
   utils::populate_tmp_jsbsim_dir(types::AircraftType::F16);
