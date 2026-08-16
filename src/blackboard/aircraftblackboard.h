@@ -10,7 +10,7 @@ class AircraftBlackboard : public Blackboard {
     AircraftBlackboard() {}
 
     // Inputs
-    uint32_t active_aircraft_index = 0;
+    size_t active_aircraft_index = 0;
 
     // Outputs
     std::vector<AircraftHandle> aircraft;

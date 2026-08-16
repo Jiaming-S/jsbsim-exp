@@ -1,5 +1,4 @@
 #include "app.h"
-#include "types/types.h"
 
 JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   : Magnum::Platform::Application{
@@ -15,7 +14,8 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     _aircraft_state_info_component{_blackboard, this},
     _gui_component{_blackboard, this},
     _foreign_input_component{_blackboard, this},
-    _camera_movement_component{_blackboard, this},
+    _camera_control_component{_blackboard, this},
+    _camera_draw_component{_blackboard, this},
     _keyboard_input_component{_blackboard, this},
     _mouse_cursor_hide_component{_blackboard, this},
     _mouse_input_component{_blackboard, this},
@@ -129,7 +129,8 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   // Initialize environment
   _blackboard->magnum_blackboard->scene_root = new types::Object3D(&_scene);
   _blackboard->magnum_blackboard->imgui_ctx = &_imgui_ctx;
-
+  _blackboard->magnum_blackboard->_drawables = &_drawables;
+  _blackboard->magnum_blackboard->_background_drawables = &_background_drawables;
 
   _atmosphere = new drawn::AtmosphereDrawable(
     *_blackboard->magnum_blackboard->scene_root,
@@ -185,12 +186,10 @@ void JSBSimVisualizer::drawEvent() {
 
   // Apply input on aircraft and camera
   _aircraft_control_component.handle_dispatch();
-  _camera_movement_component.handle_dispatch();
+  _camera_control_component.handle_dispatch();
 
   // Draw camera
-  // TODO: make a method for this
-  _blackboard->camera_blackboard->cameras[0]._camera->draw(_background_drawables);
-  _blackboard->camera_blackboard->cameras[0]._camera->draw(_drawables);
+  _camera_draw_component.handle_dispatch();
 
   // Draw imgui guis
   _gui_component.handle_dispatch();

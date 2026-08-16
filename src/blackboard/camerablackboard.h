@@ -21,7 +21,7 @@ class CameraBlackboard : public Blackboard {
     const float default_camera_far_dist = INFINITY;
     
     float camera_translation_speed = 1.0f;
-    uint32_t active_camera_index = 0;
+    size_t active_camera_index = 0;
 
     // Outputs
     std::vector<CameraHandle> cameras;

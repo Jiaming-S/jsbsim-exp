@@ -42,6 +42,7 @@
 #include "components/aircraft_control_component.h"
 #include "components/aircraft_state_info_component.h"
 #include "components/camera_control_component.h"
+#include "components/camera_draw_component.h"
 #include "components/gui_component.h"
 #include "components/foreign_input_component.h"
 #include "components/keyboard_input_component.h"
@@ -76,7 +77,8 @@ class JSBSimVisualizer : public Magnum::Platform::Application {
     // Blackboard Components
     AircraftControlComponent _aircraft_control_component;
     AircraftStateInfoComponent _aircraft_state_info_component;
-    CameraControlComponent _camera_movement_component;
+    CameraControlComponent _camera_control_component;
+    CameraDrawComponent _camera_draw_component;
     ForeignInputComponent _foreign_input_component;
     GuiComponent _gui_component;
     KeyboardInputComponent _keyboard_input_component;
