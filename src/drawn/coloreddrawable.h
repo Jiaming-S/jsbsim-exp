@@ -38,7 +38,7 @@ class ColoredDrawable: public Magnum::SceneGraph::Drawable3D {
         .setSpecularColor(Magnum::Color4{0.4f, 0.4f, 0.4f, 1.0f})
         .setShininess(60.0f);
 
-      _mesh.draw(_shader);
+      _shader.draw(_mesh);
     }
 };
 

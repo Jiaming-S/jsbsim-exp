@@ -12,10 +12,10 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     // Initialize all components hooked onto blackboard
     _aircraft_control_component{_blackboard, this},
     _aircraft_state_info_component{_blackboard, this},
-    _gui_component{_blackboard, this},
-    _foreign_input_component{_blackboard, this},
     _camera_control_component{_blackboard, this},
     _camera_draw_component{_blackboard, this},
+    _foreign_input_component{_blackboard, this},
+    _gui_component{_blackboard, this},
     _keyboard_input_component{_blackboard, this},
     _mouse_cursor_hide_component{_blackboard, this},
     _mouse_input_component{_blackboard, this},

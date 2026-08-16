@@ -76,7 +76,7 @@ class ShadowDrawable: public Magnum::SceneGraph::Drawable3D {
         );
       }
 
-      _mesh.draw(_shader);
+      _shader.draw(_mesh);
 
       { // Pop settings
         Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::FaceCulling);

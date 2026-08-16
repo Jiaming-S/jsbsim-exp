@@ -41,7 +41,7 @@ class TexturedDrawable: public Magnum::SceneGraph::Drawable3D {
         .setShininess(60.0f);
 
       _shader.bindDiffuseTexture(*_texture);
-      _mesh.draw(_shader);
+      _shader.draw(_mesh);
     }
 };
 

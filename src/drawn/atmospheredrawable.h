@@ -43,7 +43,7 @@ class AtmosphereDrawable: public Magnum::SceneGraph::Drawable3D {
         .setCameraWorldPos(camera_from_root_pos.translation())
         .setViewMatrix(camera_from_root_pos.inverted())
         .setSunDirection({0.3f, 0.5f, -0.6f});
-      _mesh.draw(_shader);
+      _shader.draw(_mesh);
 
       { // Pop Environment required settings
         Magnum::GL::Renderer::setDepthMask(GL_TRUE);

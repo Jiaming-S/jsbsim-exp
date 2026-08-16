@@ -28,7 +28,7 @@ void KeyboardInputComponent::handle_dispatch() {
   const types::eSimPhysicsState sim_physics_state = blackboard->sim_state_blackboard->sim_physics_state;
   const types::eSimControlType sim_control_type = blackboard->sim_state_blackboard->sim_control_type;
   const types::eSimControlType sim_control_type_default = blackboard->sim_state_blackboard->sim_control_type_default;
-  const types::eCursorHidden cursor_hidden = blackboard->sim_state_blackboard->cursor_hidden;
+  
   const float camera_translation_speed_default = blackboard->camera_blackboard->camera_translation_speed_default;
   const float camera_translation_speed_accelerated = blackboard->camera_blackboard->camera_translation_speed_accelerated;
 

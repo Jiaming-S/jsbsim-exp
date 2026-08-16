@@ -45,7 +45,7 @@ class EnvironmentDrawable: public Magnum::SceneGraph::Drawable3D {
         .setViewMatrix(camera_from_root_pos.inverted())
         .setGridSpacing(100.0f)
         .setSnapInterval(100.0f);
-      _mesh.draw(_shader);
+      _shader.draw(_mesh);
 
       { // Pop Environment required settings
         Magnum::GL::Renderer::disable(Magnum::GL::Renderer::Feature::Blending);
