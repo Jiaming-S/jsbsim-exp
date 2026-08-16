@@ -18,6 +18,8 @@ class MagnumBlackboard : public Blackboard {
     // Outputs
     types::Object3D *scene_root;
     Magnum::ImGuiIntegration::Context *imgui_ctx;
+
+    // TODO: make these actually used, needs a CameraDrawComponent
     Magnum::SceneGraph::DrawableGroup3D _background_drawables;
     Magnum::SceneGraph::DrawableGroup3D _drawables;
 

@@ -22,6 +22,8 @@ class SimStateBlackboard : public Blackboard {
 
     types::eCursorHidden cursor_hidden{types::eCursorHidden::HIDDEN_AND_LOCKED};
 
+    types::eDebugViews debug_views{types::eDebugViews::DEBUG_NOT_VISIBLE};
+
     // Locals
 
 };

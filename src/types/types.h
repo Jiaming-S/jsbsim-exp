@@ -106,9 +106,18 @@ enum eAircraftActive {
   HAS_ACTIVE,
 };
 
+// Info on whether cursor is hidden or visible
 enum eCursorHidden {
   HIDDEN_AND_LOCKED,
   VISIBLE,
 };
 
-}
+// Info on whether debug information is displayed
+enum eDebugViews {
+  DEBUG_NOT_VISIBLE,
+  DEBUG_OBJECTS_AND_STATISICS,
+  DEBUG_OBJECTS,
+  DEBUG_STATISTICS,
+};
+
+};
