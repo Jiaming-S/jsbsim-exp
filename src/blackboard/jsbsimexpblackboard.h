@@ -16,7 +16,8 @@ class JSBSimExpBlackboard : public Blackboard {
       camera_blackboard{std::make_unique<CameraBlackboard>()},
       input_blackboard{std::make_unique<InputBlackboard>()},
       magnum_blackboard{std::make_unique<MagnumBlackboard>()},
-      sim_state_blackboard{std::make_unique<SimStateBlackboard>()} {}
+      sim_state_blackboard{std::make_unique<SimStateBlackboard>()},
+      telemetry_blackboard{std::make_unique<TelemetryBlackboard>()} {}
 
     std::unique_ptr<AircraftBlackboard> aircraft_blackboard;
     std::unique_ptr<CameraBlackboard> camera_blackboard;
