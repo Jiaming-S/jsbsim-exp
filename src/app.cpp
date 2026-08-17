@@ -20,6 +20,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     _mouse_cursor_hide_component{_blackboard, this},
     _mouse_input_component{_blackboard, this},
     _sim_tick_component{_blackboard, this},
+    _telemetry_tick_component{_blackboard, this},
     _vis_tick_component{_blackboard, this}
 {
   // Enable depth test
@@ -150,6 +151,9 @@ void JSBSimVisualizer::tickEvent() {
 
   _aircraft_state_info_component.handle_dispatch();
   _vis_tick_component.handle_dispatch();
+
+  // Send telemetry
+  _telemetry_tick_component.handle_dispatch();
 }
 
 // Tick frame

@@ -164,6 +164,7 @@ add_executable(jsbsimexp
   src/components/mouse_cursor_hide_component.cpp
   src/components/mouse_input_component.cpp
   src/components/sim_tick_component.cpp
+  src/components/telemetry_tick_component.cpp
   src/components/vis_tick_component.cpp
   ${app_resources}
 )

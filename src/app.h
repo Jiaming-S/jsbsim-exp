@@ -48,6 +48,7 @@
 #include "components/mouse_cursor_hide_component.h"
 #include "components/mouse_input_component.h"
 #include "components/sim_tick_component.h"
+#include "components/telemetry_tick_component.h"
 #include "components/vis_tick_component.h"
 
 #include "aircrafthandle.h"
@@ -84,6 +85,7 @@ class JSBSimVisualizer : public Magnum::Platform::Application {
     MouseCursorHideComponent _mouse_cursor_hide_component;
     MouseInputComponent _mouse_input_component;
     SimTickComponent _sim_tick_component;
+    TelemetryTickComponent _telemetry_tick_component;
     VisTickComponent _vis_tick_component;
 
     // Magnum

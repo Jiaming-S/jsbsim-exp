@@ -7,6 +7,7 @@
 #include "inputblackboard.h"
 #include "magnumblackboard.h"
 #include "simstateblackboard.h"
+#include "telemetryblackboard.h"
 
 class JSBSimExpBlackboard : public Blackboard {
   public:
@@ -22,6 +23,7 @@ class JSBSimExpBlackboard : public Blackboard {
     std::unique_ptr<InputBlackboard> input_blackboard;
     std::unique_ptr<MagnumBlackboard> magnum_blackboard;
     std::unique_ptr<SimStateBlackboard> sim_state_blackboard;
+    std::unique_ptr<TelemetryBlackboard> telemetry_blackboard;
 };
 
 inline std::shared_ptr<JSBSimExpBlackboard> make_jsbsimexp_blackboard() {
