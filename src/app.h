@@ -15,7 +15,6 @@
 #include <Magnum/SceneGraph/MatrixTransformation3D.h>
 #include <Magnum/SceneGraph/Object.h>
 #include <Magnum/SceneGraph/Scene.h>
-#include <Magnum/Shaders/FlatGL.h>
 #include <Magnum/Shaders/PhongGL.h>
 #include <Magnum/Trade/MeshData.h>
 #include <Magnum/Timeline.h>
@@ -88,7 +87,6 @@ class JSBSimVisualizer : public Magnum::Platform::Application {
     VisTickComponent _vis_tick_component;
 
     // Magnum
-    Magnum::Shaders::FlatGL3D _flat_shader;
     Magnum::Shaders::PhongGL _phong_shader;
     
     shaders::FloorShader _floor_shader;
@@ -106,7 +104,7 @@ class JSBSimVisualizer : public Magnum::Platform::Application {
     drawn::AtmosphereDrawable* _atmosphere;
 
     // 3D Model Repository
-    model::ModelRepository _model_repo;
+    model::GLBModelRepository _model_repo;
 
     // ImGui
     Magnum::ImGuiIntegration::Context _imgui_ctx{Magnum::NoCreate};

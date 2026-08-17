@@ -15,7 +15,7 @@ void _traverse_scene_graph(
   const Magnum::Trade::SceneData& scene_data,
   Magnum::UnsignedLong node_id, 
   const Magnum::Matrix4& parent_transform, 
-  std::shared_ptr<ModelMultipartTextured>& target_model,
+  std::shared_ptr<GLBModelMultipartTextured>& target_model,
   size_t fallback_texture_idx,
   std::unordered_map<Magnum::Int, size_t>& material_texture_cache
 ) {
@@ -34,40 +34,33 @@ void _traverse_scene_graph(
       auto cached_texture = material_texture_cache.find(mat_id);
       if (cached_texture != material_texture_cache.end()) {
         texture_idx = cached_texture->second;
-      } else {
+      }
+      else {
         Corrade::Containers::Optional<Magnum::Trade::MaterialData> material_data = importer.material(mat_id);
         if (material_data) {
           if (material_data->hasAttribute(Magnum::Trade::MaterialAttribute::BaseColorTexture)) {
             texture_idx = material_data->attribute<Magnum::UnsignedInt>(Magnum::Trade::MaterialAttribute::BaseColorTexture);
             material_texture_cache[mat_id] = texture_idx;
-          } else {
-            // Get base color or fallback
+          } 
+          else {
+            // Get base color
             Magnum::Color4 base_color{1.0f, 1.0f, 1.0f, 1.0f};
             if (material_data->hasAttribute(Magnum::Trade::MaterialAttribute::BaseColor)) {
               base_color = material_data->attribute<Magnum::Color4>(Magnum::Trade::MaterialAttribute::BaseColor);
             }
 
-            // Check if material name is canopy or glass to make it gold reflective
-            std::string mat_name = importer.materialName(mat_id);
-            for (auto& c : mat_name) c = std::tolower(c);
-
-            if (mat_name.find("canopy") != std::string::npos || mat_name.find("glass") != std::string::npos) {
-              // Set to a beautiful reflective golden color
-              base_color = Magnum::Color4{0.92f, 0.78f, 0.32f, 1.0f};
-            }
-
             // Create 1x1 color texture
             Magnum::Vector4ub color_ub{
-                static_cast<Magnum::UnsignedByte>(base_color.r() * 255.0f),
-                static_cast<Magnum::UnsignedByte>(base_color.g() * 255.0f),
-                static_cast<Magnum::UnsignedByte>(base_color.b() * 255.0f),
-                static_cast<Magnum::UnsignedByte>(base_color.a() * 255.0f)
+              static_cast<Magnum::UnsignedByte>(base_color.r() * 255.0f),
+              static_cast<Magnum::UnsignedByte>(base_color.g() * 255.0f),
+              static_cast<Magnum::UnsignedByte>(base_color.b() * 255.0f),
+              static_cast<Magnum::UnsignedByte>(base_color.a() * 255.0f)
             };
 
             Magnum::ImageView2D image{
-                Magnum::PixelFormat::RGBA8Unorm,
-                {1, 1},
-                Corrade::Containers::ArrayView<const void>{&color_ub, 4}
+              Magnum::PixelFormat::RGBA8Unorm,
+              {1, 1},
+              Corrade::Containers::ArrayView<const void>{&color_ub, 4}
             };
 
             Magnum::GL::Texture2D texture;
@@ -84,7 +77,7 @@ void _traverse_scene_graph(
       }
     }
 
-    target_model->_components.push_back(ModelComponent{
+    target_model->_components.push_back(GLBModelComponent{
       static_cast<size_t>(mesh_idx),
       texture_idx,
       absolute_transform
@@ -96,7 +89,7 @@ void _traverse_scene_graph(
   }
 }
 
-void ModelRepository::ingest_asset_glb(
+void GLBModelRepository::ingest_asset_glb(
   std::string asset_name,
   std::string asset_filepath
 ) {
@@ -107,7 +100,7 @@ void ModelRepository::ingest_asset_glb(
   Corrade::Utility::Resource rs{"assets"};
   importer->openData(rs.getRaw(asset_filepath));
 
-  auto target_model = std::make_shared<ModelMultipartTextured>();
+  auto target_model = std::make_shared<GLBModelMultipartTextured>();
   target_model->_textures.reserve(importer->textureCount() + 8); // reserve extra space for fallback & dynamic textures
 
   // 1A. Load all Textures
@@ -133,9 +126,9 @@ void ModelRepository::ingest_asset_glb(
   {
     Magnum::Vector4ub color_ub{255, 255, 255, 255};
     Magnum::ImageView2D image{
-        Magnum::PixelFormat::RGBA8Unorm,
-        {1, 1},
-        Corrade::Containers::ArrayView<const void>{&color_ub, 4}
+      Magnum::PixelFormat::RGBA8Unorm,
+      {1, 1},
+      Corrade::Containers::ArrayView<const void>{&color_ub, 4}
     };
     Magnum::GL::Texture2D texture;
     texture.setMagnificationFilter(Magnum::GL::SamplerFilter::Nearest)
@@ -149,11 +142,8 @@ void ModelRepository::ingest_asset_glb(
   target_model->_meshes.reserve(importer->meshCount());
   for (Magnum::UnsignedInt i = 0; i < importer->meshCount(); ++i) {
     Corrade::Containers::Optional<Magnum::Trade::MeshData> mesh_data = importer->mesh(i);
-    if (mesh_data) {
-      target_model->_meshes.push_back(Magnum::MeshTools::compile(*mesh_data));
-    } else {
-      target_model->_meshes.push_back(Magnum::GL::Mesh{}); 
-    }
+    if (mesh_data) target_model->_meshes.push_back(Magnum::MeshTools::compile(*mesh_data));
+    else target_model->_meshes.push_back(Magnum::GL::Mesh{}); 
   }
 
   // 2. Build the Blueprints via Recursive Helper
@@ -173,7 +163,11 @@ void ModelRepository::ingest_asset_glb(
   _all_models[asset_name] = std::move(target_model);
 }
 
-std::shared_ptr<ModelMultipartTextured> ModelRepository::get_aircraft_model(types::AircraftType type) {
+std::shared_ptr<GLBModelMultipartTextured> GLBModelRepository::get_aircraft_model(std::string type_string) {
+  return _all_models[type_string];
+}
+
+std::shared_ptr<GLBModelMultipartTextured> GLBModelRepository::get_aircraft_model(types::AircraftType type) {
   return _all_models[utils::to_type_string(type)];
 }
 

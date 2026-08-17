@@ -26,12 +26,10 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   Magnum::GL::Renderer::enable(Magnum::GL::Renderer::Feature::DepthTest);
 
   // Initialize shaders
-  _flat_shader = Magnum::Shaders::FlatGL3D{};
   _phong_shader = Magnum::Shaders::PhongGL{
     Magnum::Shaders::PhongGL::Configuration{}
       .setFlags(Magnum::Shaders::PhongGL::Flag::DiffuseTexture)
   };
-
 
   // Initialize ImGui
   _imgui_ctx = Magnum::ImGuiIntegration::Context(
@@ -45,15 +43,8 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   // Disable ImGui fighting Magnum for cursor control
   ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 
-  // Load and ingest GLTF models
-  std::vector<std::pair<std::string, std::string>> models_to_import = {
-    {"f16", "assets/f16/model/f16.glb"},
-  };
-
-  for (auto& p : models_to_import) {
-    std::string asset_name = p.first;
-    std::string asset_filepath = p.second;
-    _model_repo.ingest_asset_glb(asset_name, asset_filepath);
+  { // Load and ingest GLB models
+    _model_repo.ingest_asset_glb("f16", "assets/f16/3d/f16.glb");
   }
 
   { // Load and setup camera

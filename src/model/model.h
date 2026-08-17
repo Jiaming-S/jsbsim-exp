@@ -26,31 +26,32 @@ using namespace Magnum::Math::Literals;
 
 namespace model {
 
-struct ModelComponent {
+struct GLBModelComponent {
   size_t mesh_idx;
   size_t texture_idx;
   Magnum::Matrix4 local_transformation;
 };
 
-struct ModelMultipartTextured {
+struct GLBModelMultipartTextured {
   std::vector<Magnum::GL::Mesh> _meshes;
   std::vector<Magnum::GL::Texture2D> _textures;
-  std::vector<model::ModelComponent> _components;
+  std::vector<model::GLBModelComponent> _components;
 };
 
-class ModelRepository {
+class GLBModelRepository {
   private:
-    std::unordered_map<std::string, std::shared_ptr<ModelMultipartTextured>> _all_models;
+    std::unordered_map<std::string, std::shared_ptr<GLBModelMultipartTextured>> _all_models;
 
   public:
+    explicit GLBModelRepository() {}
+    
     void ingest_asset_glb(
       std::string asset_name,
       std::string asset_filepath
     );
     
-    std::shared_ptr<ModelMultipartTextured> get_aircraft_model(
-      types::AircraftType type = types::AircraftType::F16
-    );
+    std::shared_ptr<GLBModelMultipartTextured> get_aircraft_model(std::string type_string);
+    std::shared_ptr<GLBModelMultipartTextured> get_aircraft_model(types::AircraftType type);
 };
 
 };

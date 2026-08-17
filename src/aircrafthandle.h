@@ -50,7 +50,7 @@ class AircraftHandle {
     AircraftHandle& with_ic(types::AircraftInitialConditionPreset preset);
     AircraftHandle& with_visual_root(types::Object3D *object);
     AircraftHandle& with_keypoints(std::vector<types::AircraftKeyPoints> keypoints);
-    AircraftHandle& with_model(std::shared_ptr<model::ModelMultipartTextured> model);
+    AircraftHandle& with_model(std::shared_ptr<model::GLBModelMultipartTextured> model);
     AircraftHandle& link(Magnum::Shaders::PhongGL& shader, Magnum::SceneGraph::DrawableGroup3D& drawables);
     AircraftHandle& link_trails(types::Object3D& object, Magnum::SceneGraph::DrawableGroup3D& drawables);
     AircraftHandle& link_shadow(shaders::ShadowShader& shader, Magnum::SceneGraph::DrawableGroup3D& drawables);

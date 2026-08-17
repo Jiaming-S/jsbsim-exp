@@ -46,7 +46,7 @@ AircraftHandle& AircraftHandle::with_keypoints(std::vector<types::AircraftKeyPoi
   return *this;
 }
 
-AircraftHandle& AircraftHandle::with_model(std::shared_ptr<model::ModelMultipartTextured> model) {
+AircraftHandle& AircraftHandle::with_model(std::shared_ptr<model::GLBModelMultipartTextured> model) {
   assert(_visual_root_object);
   assert(model);
 
