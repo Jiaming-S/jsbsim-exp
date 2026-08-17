@@ -5,7 +5,6 @@
 #include <Magnum/Trade/MeshData.h>
 #include <Magnum/MeshTools/Compile.h>
 #include <Magnum/Trade/SceneData.h>
-#include <Magnum/Trade/ObjectData3D.h>
 #include <Corrade/PluginManager/Manager.h>
 #include <Corrade/Containers/Optional.h>
 #include <Corrade/Utility/Debug.h>

@@ -10,7 +10,6 @@
 #include <Magnum/Trade/AbstractImporter.h>
 #include <Magnum/Trade/SceneData.h>
 #include <Magnum/Trade/MeshData.h>
-#include <Magnum/Trade/MeshObjectData3D.h>
 #include <Magnum/Trade/TextureData.h>
 #include <Magnum/Trade/ImageData.h>
 #include <Magnum/Trade/MaterialData.h>

@@ -68,14 +68,14 @@ std::unique_ptr<JSBSim::FGFDMExec> load_aircraft(
   POP_JSBSIM_DEBUG_LEVEL
   
   // Return unique_ptr
-  return std::move(aircraft_fdmexec);
+  return aircraft_fdmexec;
 }
 
 std::string to_type_string(types::AircraftType& t) {
   switch (t) {
     case types::AircraftType::F16: return "f16";
     case types::AircraftType::F16_NO_PID: return "f16_no_pid";
-    default: return NULL;
+    default: return "";
   }
 }
 

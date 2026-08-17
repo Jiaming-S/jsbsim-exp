@@ -2,6 +2,7 @@
 #include <Magnum/PixelFormat.h>
 #include <Magnum/Math/Color.h>
 #include <Corrade/Containers/ArrayView.h>
+#include <Corrade/Containers/Pair.h>
 #include <unordered_map>
 #include <string>
 #include <cctype>
@@ -11,23 +12,23 @@ namespace model {
 
 void _traverse_scene_graph(
   Magnum::Trade::AbstractImporter& importer, 
-  Magnum::UnsignedInt node_id, 
+  const Magnum::Trade::SceneData& scene_data,
+  Magnum::UnsignedLong node_id, 
   const Magnum::Matrix4& parent_transform, 
   std::shared_ptr<ModelMultipartTextured>& target_model,
   size_t fallback_texture_idx,
   std::unordered_map<Magnum::Int, size_t>& material_texture_cache
 ) {
-  Corrade::Containers::Pointer<Magnum::Trade::ObjectData3D> object_data = importer.object3D(node_id);
-  if (!object_data) return;
+  auto opt_transform = scene_data.transformation3DFor(node_id);
+  Magnum::Matrix4 local_transform = opt_transform ? *opt_transform : Magnum::Matrix4{};
+  Magnum::Matrix4 absolute_transform = parent_transform * local_transform;
 
-  Magnum::Matrix4 absolute_transform = parent_transform * object_data->transformation();
+  auto meshes_materials = scene_data.meshesMaterialsFor(node_id);
+  for (const auto& mesh_material : meshes_materials) {
+    Magnum::UnsignedInt mesh_idx = mesh_material.first();
+    Magnum::Int mat_id = mesh_material.second();
 
-  if (object_data->instanceType() == Magnum::Trade::ObjectInstanceType3D::Mesh) {
-    Magnum::UnsignedInt mesh_idx = object_data->instance();
     size_t texture_idx = fallback_texture_idx;
-
-    const auto& mesh_object = static_cast<const Magnum::Trade::MeshObjectData3D&>(*object_data);
-    Magnum::Int mat_id = mesh_object.material();
 
     if (mat_id != -1) {
       auto cached_texture = material_texture_cache.find(mat_id);
@@ -90,8 +91,8 @@ void _traverse_scene_graph(
     });
   }
 
-  for (Magnum::UnsignedInt child_id : object_data->children()) {
-    _traverse_scene_graph(importer, child_id, absolute_transform, target_model, fallback_texture_idx, material_texture_cache);
+  for (Magnum::UnsignedLong child_id : scene_data.childrenFor(node_id)) {
+    _traverse_scene_graph(importer, scene_data, child_id, absolute_transform, target_model, fallback_texture_idx, material_texture_cache);
   }
 }
 
@@ -162,8 +163,8 @@ void ModelRepository::ingest_asset_glb(
     if (scene_data) {
       Magnum::Matrix4 root_correction = Magnum::Matrix4::rotationY(Magnum::Deg(90.0f));
       std::unordered_map<Magnum::Int, size_t> material_texture_cache;
-      for (Magnum::UnsignedInt root_id : scene_data->children3D()) {
-        _traverse_scene_graph(*importer, root_id, root_correction, target_model, fallback_texture_idx, material_texture_cache);
+      for (Magnum::UnsignedLong root_id : scene_data->childrenFor(-1)) {
+        _traverse_scene_graph(*importer, *scene_data, root_id, root_correction, target_model, fallback_texture_idx, material_texture_cache);
       }
     }
   }
