@@ -157,16 +157,18 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
 
 // Tick sim and visual model
 void JSBSimVisualizer::tickEvent() {
-  types::eSimPhysicsState sim_physics_state = _blackboard->sim_state_blackboard->sim_physics_state;
-  if (sim_physics_state != types::eSimPhysicsState::PAUSED) {
-    _sim_tick_component.handle_dispatch();
-  }
+  // Tick jsbsim
+  _sim_tick_component.handle_dispatch();
 
+  // Tick visuals
   _aircraft_state_info_component.handle_dispatch();
   _vis_tick_component.handle_dispatch();
 
   // Send telemetry
   _telemetry_tick_component.handle_dispatch();
+
+  // Wait for hand-of-god control (if enabled)
+  _hand_of_god_tick_component.handle_dispatch();
 }
 
 // Tick frame

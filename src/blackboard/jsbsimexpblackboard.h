@@ -4,6 +4,7 @@
 
 #include "aircraftblackboard.h"
 #include "camerablackboard.h"
+#include "handofgodblackboard.h"
 #include "inputblackboard.h"
 #include "magnumblackboard.h"
 #include "networkblackboard.h"
@@ -14,6 +15,7 @@ class JSBSimExpBlackboard : public Blackboard {
   public:
     std::unique_ptr<AircraftBlackboard> aircraft_blackboard;
     std::unique_ptr<CameraBlackboard> camera_blackboard;
+    std::unique_ptr<HandOfGodBlackboard> hand_of_god_blackboard;
     std::unique_ptr<InputBlackboard> input_blackboard;
     std::unique_ptr<MagnumBlackboard> magnum_blackboard;
     std::unique_ptr<NetworkBlackboard> network_blackboard;
@@ -23,6 +25,7 @@ class JSBSimExpBlackboard : public Blackboard {
     JSBSimExpBlackboard() :
       aircraft_blackboard{std::make_unique<AircraftBlackboard>()},  
       camera_blackboard{std::make_unique<CameraBlackboard>()},
+      hand_of_god_blackboard{std::make_unique<HandOfGodBlackboard>()},
       input_blackboard{std::make_unique<InputBlackboard>()},
       magnum_blackboard{std::make_unique<MagnumBlackboard>()},
       network_blackboard{std::make_unique<NetworkBlackboard>()},

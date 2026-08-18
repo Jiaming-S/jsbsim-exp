@@ -137,7 +137,7 @@ enum class eTelemetryDeliveryStatus {
 
 // Info on whether hand of god external controller is active
 enum class eHandOfGodMode {
-  INACTIVE,
+  HAND_OF_GOD_INACTIVE,
   HAND_OF_GOD_MANUAL_CONTROL,
   HAND_OF_GOD_SCRIPT_CONTROL,
 };
@@ -194,5 +194,17 @@ struct InputTelemetry {
     commanded_aircraft_pitch
   );
 };
+
+
+// Hand of God Blackboard Types
+
+// Hand of god controls for simulation environment 
+struct EnvironmentControlsHandOfGod {
+  bool sim_reset;
+  bool sim_pause;
+};
+
+
+//
 
 };

@@ -27,6 +27,8 @@ class SimStateBlackboard : public Blackboard {
     types::eTelemetryMode telemetry_mode{types::eTelemetryMode::TELEMETRY_ON};
     types::eTelemetryDeliveryStatus telemetry_delivery_status{types::eTelemetryDeliveryStatus::PACKET_NO_STATUS};
 
+    types::eHandOfGodMode hand_of_god_mode{types::eHandOfGodMode::HAND_OF_GOD_INACTIVE};
+
     // Locals
 
 };
