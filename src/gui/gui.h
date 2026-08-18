@@ -122,7 +122,7 @@ inline void gui_camera_selection(
   CameraHandle &camera_handle = blackboard->camera_blackboard->cameras[active_camera_index];
   
   const size_t active_aircraft_index = blackboard->aircraft_blackboard->active_aircraft_index;
-  const bool has_active_aircraft = blackboard->sim_state_blackboard->has_active_aircraft;
+  const bool has_active_aircraft = blackboard->sim_state_blackboard->has_active_aircraft == types::eAircraftActive::HAS_ACTIVE;
   const std::vector<AircraftHandle> &aircraft = blackboard->aircraft_blackboard->aircraft;
 
   types::Object3D *scene_root = blackboard->magnum_blackboard->scene_root;

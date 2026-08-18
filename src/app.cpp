@@ -16,6 +16,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     _camera_draw_component{_blackboard, this},
     _foreign_input_component{_blackboard, this},
     _gui_component{_blackboard, this},
+    _hand_of_god_tick_component{_blackboard, this},
     _keyboard_input_component{_blackboard, this},
     _mouse_cursor_hide_component{_blackboard, this},
     _mouse_input_component{_blackboard, this},

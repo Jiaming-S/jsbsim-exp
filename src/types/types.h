@@ -21,12 +21,12 @@ struct Object3DRenderable {
   Magnum::GL::Texture2D* texture;
 };
 
-enum AircraftType {
+enum class AircraftType {
   F16,
   F16_NO_PID,
 };
 
-enum AircraftInitialConditionPreset {
+enum class AircraftInitialConditionPreset {
   DEFAULT,
   DEFAULT_OPPONENT,
   ON_GROUND,
@@ -73,7 +73,7 @@ struct AircraftTrailBreadcrumb {
   double sim_time;
 };
 
-enum AircraftKeyPoints {
+enum class AircraftKeyPoints {
   NOSE,
   WINGTIP_L,
   WINGTIP_R,
@@ -84,38 +84,38 @@ enum AircraftKeyPoints {
 // Blackboard Types
 
 // Info on our physics simulation type
-enum eSimPhysicsState {
+enum class eSimPhysicsState {
   NORMAL,
   PAUSED,
   CUSTOM,
 };
 
 // Info on whether we are controlling the camera or model
-enum eSimControlType {
+enum class eSimControlType {
   CAMERA,
   MODEL,
 };
 
 // Info on whether we are orientation-locked or free floating about camera root
-enum eCameraType {
+enum class eCameraType {
   LOCKED,
   FREE,
 };
 
 // Info on whether there is an active aircraft
-enum eAircraftActive {
+enum class eAircraftActive {
   NO_ACTIVE,
   HAS_ACTIVE,
 };
 
 // Info on whether cursor is hidden or visible
-enum eCursorHidden {
+enum class eCursorHidden {
   HIDDEN_AND_LOCKED,
   VISIBLE,
 };
 
 // Info on whether debug information is displayed
-enum eDebugViews {
+enum class eDebugViews {
   DEBUG_NOT_VISIBLE,
   DEBUG_OBJECTS_AND_STATISICS,
   DEBUG_OBJECTS,
@@ -123,16 +123,23 @@ enum eDebugViews {
 };
 
 // Info on whether telemetry is currently sending
-enum eTelemetryMode {
+enum class eTelemetryMode {
   TELEMETRY_ON,
   TELEMETRY_OFF,
 };
 
 // Info on whether telemetry was sent successfully (or no status)
-enum eTelemetryDeliveryStatus {
+enum class eTelemetryDeliveryStatus {
   PACKET_NO_STATUS,
   PACKET_SEND_SUCCESS,
   PACKET_SEND_FAILURE,
+};
+
+// Info on whether hand of god external controller is active
+enum class eHandOfGodMode {
+  INACTIVE,
+  HAND_OF_GOD_MANUAL_CONTROL,
+  HAND_OF_GOD_SCRIPT_CONTROL,
 };
 
 

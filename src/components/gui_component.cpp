@@ -12,7 +12,7 @@ void GuiComponent::handle_dispatch() {
   Magnum::GL::Renderer::setBlendEquation(Magnum::GL::Renderer::BlendEquation::Add, Magnum::GL::Renderer::BlendEquation::Add);
   Magnum::GL::Renderer::setBlendFunction(Magnum::GL::Renderer::BlendFunction::SourceAlpha, Magnum::GL::Renderer::BlendFunction::OneMinusSourceAlpha);
 
-  const bool cursor_hidden = blackboard->sim_state_blackboard->cursor_hidden;
+  const types::eCursorHidden cursor_hidden = blackboard->sim_state_blackboard->cursor_hidden;
   Magnum::ImGuiIntegration::Context *imgui_ctx = blackboard->magnum_blackboard->imgui_ctx;
 
   gui::gui_aircraft_debug(blackboard);

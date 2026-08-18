@@ -43,6 +43,7 @@
 #include "components/camera_control_component.h"
 #include "components/camera_draw_component.h"
 #include "components/gui_component.h"
+#include "components/hand_of_god_tick_component.h"
 #include "components/foreign_input_component.h"
 #include "components/keyboard_input_component.h"
 #include "components/mouse_cursor_hide_component.h"
@@ -81,6 +82,7 @@ class JSBSimVisualizer : public Magnum::Platform::Application {
     CameraDrawComponent _camera_draw_component;
     ForeignInputComponent _foreign_input_component;
     GuiComponent _gui_component;
+    HandOfGodTickComponent _hand_of_god_tick_component;
     KeyboardInputComponent _keyboard_input_component;
     MouseCursorHideComponent _mouse_cursor_hide_component;
     MouseInputComponent _mouse_input_component;
