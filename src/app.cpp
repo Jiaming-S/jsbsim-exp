@@ -1,4 +1,5 @@
 #include "app.h"
+#include "types/types.h"
 
 JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   : Magnum::Platform::Application{
@@ -20,6 +21,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     _keyboard_input_component{_blackboard, this},
     _mouse_cursor_hide_component{_blackboard, this},
     _mouse_input_component{_blackboard, this},
+    _scenario_control_component{_blackboard, this},
     _sim_tick_component{_blackboard, this},
     _telemetry_tick_component{_blackboard, this},
     _vis_tick_component{_blackboard, this}
@@ -69,67 +71,24 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   utils::populate_tmp_jsbsim_dir(types::AircraftType::F16);
   utils::populate_tmp_jsbsim_dir(types::AircraftType::F16_NO_PID);
 
-  { // Load initial conditions
-    std::vector<types::AircraftInitialConditionPreset> presets = {
-      types::AircraftInitialConditionPreset::DEFAULT,
-      types::AircraftInitialConditionPreset::DEFAULT_OPPONENT,
-      types::AircraftInitialConditionPreset::ON_GROUND,
-      types::AircraftInitialConditionPreset::TAKEOFF_ROLL,
-      types::AircraftInitialConditionPreset::LEFT_SPIRAL,
-      types::AircraftInitialConditionPreset::RIGHT_SPIRAL,
-      types::AircraftInitialConditionPreset::LEFT_TAXI,
-      types::AircraftInitialConditionPreset::RIGHT_TAXI,
-    };
-
-    for (auto preset : presets) {
-      AircraftHandle aircraft = AircraftHandle{types::AircraftType::F16};
-      aircraft
-        .with_fdmexec()
-        .with_ic(preset)
-        .with_visual_root(new types::Object3D{&_scene})
-        .with_keypoints({
-          types::AircraftKeyPoints::WINGTIP_L,
-          types::AircraftKeyPoints::WINGTIP_R,
-          types::AircraftKeyPoints::ENGINE_EXHAUST,
-          types::AircraftKeyPoints::NOSE,
-        })
-        .with_model(_model_repo.get_aircraft_model(types::AircraftType::F16))
-        .link(_phong_shader, _drawables)
-        .link_trails(_scene, _drawables)
-        .link_shadow(_shadow_shader, _drawables);
-      _blackboard->aircraft_blackboard->aircraft.push_back(std::move(aircraft));
-    }
-  }
-
-  { // Add an F16 with all PID's turned off
-    AircraftHandle funny_aircraft = AircraftHandle{types::AircraftType::F16_NO_PID};
-    funny_aircraft
-      .with_fdmexec()
-      .with_ic(types::AircraftInitialConditionPreset::TAKEOFF_ROLL_ROTATION)
-      .with_visual_root(new types::Object3D{&_scene})
-      .with_keypoints({
-        types::AircraftKeyPoints::WINGTIP_L,
-        types::AircraftKeyPoints::WINGTIP_R,
-        types::AircraftKeyPoints::ENGINE_EXHAUST,
-        types::AircraftKeyPoints::NOSE,
-      })
-      .with_model(_model_repo.get_aircraft_model(types::AircraftType::F16))
-      .link(_phong_shader, _drawables)
-      .link_trails(_scene, _drawables)
-      .link_shadow(_shadow_shader, _drawables);
-    _blackboard->aircraft_blackboard->aircraft.push_back(std::move(funny_aircraft));
-  }
+  // Request default debugging scenario
+  _blackboard->sim_state_blackboard->scenario_reset_request = types::eScenarioResetRequest::REQUEST_RESET_TO_DEBUG;
 
   { // Open and bind telemetry port
     _telemetry_pub_socket = zmq::socket_t{_zmq_ctx, zmq::socket_type::pub};
     _telemetry_pub_socket.bind("tcp://127.0.0.1:5555");
   }
 
-  { // Initialize blackboard
+  { // Initialize blackboard pointers
     _blackboard->magnum_blackboard->scene_root = new types::Object3D(&_scene);
     _blackboard->magnum_blackboard->imgui_ctx = &_imgui_ctx;
-    _blackboard->magnum_blackboard->_drawables = &_drawables;
-    _blackboard->magnum_blackboard->_background_drawables = &_background_drawables;
+    _blackboard->magnum_blackboard->drawables = &_drawables;
+    _blackboard->magnum_blackboard->background_drawables = &_background_drawables;
+    _blackboard->magnum_blackboard->model_repo = &_model_repo;
+    _blackboard->magnum_blackboard->phong_shader = &_phong_shader;
+    _blackboard->magnum_blackboard->floor_shader = &_floor_shader;
+    _blackboard->magnum_blackboard->sky_shader = &_sky_shader;
+    _blackboard->magnum_blackboard->shadow_shader = &_shadow_shader;
     _blackboard->network_blackboard->zmq_ctx = &_zmq_ctx;
     _blackboard->network_blackboard->telemetry_pub_socket = &_telemetry_pub_socket;
   }
@@ -157,6 +116,9 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
 
 // Tick sim and visual model
 void JSBSimVisualizer::tickEvent() {
+  // Listen for potential scenario reset requests (always runs once on startup)
+  _scenario_control_component.handle_dispatch();
+
   // Tick jsbsim
   _sim_tick_component.handle_dispatch();
 

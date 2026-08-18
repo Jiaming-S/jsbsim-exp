@@ -163,12 +163,12 @@ void GLBModelRepository::ingest_asset_glb(
   _all_models[asset_name] = std::move(target_model);
 }
 
-std::shared_ptr<GLBModelMultipartTextured> GLBModelRepository::get_aircraft_model(std::string type_string) {
-  return _all_models[type_string];
+std::shared_ptr<GLBModelMultipartTextured> GLBModelRepository::get_aircraft_model(std::string type_string) const {
+  return _all_models.at(type_string);
 }
 
-std::shared_ptr<GLBModelMultipartTextured> GLBModelRepository::get_aircraft_model(types::AircraftType type) {
-  return _all_models[utils::to_type_string(type)];
+std::shared_ptr<GLBModelMultipartTextured> GLBModelRepository::get_aircraft_model(types::AircraftType type) const {
+  return _all_models.at(utils::to_type_string(type));
 }
 
 };

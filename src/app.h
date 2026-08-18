@@ -48,6 +48,7 @@
 #include "components/keyboard_input_component.h"
 #include "components/mouse_cursor_hide_component.h"
 #include "components/mouse_input_component.h"
+#include "components/scenario_control_component.h"
 #include "components/sim_tick_component.h"
 #include "components/telemetry_tick_component.h"
 #include "components/vis_tick_component.h"
@@ -86,6 +87,7 @@ class JSBSimVisualizer : public Magnum::Platform::Application {
     KeyboardInputComponent _keyboard_input_component;
     MouseCursorHideComponent _mouse_cursor_hide_component;
     MouseInputComponent _mouse_input_component;
+    ScenarioControlComponent _scenario_control_component;
     SimTickComponent _sim_tick_component;
     TelemetryTickComponent _telemetry_tick_component;
     VisTickComponent _vis_tick_component;

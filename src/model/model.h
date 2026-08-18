@@ -50,8 +50,8 @@ class GLBModelRepository {
       std::string asset_filepath
     );
     
-    std::shared_ptr<GLBModelMultipartTextured> get_aircraft_model(std::string type_string);
-    std::shared_ptr<GLBModelMultipartTextured> get_aircraft_model(types::AircraftType type);
+    std::shared_ptr<GLBModelMultipartTextured> get_aircraft_model(std::string type_string) const;
+    std::shared_ptr<GLBModelMultipartTextured> get_aircraft_model(types::AircraftType type) const;
 };
 
 };

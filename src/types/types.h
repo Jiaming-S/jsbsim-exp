@@ -142,6 +142,15 @@ enum class eHandOfGodMode {
   HAND_OF_GOD_SCRIPT_CONTROL,
 };
 
+// Info on whether to reset sim and to what scenario
+enum class eScenarioResetRequest {
+  NO_REQUEST,
+  REQUEST_RESET_TO_EMPTY,
+  REQUEST_RESET_TO_DEBUG,
+  REQUEST_RESET_TO_CLASSIC_MERGE,
+  REQUEST_RESET_TO_FREE_FLIGHT,
+};
+
 
 // Telemetry Blackboard types
 
@@ -202,6 +211,11 @@ struct InputTelemetry {
 struct EnvironmentControlsHandOfGod {
   bool sim_reset;
   bool sim_pause;
+
+  MSGPACK_DEFINE(
+    sim_reset,
+    sim_pause
+  );
 };
 
 

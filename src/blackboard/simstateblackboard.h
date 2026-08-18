@@ -29,6 +29,8 @@ class SimStateBlackboard : public Blackboard {
 
     types::eHandOfGodMode hand_of_god_mode{types::eHandOfGodMode::HAND_OF_GOD_INACTIVE};
 
+    types::eScenarioResetRequest scenario_reset_request{types::eScenarioResetRequest::NO_REQUEST};
+
     // Locals
 
 };

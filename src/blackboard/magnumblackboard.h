@@ -7,6 +7,10 @@
 #include "blackboard.h"
 
 #include "../types/types.h"
+#include "../model/model.h"
+#include "../shaders/floorshader.h"
+#include "../shaders/skyshader.h"
+#include "../shaders/shadowshader.h"
 
 class MagnumBlackboard : public Blackboard {
   public:
@@ -16,8 +20,15 @@ class MagnumBlackboard : public Blackboard {
     types::Object3D *scene_root;
     Magnum::ImGuiIntegration::Context *imgui_ctx;
 
-    Magnum::SceneGraph::DrawableGroup3D *_background_drawables;
-    Magnum::SceneGraph::DrawableGroup3D *_drawables;
+    Magnum::SceneGraph::DrawableGroup3D *background_drawables;
+    Magnum::SceneGraph::DrawableGroup3D *drawables;
+
+    model::GLBModelRepository *model_repo;
+
+    Magnum::Shaders::PhongGL *phong_shader;
+    shaders::FloorShader *floor_shader;
+    shaders::SkyShader *sky_shader;
+    shaders::ShadowShader *shadow_shader;
 
 
     // Outputs

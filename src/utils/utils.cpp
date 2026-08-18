@@ -121,8 +121,8 @@ void apply_preset_ic(
 ) {
   switch (preset) {
     case types::AircraftInitialConditionPreset::DEFAULT:
-      fdmexec.GetIC()->SetAltitudeASLFtIC(60.0f);
-      fdmexec.GetIC()->SetVNorthFpsIC(450.0f);
+      fdmexec.GetIC()->SetAltitudeASLFtIC(1200.0f);
+      fdmexec.GetIC()->SetVNorthFpsIC(650.0f);
       fdmexec.GetIC()->SetPhiDegIC(0.0f);
       fdmexec.GetIC()->SetThetaDegIC(0.0f);
       fdmexec.GetIC()->SetPsiDegIC(0.0f);
@@ -130,12 +130,12 @@ void apply_preset_ic(
       fdmexec.GetIC()->SetLongitudeDegIC(0.0f);
       break;
     case types::AircraftInitialConditionPreset::DEFAULT_OPPONENT:
-      fdmexec.GetIC()->SetAltitudeASLFtIC(60.0f);
-      fdmexec.GetIC()->SetVNorthFpsIC(-450.0f);
+      fdmexec.GetIC()->SetAltitudeASLFtIC(1200.0f);
+      fdmexec.GetIC()->SetVNorthFpsIC(-650.0f);
       fdmexec.GetIC()->SetPhiDegIC(0.0f);
       fdmexec.GetIC()->SetThetaDegIC(0.0f);
       fdmexec.GetIC()->SetPsiDegIC(180.0f);
-      fdmexec.GetIC()->SetLatitudeDegIC(3e-3f);
+      fdmexec.GetIC()->SetLatitudeDegIC(5e-2f);
       fdmexec.GetIC()->SetLongitudeDegIC(0.0f);
       break;
     case types::AircraftInitialConditionPreset::ON_GROUND:
