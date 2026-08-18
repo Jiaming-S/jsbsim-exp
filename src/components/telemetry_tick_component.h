@@ -1,5 +1,8 @@
 #pragma once
 
+#include <msgpack.hpp>
+#include <zmq.hpp>
+
 #include "component.h"
 
 class TelemetryTickComponent : public Component {

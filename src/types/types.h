@@ -122,6 +122,19 @@ enum eDebugViews {
   DEBUG_STATISTICS,
 };
 
+// Info on whether telemetry is currently sending
+enum eTelemetryMode {
+  TELEMETRY_ON,
+  TELEMETRY_OFF,
+};
+
+// Info on whether telemetry was sent successfully (or no status)
+enum eTelemetryDeliveryStatus {
+  PACKET_NO_STATUS,
+  PACKET_SEND_SUCCESS,
+  PACKET_SEND_FAILURE,
+};
+
 
 // Telemetry Blackboard types
 

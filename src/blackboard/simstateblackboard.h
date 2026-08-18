@@ -24,6 +24,9 @@ class SimStateBlackboard : public Blackboard {
 
     types::eDebugViews debug_views{types::eDebugViews::DEBUG_NOT_VISIBLE};
 
+    types::eTelemetryMode telemetry_mode{types::eTelemetryMode::TELEMETRY_ON};
+    types::eTelemetryDeliveryStatus telemetry_delivery_status{types::eTelemetryDeliveryStatus::PACKET_NO_STATUS};
+
     // Locals
 
 };

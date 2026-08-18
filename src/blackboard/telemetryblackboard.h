@@ -14,10 +14,11 @@ class TelemetryBlackboard : public SerializeMixin<TelemetryBlackboard> {
     // Inputs
 
     // Outputs
-    std::vector<types::AircraftHandleTelemetry> aircraft_handle_telemetry;
-    types::InputTelemetry input_telemetry;
+    std::vector<types::AircraftHandleTelemetry> aircraft_handle_telemetry{};
+    types::InputTelemetry input_telemetry{};
 
     // Local
+    size_t bytes_sent = 0;
 
     MSGPACK_DEFINE(
       aircraft_handle_telemetry,

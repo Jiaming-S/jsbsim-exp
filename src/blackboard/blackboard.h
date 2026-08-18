@@ -1,7 +1,7 @@
 #pragma once
 
-#include <zmq.hpp>
 #include <msgpack.hpp>
+#include <zmq.hpp>
 
 class Blackboard {
   public:

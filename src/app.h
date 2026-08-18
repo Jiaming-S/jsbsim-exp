@@ -101,6 +101,10 @@ class JSBSimVisualizer : public Magnum::Platform::Application {
     Magnum::Timeline _timeline;
     types::Scene3D _scene;
 
+    // ZMQ
+    zmq::context_t _zmq_ctx;
+    zmq::socket_t _telemetry_pub_socket;
+
     // Environment
     drawn::EnvironmentDrawable* _environment;
     drawn::AtmosphereDrawable* _atmosphere;

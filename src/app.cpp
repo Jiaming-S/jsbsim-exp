@@ -44,7 +44,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   // Disable ImGui fighting Magnum for cursor control
   ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 
-  { // Load and ingest GLB models
+  { // Load and ingest GLTF models
     _model_repo.ingest_asset_glb("f16", "assets/f16/3d/f16.glb");
   }
 
@@ -68,35 +68,36 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   utils::populate_tmp_jsbsim_dir(types::AircraftType::F16);
   utils::populate_tmp_jsbsim_dir(types::AircraftType::F16_NO_PID);
 
-  // Load initial conditions
-  std::vector<types::AircraftInitialConditionPreset> presets = {
-    types::AircraftInitialConditionPreset::DEFAULT,
-    types::AircraftInitialConditionPreset::DEFAULT_OPPONENT,
-    types::AircraftInitialConditionPreset::ON_GROUND,
-    types::AircraftInitialConditionPreset::TAKEOFF_ROLL,
-    types::AircraftInitialConditionPreset::LEFT_SPIRAL,
-    types::AircraftInitialConditionPreset::RIGHT_SPIRAL,
-    types::AircraftInitialConditionPreset::LEFT_TAXI,
-    types::AircraftInitialConditionPreset::RIGHT_TAXI,
-  };
+  { // Load initial conditions
+    std::vector<types::AircraftInitialConditionPreset> presets = {
+      types::AircraftInitialConditionPreset::DEFAULT,
+      types::AircraftInitialConditionPreset::DEFAULT_OPPONENT,
+      types::AircraftInitialConditionPreset::ON_GROUND,
+      types::AircraftInitialConditionPreset::TAKEOFF_ROLL,
+      types::AircraftInitialConditionPreset::LEFT_SPIRAL,
+      types::AircraftInitialConditionPreset::RIGHT_SPIRAL,
+      types::AircraftInitialConditionPreset::LEFT_TAXI,
+      types::AircraftInitialConditionPreset::RIGHT_TAXI,
+    };
 
-  for (auto preset : presets) {
-    AircraftHandle aircraft = AircraftHandle{types::AircraftType::F16};
-    aircraft
-      .with_fdmexec()
-      .with_ic(preset)
-      .with_visual_root(new types::Object3D{&_scene})
-      .with_keypoints({
-        types::AircraftKeyPoints::WINGTIP_L,
-        types::AircraftKeyPoints::WINGTIP_R,
-        types::AircraftKeyPoints::ENGINE_EXHAUST,
-        types::AircraftKeyPoints::NOSE,
-      })
-      .with_model(_model_repo.get_aircraft_model(types::AircraftType::F16))
-      .link(_phong_shader, _drawables)
-      .link_trails(_scene, _drawables)
-      .link_shadow(_shadow_shader, _drawables);
-    _blackboard->aircraft_blackboard->aircraft.push_back(std::move(aircraft));
+    for (auto preset : presets) {
+      AircraftHandle aircraft = AircraftHandle{types::AircraftType::F16};
+      aircraft
+        .with_fdmexec()
+        .with_ic(preset)
+        .with_visual_root(new types::Object3D{&_scene})
+        .with_keypoints({
+          types::AircraftKeyPoints::WINGTIP_L,
+          types::AircraftKeyPoints::WINGTIP_R,
+          types::AircraftKeyPoints::ENGINE_EXHAUST,
+          types::AircraftKeyPoints::NOSE,
+        })
+        .with_model(_model_repo.get_aircraft_model(types::AircraftType::F16))
+        .link(_phong_shader, _drawables)
+        .link_trails(_scene, _drawables)
+        .link_shadow(_shadow_shader, _drawables);
+      _blackboard->aircraft_blackboard->aircraft.push_back(std::move(aircraft));
+    }
   }
 
   { // Add an F16 with all PID's turned off
@@ -118,22 +119,33 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     _blackboard->aircraft_blackboard->aircraft.push_back(std::move(funny_aircraft));
   }
 
-  // Initialize environment
-  _blackboard->magnum_blackboard->scene_root = new types::Object3D(&_scene);
-  _blackboard->magnum_blackboard->imgui_ctx = &_imgui_ctx;
-  _blackboard->magnum_blackboard->_drawables = &_drawables;
-  _blackboard->magnum_blackboard->_background_drawables = &_background_drawables;
+  { // Open and bind telemetry port
+    _telemetry_pub_socket = zmq::socket_t{_zmq_ctx, zmq::socket_type::pub};
+    _telemetry_pub_socket.bind("tcp://127.0.0.1:5555");
+  }
 
-  _atmosphere = new drawn::AtmosphereDrawable(
-    *_blackboard->magnum_blackboard->scene_root,
-    _sky_shader,
-    _background_drawables
-  );
-  _environment = new drawn::EnvironmentDrawable(
-    *_blackboard->magnum_blackboard->scene_root,
-    _floor_shader,
-    _background_drawables
-  );
+  { // Initialize blackboard
+    _blackboard->magnum_blackboard->scene_root = new types::Object3D(&_scene);
+    _blackboard->magnum_blackboard->imgui_ctx = &_imgui_ctx;
+    _blackboard->magnum_blackboard->_drawables = &_drawables;
+    _blackboard->magnum_blackboard->_background_drawables = &_background_drawables;
+    _blackboard->network_blackboard->zmq_ctx = &_zmq_ctx;
+    _blackboard->network_blackboard->telemetry_pub_socket = &_telemetry_pub_socket;
+  }
+
+  { // Initialize environment
+    _atmosphere = new drawn::AtmosphereDrawable(
+      *_blackboard->magnum_blackboard->scene_root,
+      _sky_shader,
+      _background_drawables
+    );
+
+    _environment = new drawn::EnvironmentDrawable(
+      *_blackboard->magnum_blackboard->scene_root,
+      _floor_shader,
+      _background_drawables
+    );
+  }
 
   // Start Magnum timeline
   _timeline.start();
