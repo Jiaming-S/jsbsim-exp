@@ -5,6 +5,8 @@
 #include <Magnum/SceneGraph/Object.h>
 #include <Magnum/SceneGraph/MatrixTransformation3D.h>
 
+#include <msgpack.hpp>
+
 #include <FGFDMExec.h>
 
 
@@ -118,6 +120,59 @@ enum eDebugViews {
   DEBUG_OBJECTS_AND_STATISICS,
   DEBUG_OBJECTS,
   DEBUG_STATISTICS,
+};
+
+
+// Telemetry Blackboard types
+
+// Telemetry for each AircraftHandle
+struct AircraftHandleTelemetry {
+  float pitch_rad;
+  float roll_rad;
+  float yaw_rad;
+  float alpha_rad;
+  double alt_ft;
+  double north_ft;
+  double east_ft;
+  double down_ft;
+  double north_spd_fps;
+  double east_spd_fps;
+  double down_spd_fps;
+  double ground_spd_fps;
+  double indicated_spd_fps;
+
+  MSGPACK_DEFINE(
+    pitch_rad,
+    roll_rad,
+    yaw_rad,
+    alpha_rad,
+    alt_ft,
+    north_ft,
+    east_ft,
+    down_ft,
+    north_spd_fps,
+    east_spd_fps,
+    down_spd_fps,
+    ground_spd_fps,
+    indicated_spd_fps
+  );
+};
+
+// Telemetry for commanded inputs
+struct InputTelemetry {
+  float commanded_aircraft_throttle;
+  float commanded_aircraft_braking;
+  float commanded_aircraft_roll;
+  float commanded_aircraft_yaw;
+  float commanded_aircraft_pitch;
+
+  MSGPACK_DEFINE(
+    commanded_aircraft_throttle,
+    commanded_aircraft_braking,
+    commanded_aircraft_roll,
+    commanded_aircraft_yaw,
+    commanded_aircraft_pitch
+  );
 };
 
 };

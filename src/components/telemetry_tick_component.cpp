@@ -24,7 +24,7 @@ void TelemetryTickComponent::handle_dispatch() {
       const double ground_spd_fps = ac._state_info.ground_spd_fps;
       const double indicated_spd_fps = ac._state_info.indicated_spd_fps;
 
-      blackboard->telemetry_blackboard->aircraft_handle_telemetry.push_back(TelemetryBlackboard::AircraftHandleTelemetry{
+      blackboard->telemetry_blackboard->aircraft_handle_telemetry.push_back(types::AircraftHandleTelemetry{
         float(pitch_rad),
         float(roll_rad),
         float(yaw_rad),
@@ -49,7 +49,7 @@ void TelemetryTickComponent::handle_dispatch() {
     const Magnum::Float commanded_aircraft_yaw = blackboard->input_blackboard->commanded_aircraft_yaw;
     const Magnum::Float commanded_aircraft_pitch = blackboard->input_blackboard->commanded_aircraft_pitch;
     
-    blackboard->telemetry_blackboard->input_telemetry = TelemetryBlackboard::InputTelemetry {
+    blackboard->telemetry_blackboard->input_telemetry = types::InputTelemetry {
       commanded_aircraft_throttle,
       commanded_aircraft_braking,
       commanded_aircraft_roll,
