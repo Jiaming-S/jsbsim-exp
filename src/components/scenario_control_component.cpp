@@ -4,8 +4,41 @@ void ScenarioControlComponent::init() {}
 
 void ScenarioControlComponent::quit() {}
 
-void perform_sim_reset() {
+void perform_sim_reset(std::shared_ptr<JSBSimExpBlackboard> &blackboard) {
+  std::vector<CameraHandle> &cameras = blackboard->camera_blackboard->cameras;
+  std::vector<AircraftHandle> &aircraft = blackboard->aircraft_blackboard->aircraft;
+  types::Object3D *scene_root = blackboard->magnum_blackboard->scene_root;
 
+  // Avoid segfault when camera is attached to deleted AircraftHandle visual_root
+  for (CameraHandle &camera : cameras) {
+    camera.attach_to_scene_root(scene_root);
+  }
+
+  { // Delete all aircraft visual roots
+    for (AircraftHandle &ac : aircraft) {
+      delete ac._visual_root_object;
+      ac._visual_root_object = nullptr;
+    }
+    blackboard->aircraft_blackboard->aircraft.clear();
+  }
+
+  { // Reset relevant blackboards
+    // Reset aircraft blackboard state
+    blackboard->aircraft_blackboard->active_aircraft_index = 0;
+    blackboard->sim_state_blackboard->has_active_aircraft = types::eAircraftActive::NO_ACTIVE;
+    blackboard->sim_state_blackboard->sim_control_type = types::eSimControlType::CAMERA;
+    blackboard->sim_state_blackboard->sim_control_type_default = types::eSimControlType::CAMERA;
+
+    // Reset commanded aircraft controls
+    blackboard->input_blackboard->commanded_aircraft_throttle = 0.0f;
+    blackboard->input_blackboard->commanded_aircraft_braking = 0.0f;
+    blackboard->input_blackboard->commanded_aircraft_roll = 0.0f;
+    blackboard->input_blackboard->commanded_aircraft_yaw = 0.0f;
+    blackboard->input_blackboard->commanded_aircraft_pitch = 0.0f;
+    
+    // Clear telemetry
+    blackboard->telemetry_blackboard->aircraft_handle_telemetry.clear();
+  }
 }
 
 void ScenarioControlComponent::handle_dispatch() {
@@ -50,7 +83,7 @@ void ScenarioControlComponent::handle_dispatch() {
   }
 
   // Wipe sim
-  perform_sim_reset();
+  perform_sim_reset(blackboard);
 
   // Apply presets and initial conditions
   types::Object3D *scene_root = blackboard->magnum_blackboard->scene_root;
