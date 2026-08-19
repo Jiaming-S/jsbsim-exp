@@ -6,7 +6,8 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
       arguments,
       Configuration{}
         .setTitle("Visualizer")
-        .addWindowFlags(Magnum::Platform::Sdl2Application::Configuration::WindowFlag::FullscreenDesktop)
+        .addWindowFlags(Magnum::Platform::Sdl2Application::Configuration::WindowFlag::Maximized)
+        .addWindowFlags(Magnum::Platform::Sdl2Application::Configuration::WindowFlag::Resizable)
     },
     // Initialize smart pointer to blackboard
     _blackboard{make_jsbsimexp_blackboard()},

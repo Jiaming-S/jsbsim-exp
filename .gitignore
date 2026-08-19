@@ -31,5 +31,8 @@
 *.out
 *.app
 
+# Debugging Python Notebook
+testing.ipynb
+
 # Build directory
 build/
