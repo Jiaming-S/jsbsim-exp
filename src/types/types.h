@@ -124,8 +124,8 @@ enum class eDebugViews {
 
 // Info on whether telemetry is currently sending
 enum class eTelemetryMode {
-  TELEMETRY_ON,
   TELEMETRY_OFF,
+  TELEMETRY_ON,
 };
 
 // Info on whether telemetry was sent successfully (or no status)
@@ -137,7 +137,7 @@ enum class eTelemetryDeliveryStatus {
 
 // Info on whether hand of god external controller is active
 enum class eHandOfGodMode {
-  HAND_OF_GOD_INACTIVE,
+  HAND_OF_GOD_OFF,
   HAND_OF_GOD_SCRIPT_CONTROL,
 };
 

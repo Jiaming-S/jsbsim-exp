@@ -189,9 +189,9 @@ inline void gui_sim_state(
   std::shared_ptr<JSBSimExpBlackboard> &blackboard,
   ImGuiTableFlags table_flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders
 ) {
-  ImGui::SetNextWindowSize(ImVec2(320, 400), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowPos(ImVec2(440, 25), ImGuiCond_FirstUseEver);
-  ImGui::Begin("Sim State");
+  ImGui::SetNextWindowSize(ImVec2(360, 400), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowPos(ImVec2(435, 25), ImGuiCond_FirstUseEver);
+  ImGui::Begin("Sim State Blackboard");
 
   if (ImGui::BeginTable("Sim State Info", 2, table_flags)) {
     ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed);
@@ -258,6 +258,79 @@ inline void gui_sim_state(
     ImGui::Text("%s", magic_enum::enum_name(blackboard->sim_state_blackboard->scenario_reset_request).data());
 
     ImGui::EndTable();
+  }
+
+  ImGui::End();
+}
+
+inline void gui_networking_controls(
+  std::shared_ptr<JSBSimExpBlackboard> &blackboard,
+  ImGuiTableFlags table_flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders
+) {
+  ImGui::SetNextWindowSize(ImVec2(240, 400), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowPos(ImVec2(800, 25), ImGuiCond_FirstUseEver);
+  ImGui::Begin("Networking Controls");
+
+  if (ImGui::CollapsingHeader("Telemetry", ImGuiTreeNodeFlags_DefaultOpen)) {
+    ImGui::PushID("telemetry_controls");
+    ImGui::Text("Mode:");
+    for (auto mode : magic_enum::enum_values<types::eTelemetryMode>()) {
+      bool is_active = (blackboard->sim_state_blackboard->telemetry_mode == mode);
+      if (ImGui::RadioButton(magic_enum::enum_name(mode).data(), is_active)) {
+        blackboard->sim_state_blackboard->telemetry_mode = mode;
+      }
+    }
+
+    ImGui::Spacing();
+    if (ImGui::BeginTable("Telemetry Status", 2, table_flags)) {
+      ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed);
+      ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+
+      ImGui::TableNextColumn();
+      ImGui::Text("Status");
+      ImGui::TableNextColumn();
+      ImGui::Text("%s", magic_enum::enum_name(blackboard->sim_state_blackboard->telemetry_delivery_status).data());
+
+      ImGui::TableNextColumn();
+      ImGui::Text("Bytes Sent");
+      ImGui::TableNextColumn();
+      ImGui::Text("%zu B", blackboard->network_blackboard->telemetry_bytes_sent);
+
+      ImGui::EndTable();
+    }
+    ImGui::PopID();
+  }
+
+  ImGui::Spacing();
+
+  if (ImGui::CollapsingHeader("Hand of God", ImGuiTreeNodeFlags_DefaultOpen)) {
+    ImGui::PushID("hand_of_god_controls");
+    ImGui::Text("Mode:");
+    for (auto mode : magic_enum::enum_values<types::eHandOfGodMode>()) {
+      bool is_active = (blackboard->sim_state_blackboard->hand_of_god_mode == mode);
+      if (ImGui::RadioButton(magic_enum::enum_name(mode).data(), is_active)) {
+        blackboard->sim_state_blackboard->hand_of_god_mode = mode;
+      }
+    }
+
+    ImGui::Spacing();
+    if (ImGui::BeginTable("Hand of God Status", 2, table_flags)) {
+      ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed);
+      ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+
+      ImGui::TableNextColumn();
+      ImGui::Text("Status");
+      ImGui::TableNextColumn();
+      ImGui::Text("%s", magic_enum::enum_name(blackboard->sim_state_blackboard->hand_of_god_receipt_status).data());
+
+      ImGui::TableNextColumn();
+      ImGui::Text("Bytes Recv");
+      ImGui::TableNextColumn();
+      ImGui::Text("%zu B", blackboard->network_blackboard->hand_of_god_bytes_recvd);
+
+      ImGui::EndTable();
+    }
+    ImGui::PopID();
   }
 
   ImGui::End();

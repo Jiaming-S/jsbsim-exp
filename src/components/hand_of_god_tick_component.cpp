@@ -5,7 +5,7 @@ void HandOfGodTickComponent::init() {}
 void HandOfGodTickComponent::quit() {}
 
 void HandOfGodTickComponent::handle_dispatch() {
-  if (blackboard->sim_state_blackboard->hand_of_god_mode == types::eHandOfGodMode::HAND_OF_GOD_INACTIVE) {
+  if (blackboard->sim_state_blackboard->hand_of_god_mode == types::eHandOfGodMode::HAND_OF_GOD_OFF) {
     return;
   }
   
