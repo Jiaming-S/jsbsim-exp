@@ -3,6 +3,7 @@
 #include <Magnum/Platform/Sdl2Application.h>
 
 #include "component.h"
+#include "zmq.hpp"
 
 class HandOfGodTickComponent : public Component {
   public:

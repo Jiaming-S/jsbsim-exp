@@ -12,7 +12,7 @@ void ScenarioControlComponent::handle_dispatch() {
   const types::eScenarioResetRequest scenario_reset_request = blackboard->sim_state_blackboard->scenario_reset_request;
 
   // Populate preset
-    std::vector<std::pair<types::AircraftType, types::AircraftInitialConditionPreset>> presets;
+  std::vector<std::pair<types::AircraftType, types::AircraftInitialConditionPreset>> presets;
   switch (scenario_reset_request) {
     case types::eScenarioResetRequest::NO_REQUEST: {
       return;

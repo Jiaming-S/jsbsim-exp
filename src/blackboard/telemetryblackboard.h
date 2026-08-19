@@ -18,7 +18,6 @@ class TelemetryBlackboard : public SerializeMixin<TelemetryBlackboard> {
     types::InputTelemetry input_telemetry{};
 
     // Local
-    size_t bytes_sent = 0;
 
     MSGPACK_DEFINE(
       aircraft_handle_telemetry,

@@ -17,6 +17,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     _camera_draw_component{_blackboard, this},
     _foreign_input_component{_blackboard, this},
     _gui_component{_blackboard, this},
+    _hand_of_god_control_component{_blackboard, this},
     _hand_of_god_tick_component{_blackboard, this},
     _keyboard_input_component{_blackboard, this},
     _mouse_cursor_hide_component{_blackboard, this},
@@ -74,9 +75,13 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   // Request default debugging scenario
   _blackboard->sim_state_blackboard->scenario_reset_request = types::eScenarioResetRequest::REQUEST_RESET_TO_DEBUG;
 
-  { // Open and bind telemetry port
+  { // Open and bind telemetry/HoG port
     _telemetry_pub_socket = zmq::socket_t{_zmq_ctx, zmq::socket_type::pub};
     _telemetry_pub_socket.bind("tcp://127.0.0.1:5555");
+    
+    _hand_of_god_sub_socket = zmq::socket_t{_zmq_ctx, zmq::socket_type::sub};
+    _hand_of_god_sub_socket.set(zmq::sockopt::subscribe, "");
+    _hand_of_god_sub_socket.bind("tcp://*:5556");
   }
 
   { // Initialize blackboard pointers
@@ -91,6 +96,7 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
     _blackboard->magnum_blackboard->shadow_shader = &_shadow_shader;
     _blackboard->network_blackboard->zmq_ctx = &_zmq_ctx;
     _blackboard->network_blackboard->telemetry_pub_socket = &_telemetry_pub_socket;
+    _blackboard->network_blackboard->hand_of_god_sub_socket = &_hand_of_god_sub_socket;
   }
 
   { // Initialize environment
@@ -131,6 +137,7 @@ void JSBSimVisualizer::tickEvent() {
 
   // Wait for hand-of-god control (if enabled)
   _hand_of_god_tick_component.handle_dispatch();
+  _hand_of_god_control_component.handle_dispatch();
 }
 
 // Tick frame

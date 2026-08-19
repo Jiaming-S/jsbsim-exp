@@ -14,5 +14,6 @@ class NetworkBlackboard : public Blackboard {
     zmq::socket_t *hand_of_god_sub_socket;
 
     // Locals
-
+    size_t telemetry_bytes_sent = 0;
+    size_t hand_of_god_bytes_recvd = 0;
 };

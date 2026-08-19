@@ -13,7 +13,8 @@ void MouseInputComponent::handle_dispatch() {
   const float mouse_sensitivity = blackboard->input_blackboard->mouse_sensitivity;
 
   // Perform commanded movement conversion (rotation)
-  if (sim_control_type == types::eSimControlType::MODEL) {
+  if (sim_control_type == types::eSimControlType::MODEL &&
+      cursor_hidden == types::eCursorHidden::HIDDEN_AND_LOCKED) {
     const Magnum::Float roll_movement = mouse_delta.x() * mouse_sensitivity;
     const Magnum::Float pitch_movement = mouse_delta.y() * mouse_sensitivity;
 

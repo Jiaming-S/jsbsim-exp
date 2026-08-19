@@ -7,7 +7,7 @@ void TelemetryTickComponent::quit() {}
 void TelemetryTickComponent::handle_dispatch() {
   if (blackboard->sim_state_blackboard->telemetry_mode != types::eTelemetryMode::TELEMETRY_ON) {
     blackboard->sim_state_blackboard->telemetry_delivery_status = types::eTelemetryDeliveryStatus::PACKET_NO_STATUS;
-    blackboard->telemetry_blackboard->bytes_sent = 0;
+    blackboard->network_blackboard->telemetry_bytes_sent = 0;
     return;
   }
 
@@ -55,12 +55,12 @@ void TelemetryTickComponent::handle_dispatch() {
     if (telemetry_pub_socket->send(msg, zmq::send_flags::none)) {
       // Send successful
       blackboard->sim_state_blackboard->telemetry_delivery_status = types::eTelemetryDeliveryStatus::PACKET_SEND_SUCCESS;
-      blackboard->telemetry_blackboard->bytes_sent = sbuf.size();
+      blackboard->network_blackboard->telemetry_bytes_sent = sbuf.size();
     }
     else {
       // Send failed
       blackboard->sim_state_blackboard->telemetry_delivery_status = types::eTelemetryDeliveryStatus::PACKET_SEND_FAILURE;
-      blackboard->telemetry_blackboard->bytes_sent = 0;
+      blackboard->network_blackboard->telemetry_bytes_sent = 0;
     }
   }
 }

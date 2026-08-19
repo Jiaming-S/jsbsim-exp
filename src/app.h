@@ -43,6 +43,7 @@
 #include "components/camera_control_component.h"
 #include "components/camera_draw_component.h"
 #include "components/gui_component.h"
+#include "components/hand_of_god_control_component.h"
 #include "components/hand_of_god_tick_component.h"
 #include "components/foreign_input_component.h"
 #include "components/keyboard_input_component.h"
@@ -83,6 +84,7 @@ class JSBSimVisualizer : public Magnum::Platform::Application {
     CameraDrawComponent _camera_draw_component;
     ForeignInputComponent _foreign_input_component;
     GuiComponent _gui_component;
+    HandOfGodControlComponent _hand_of_god_control_component;
     HandOfGodTickComponent _hand_of_god_tick_component;
     KeyboardInputComponent _keyboard_input_component;
     MouseCursorHideComponent _mouse_cursor_hide_component;
@@ -108,6 +110,7 @@ class JSBSimVisualizer : public Magnum::Platform::Application {
     // ZMQ
     zmq::context_t _zmq_ctx;
     zmq::socket_t _telemetry_pub_socket;
+    zmq::socket_t _hand_of_god_sub_socket;
 
     // Environment
     drawn::EnvironmentDrawable* _environment;

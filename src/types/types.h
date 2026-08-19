@@ -142,6 +142,13 @@ enum class eHandOfGodMode {
   HAND_OF_GOD_SCRIPT_CONTROL,
 };
 
+// Info on whether hand of god command was received successfully (or no status)
+enum class eHandOfGodReceiptStatus {
+  PACKET_NO_STATUS,
+  PACKET_RECV_SUCCESS,
+  PACKET_RECV_FAILURE,
+};
+
 // Info on whether to reset sim and to what scenario
 enum class eScenarioResetRequest {
   NO_REQUEST,

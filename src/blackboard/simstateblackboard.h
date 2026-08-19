@@ -28,6 +28,7 @@ class SimStateBlackboard : public Blackboard {
     types::eTelemetryDeliveryStatus telemetry_delivery_status{types::eTelemetryDeliveryStatus::PACKET_NO_STATUS};
 
     types::eHandOfGodMode hand_of_god_mode{types::eHandOfGodMode::HAND_OF_GOD_INACTIVE};
+    types::eHandOfGodReceiptStatus hand_of_god_receipt_status{types::eHandOfGodReceiptStatus::PACKET_NO_STATUS};
 
     types::eScenarioResetRequest scenario_reset_request{types::eScenarioResetRequest::NO_REQUEST};
 
