@@ -19,6 +19,7 @@ void GuiComponent::handle_dispatch() {
   gui::gui_camera_selection(blackboard);
   gui::gui_sim_state(blackboard);
   gui::gui_networking_controls(blackboard);
+  gui::gui_scenario_selection(blackboard);
 
   if (cursor_hidden == types::eCursorHidden::VISIBLE) {
     imgui_ctx->updateApplicationCursor(*app);

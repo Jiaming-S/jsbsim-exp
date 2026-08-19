@@ -336,5 +336,35 @@ inline void gui_networking_controls(
   ImGui::End();
 }
 
+inline void gui_scenario_selection(
+  std::shared_ptr<JSBSimExpBlackboard> &blackboard
+) {
+  ImGui::SetNextWindowSize(ImVec2(300, 300), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowPos(ImVec2(1045, 25), ImGuiCond_FirstUseEver);
+  ImGui::Begin("Scenario Reset Controls");
+
+  if (ImGui::BeginTable("Scenario Reset", 2)) {
+    ImGui::TableSetupColumn("Scenario", ImGuiTableColumnFlags_WidthStretch);
+    ImGui::TableSetupColumn("Button", ImGuiTableColumnFlags_WidthFixed);
+
+    size_t selection_id = 0;
+    for (auto scenario_reset_request : magic_enum::enum_values<types::eScenarioResetRequest>()) {
+      ImGui::TableNextColumn();
+      ImGui::Text("%s", magic_enum::enum_name(scenario_reset_request).data());
+      ImGui::TableNextColumn();
+
+      ImGui::PushID(selection_id++);
+      if (ImGui::Button("Reset")) {
+        blackboard->sim_state_blackboard->scenario_reset_request = scenario_reset_request;
+      }
+      ImGui::PopID();
+    }
+
+    ImGui::EndTable();
+  }
+
+  ImGui::End();
+}
+
 
 }
