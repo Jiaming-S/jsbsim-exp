@@ -138,7 +138,6 @@ enum class eTelemetryDeliveryStatus {
 // Info on whether hand of god external controller is active
 enum class eHandOfGodMode {
   HAND_OF_GOD_INACTIVE,
-  HAND_OF_GOD_MANUAL_CONTROL,
   HAND_OF_GOD_SCRIPT_CONTROL,
 };
 

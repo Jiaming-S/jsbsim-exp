@@ -185,4 +185,83 @@ inline void gui_camera_selection(
 }
 
 
+inline void gui_sim_state(
+  std::shared_ptr<JSBSimExpBlackboard> &blackboard,
+  ImGuiTableFlags table_flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders
+) {
+  ImGui::SetNextWindowSize(ImVec2(320, 400), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowPos(ImVec2(440, 25), ImGuiCond_FirstUseEver);
+  ImGui::Begin("Sim State");
+
+  if (ImGui::BeginTable("Sim State Info", 2, table_flags)) {
+    ImGui::TableSetupColumn("Label", ImGuiTableColumnFlags_WidthFixed);
+    ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+
+    ImGui::TableNextColumn();
+    ImGui::Text("Physics State");
+    ImGui::TableNextColumn();
+    ImGui::Text("%s", magic_enum::enum_name(blackboard->sim_state_blackboard->sim_physics_state).data());
+
+    ImGui::TableNextColumn();
+    ImGui::Text("Control Type");
+    ImGui::TableNextColumn();
+    ImGui::Text("%s", magic_enum::enum_name(blackboard->sim_state_blackboard->sim_control_type).data());
+
+    ImGui::TableNextColumn();
+    ImGui::Text("Control Type Default");
+    ImGui::TableNextColumn();
+    ImGui::Text("%s", magic_enum::enum_name(blackboard->sim_state_blackboard->sim_control_type_default).data());
+
+    ImGui::TableNextColumn();
+    ImGui::Text("Camera Type");
+    ImGui::TableNextColumn();
+    ImGui::Text("%s", magic_enum::enum_name(blackboard->sim_state_blackboard->camera_type).data());
+
+    ImGui::TableNextColumn();
+    ImGui::Text("Has Active Aircraft");
+    ImGui::TableNextColumn();
+    ImGui::Text("%s", magic_enum::enum_name(blackboard->sim_state_blackboard->has_active_aircraft).data());
+
+    ImGui::TableNextColumn();
+    ImGui::Text("Cursor Hidden");
+    ImGui::TableNextColumn();
+    ImGui::Text("%s", magic_enum::enum_name(blackboard->sim_state_blackboard->cursor_hidden).data());
+
+    ImGui::TableNextColumn();
+    ImGui::Text("Debug Views");
+    ImGui::TableNextColumn();
+    ImGui::Text("%s", magic_enum::enum_name(blackboard->sim_state_blackboard->debug_views).data());
+
+    ImGui::TableNextColumn();
+    ImGui::Text("Telemetry Mode");
+    ImGui::TableNextColumn();
+    ImGui::Text("%s", magic_enum::enum_name(blackboard->sim_state_blackboard->telemetry_mode).data());
+
+    ImGui::TableNextColumn();
+    ImGui::Text("Telemetry Delivery Status");
+    ImGui::TableNextColumn();
+    ImGui::Text("%s", magic_enum::enum_name(blackboard->sim_state_blackboard->telemetry_delivery_status).data());
+
+    ImGui::TableNextColumn();
+    ImGui::Text("Hand Of God Mode");
+    ImGui::TableNextColumn();
+    ImGui::Text("%s", magic_enum::enum_name(blackboard->sim_state_blackboard->hand_of_god_mode).data());
+
+    ImGui::TableNextColumn();
+    ImGui::Text("Hand Of God Receipt Status");
+    ImGui::TableNextColumn();
+    ImGui::Text("%s", magic_enum::enum_name(blackboard->sim_state_blackboard->hand_of_god_receipt_status).data());
+
+    ImGui::TableNextColumn();
+    ImGui::Text("Scenario Reset Request");
+    ImGui::TableNextColumn();
+    ImGui::Text("%s", magic_enum::enum_name(blackboard->sim_state_blackboard->scenario_reset_request).data());
+
+    ImGui::EndTable();
+  }
+
+  ImGui::End();
+}
+
+
 }
