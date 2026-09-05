@@ -5,6 +5,7 @@
 #include <Magnum/GL/Mesh.h>
 #include <Magnum/GL/Renderer.h>
 #include <Magnum/Math/Color.h>
+#include <Magnum/Math/Time.h>
 #include <Magnum/MeshTools/Compile.h>
 #include <Magnum/MeshTools/Copy.h>
 #include <Magnum/Platform/Sdl2Application.h>

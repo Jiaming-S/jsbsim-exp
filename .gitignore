@@ -41,3 +41,6 @@ build/
 .venv/
 venv/
 
+# Pycache
+__pycache__/
+

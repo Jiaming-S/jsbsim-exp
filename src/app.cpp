@@ -1,5 +1,5 @@
 #include "app.h"
-#include "types/types.h"
+#include "Magnum/Magnum.h"
 
 JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   : Magnum::Platform::Application{
@@ -117,8 +117,8 @@ JSBSimVisualizer::JSBSimVisualizer(const Arguments& arguments)
   // Start Magnum timeline
   _timeline.start();
   
-  // Enable VSync
-  setSwapInterval(1);
+  // Increase tickEvent() tick rate to 120Hz
+  setMinimalLoopPeriod(8333333_nsec);
 }
 
 // Tick sim and visual model
