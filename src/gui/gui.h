@@ -349,6 +349,8 @@ inline void gui_scenario_selection(
 
     size_t selection_id = 0;
     for (auto scenario_reset_request : magic_enum::enum_values<types::eScenarioResetRequest>()) {
+      if (scenario_reset_request == types::eScenarioResetRequest::NO_REQUEST) continue;
+
       ImGui::TableNextColumn();
       ImGui::Text("%s", magic_enum::enum_name(scenario_reset_request).data());
       ImGui::TableNextColumn();

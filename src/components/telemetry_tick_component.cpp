@@ -46,6 +46,14 @@ void TelemetryTickComponent::handle_dispatch() {
     };
   }
 
+  { // Telemetry for sim state
+    const bool sim_paused = blackboard->sim_state_blackboard->sim_physics_state == types::eSimPhysicsState::NORMAL;
+    
+    blackboard->telemetry_blackboard->environment_telemetry = types::EnvironmentTelemetry {
+      sim_paused
+    };
+  }
+
   { // Publish msgpack packed telemetry
     zmq::socket_t *telemetry_pub_socket = blackboard->network_blackboard->telemetry_pub_socket;
     msgpack::sbuffer sbuf = blackboard->telemetry_blackboard->pack();

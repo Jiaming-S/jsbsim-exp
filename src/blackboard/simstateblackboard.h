@@ -32,6 +32,8 @@ class SimStateBlackboard : public Blackboard {
 
     types::eScenarioResetRequest scenario_reset_request{types::eScenarioResetRequest::NO_REQUEST};
 
+    types::eSingleTickRequest single_tick_request{types::eSingleTickRequest::NO_REQUEST};
+
     // Locals
 
 };

@@ -16,11 +16,13 @@ class TelemetryBlackboard : public SerializeMixin<TelemetryBlackboard> {
     // Outputs
     std::vector<types::AircraftHandleTelemetry> aircraft_handle_telemetry{};
     types::InputTelemetry input_telemetry{};
+    types::EnvironmentTelemetry environment_telemetry{};
 
     // Local
 
     MSGPACK_DEFINE(
       aircraft_handle_telemetry,
-      input_telemetry
+      input_telemetry,
+      environment_telemetry
     );
 };

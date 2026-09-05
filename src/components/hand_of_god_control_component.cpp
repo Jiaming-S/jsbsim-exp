@@ -12,11 +12,21 @@ void HandOfGodControlComponent::handle_dispatch() {
 
   { // Apply environment controls
     const types::EnvironmentControlsHandOfGod hog_environment_controls = blackboard->hand_of_god_blackboard->hog_environment_controls;
-    if (hog_environment_controls.sim_reset) {
-      blackboard->sim_state_blackboard->scenario_reset_request = types::eScenarioResetRequest::REQUEST_RESET_TO_FREE_FLIGHT;
-    }
+    
     if (hog_environment_controls.sim_pause) {
-      // TODO: make sim_pause a blackboard request param, handled by physics_pause_component
+      blackboard->sim_state_blackboard->sim_physics_state = types::eSimPhysicsState::PAUSED;
+    }
+    if (hog_environment_controls.sim_resume) {
+      blackboard->sim_state_blackboard->sim_physics_state = types::eSimPhysicsState::NORMAL;
+    }
+    // Note: sim_tick_component runs on the same tick loop as hand_of_god_control_component
+    if (hog_environment_controls.sim_step_physics_once) {
+      // Force paused physics if not already
+      blackboard->sim_state_blackboard->sim_physics_state = types::eSimPhysicsState::PAUSED;
+      blackboard->sim_state_blackboard->single_tick_request = types::eSingleTickRequest::REQUEST_TICK;
+    }
+    if (hog_environment_controls.sim_reset_to_free_flight) {
+      blackboard->sim_state_blackboard->scenario_reset_request = types::eScenarioResetRequest::REQUEST_RESET_TO_FREE_FLIGHT;
     }
   }
 

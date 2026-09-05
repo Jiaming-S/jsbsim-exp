@@ -157,6 +157,12 @@ enum class eScenarioResetRequest {
   REQUEST_RESET_TO_FREE_FLIGHT,
 };
 
+// Info on whether we request a single jsbsim tick
+enum class eSingleTickRequest {
+  NO_REQUEST,
+  REQUEST_TICK,
+};
+
 
 // Telemetry Blackboard types
 
@@ -210,21 +216,31 @@ struct InputTelemetry {
   );
 };
 
+// Telemetry for sim state info
+struct EnvironmentTelemetry {
+  bool sim_paused;
+  
+  MSGPACK_DEFINE(
+    sim_paused
+  );
+};
+
 
 // Hand of God Blackboard Types
 
 // Hand of god controls for simulation environment 
 struct EnvironmentControlsHandOfGod {
-  bool sim_reset;
   bool sim_pause;
+  bool sim_resume;
+  bool sim_step_physics_once;
+  bool sim_reset_to_free_flight;
 
   MSGPACK_DEFINE(
-    sim_reset,
-    sim_pause
+    sim_pause,
+    sim_resume,
+    sim_step_physics_once,
+    sim_reset_to_free_flight
   );
 };
-
-
-//
 
 };

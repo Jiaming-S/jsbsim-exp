@@ -87,6 +87,7 @@ AircraftHandle& AircraftHandle::link_trails(
   types::Object3D& object,
   Magnum::SceneGraph::DrawableGroup3D& drawables
 ) {
+  assert(_visual_root_object);
   new drawn::TrailDrawable{
     object,
     drawables,

@@ -74,17 +74,21 @@ void KeyboardInputComponent::handle_dispatch() {
     blackboard->camera_blackboard->camera_translation_speed = camera_translation_speed_default;
   }
 
-  // Reset
-  blackboard->input_blackboard->commanded_camera_translation = {0.0, 0.0, 0.0};
-  blackboard->input_blackboard->commanded_camera_pitch = 0.0;
-  blackboard->input_blackboard->commanded_camera_yaw = 0.0;
-  blackboard->input_blackboard->commanded_camera_roll = 0.0;
+  // Don't reset aircraft commands if hand of god is commanding
+  if (blackboard->sim_state_blackboard->hand_of_god_mode != types::eHandOfGodMode::HAND_OF_GOD_SCRIPT_CONTROL) {
+    blackboard->input_blackboard->commanded_aircraft_throttle = 0.0;
+    blackboard->input_blackboard->commanded_aircraft_braking = 0.0;
+    blackboard->input_blackboard->commanded_aircraft_pitch = 0.0;
+    blackboard->input_blackboard->commanded_aircraft_yaw = 0.0;
+    blackboard->input_blackboard->commanded_aircraft_roll = 0.0;
+  }
 
-  blackboard->input_blackboard->commanded_aircraft_throttle = 0.0;
-  blackboard->input_blackboard->commanded_aircraft_braking = 0.0;
-  blackboard->input_blackboard->commanded_aircraft_pitch = 0.0;
-  blackboard->input_blackboard->commanded_aircraft_yaw = 0.0;
-  blackboard->input_blackboard->commanded_aircraft_roll = 0.0;
+  { // Reset camera commands 
+    blackboard->input_blackboard->commanded_camera_translation = {0.0, 0.0, 0.0};
+    blackboard->input_blackboard->commanded_camera_pitch = 0.0;
+    blackboard->input_blackboard->commanded_camera_yaw = 0.0;
+    blackboard->input_blackboard->commanded_camera_roll = 0.0;
+  }
 
   // Controlling camera
   if (sim_control_type == types::eSimControlType::CAMERA) {
