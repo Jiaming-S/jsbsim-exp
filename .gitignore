@@ -36,3 +36,8 @@ testing.ipynb
 
 # Build directory
 build/
+
+# Virtual Environments
+.venv/
+venv/
+
