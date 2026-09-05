@@ -28,6 +28,8 @@ void perform_sim_reset(std::shared_ptr<JSBSimExpBlackboard> &blackboard) {
     blackboard->sim_state_blackboard->has_active_aircraft = types::eAircraftActive::NO_ACTIVE;
     blackboard->sim_state_blackboard->sim_control_type = types::eSimControlType::CAMERA;
     blackboard->sim_state_blackboard->sim_control_type_default = types::eSimControlType::CAMERA;
+    blackboard->sim_state_blackboard->sim_physics_state = types::eSimPhysicsState::PAUSED;                                                                                                
+    blackboard->sim_state_blackboard->single_tick_request = types::eSingleTickRequest::NO_REQUEST; 
 
     // Reset commanded aircraft controls
     blackboard->input_blackboard->commanded_aircraft_throttle = 0.0f;
@@ -38,6 +40,14 @@ void perform_sim_reset(std::shared_ptr<JSBSimExpBlackboard> &blackboard) {
     
     // Clear telemetry
     blackboard->telemetry_blackboard->aircraft_handle_telemetry.clear();
+
+    // Reset lingering hand of god controls
+    blackboard->hand_of_god_blackboard->hog_controlled_aircraft_index = 0;                                                                                                                
+    blackboard->hand_of_god_blackboard->hog_pitch = 0.0f;                                                                                                                                 
+    blackboard->hand_of_god_blackboard->hog_roll = 0.0f;                                                                                                                                  
+    blackboard->hand_of_god_blackboard->hog_yaw = 0.0f;                                                                                                                                   
+    blackboard->hand_of_god_blackboard->hog_throttle = 0.0f;                                                                                                                              
+    blackboard->hand_of_god_blackboard->hog_environment_controls = {}; 
   }
 }
 

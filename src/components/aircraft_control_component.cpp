@@ -6,9 +6,8 @@ void AircraftControlComponent::quit() {}
 
 /// Move aircraft depending on human input
 void AircraftControlComponent::handle_dispatch() {
-  // Check for whether there's an active aircraft, and whether we are in the correct control mode
-  if (blackboard->sim_state_blackboard->has_active_aircraft != types::eAircraftActive::HAS_ACTIVE ||
-      blackboard->sim_state_blackboard->sim_control_type != types::eSimControlType::MODEL) {
+  // Check for whether there's an active aircraft
+  if (blackboard->sim_state_blackboard->has_active_aircraft != types::eAircraftActive::HAS_ACTIVE) {
     return;
   }
   

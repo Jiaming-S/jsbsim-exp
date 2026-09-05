@@ -126,6 +126,9 @@ void JSBSimVisualizer::tickEvent() {
   // Listen for potential scenario reset requests (always runs once on startup)
   _scenario_control_component.handle_dispatch();
 
+  // Apply any input on aircraft
+  _aircraft_control_component.handle_dispatch();
+
   // Tick jsbsim
   _sim_tick_component.handle_dispatch();
 
@@ -164,8 +167,8 @@ void JSBSimVisualizer::drawEvent() {
   // Check if an external process has provided input
   _foreign_input_component.handle_dispatch();
 
-  // Apply input on aircraft and camera
-  _aircraft_control_component.handle_dispatch();
+  // Apply input on camera
+  // Note: _aircraft_control_component moved to tick loop for deterministic execution with hand of god
   _camera_control_component.handle_dispatch();
 
   // Draw camera
